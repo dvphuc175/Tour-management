@@ -1,7 +1,9 @@
 const express = require('express')
 const path = require('path');
+require('dotenv').config();
+require('./config/database');
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000;
 
 //Thiết lập views
 app.set('views', path.join(__dirname,"views"))
@@ -21,5 +23,5 @@ app.get('/tours', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+    console.log(`Server đang chạy tại: http://localhost:${port}`);
+});
