@@ -1,0 +1,36 @@
+extends ../../admin/layout
+
+block content
+  .form-card
+    -
+      const isEdit   = category != null
+      const action   = isEdit ? `/admin/categories/${category.id}?_method=PUT` : '/admin/categories'
+      const btnLabel = isEdit ? 'Cập nhật' : 'Thêm mới'
+
+    form(action=action method="POST")
+      .form-group
+        label Tên danh mục
+        input.form-control(
+          type="text" name="name"
+          value=category ? category.name : ''
+          placeholder="Ví dụ: Biển đảo"
+          required
+        )
+      .form-group
+        label Mô tả
+        textarea.form-control(
+          name="description"
+          rows="3"
+          placeholder="Mô tả ngắn về danh mục..."
+        )= category ? category.description : ''
+
+      if isEdit
+        .form-group
+          label Trạng thái
+          select.form-control(name="status")
+            option(value="active"   selected=category.status === 'active') Hiển thị
+            option(value="hidden"   selected=category.status === 'hidden') Ẩn
+
+      .form-actions
+        button.btn.btn--primary(type="submit")= btnLabel
+        a.btn.btn--outline(href="/admin/categories") Hủy

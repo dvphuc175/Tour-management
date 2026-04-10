@@ -1,0 +1,29 @@
+extends ../layout
+
+block content
+  .auth-page
+    .auth-card
+      .auth-card__header
+        h1.auth-card__title Đăng nhập
+        p.auth-card__sub Chào mừng bạn trở lại
+
+      form.auth-form(action="/login" method="POST")
+        .form-group
+          label(for="email") Email
+          input#email.form-control(
+            type="email" name="email"
+            placeholder="example@email.com"
+            required autocomplete="email"
+          )
+        .form-group
+          label(for="password") Mật khẩu
+          input#password.form-control(
+            type="password" name="password"
+            placeholder="Nhập mật khẩu"
+            required
+          )
+        button.btn.btn--primary.btn--block(type="submit") Đăng nhập
+
+      .auth-card__footer
+        | Chưa có tài khoản?&nbsp;
+        a(href="/register") Đăng ký ngay

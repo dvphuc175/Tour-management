@@ -11,7 +11,11 @@ nav.navbar
       span.navbar__user Xin chào, #{user.fullname}
       if user.role === 'admin'
         a(href="/admin") Admin
-      a(href="/logout") Đăng xuất
+      form(action="/logout?_method=DELETE" method="POST" style="display:inline")
+        button.btn.btn--outline.btn--sm(type="submit") Đăng xuất
     else
       a(href="/login") Đăng nhập
       a.btn.btn--primary(href="/register") Đăng ký
+
+
+    

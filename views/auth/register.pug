@@ -1,0 +1,49 @@
+extends ../layout
+
+block content
+  .auth-page
+    .auth-card
+      .auth-card__header
+        h1.auth-card__title Đăng ký tài khoản
+        p.auth-card__sub Tham gia để đặt tour dễ dàng hơn
+
+      form.auth-form(action="/register" method="POST")
+        .form-group
+          label(for="fullname") Họ và tên
+          input#fullname.form-control(
+            type="text" name="fullname"
+            placeholder="Nguyễn Văn A"
+            required
+          )
+        .form-group
+          label(for="email") Email
+          input#email.form-control(
+            type="email" name="email"
+            placeholder="example@email.com"
+            required
+          )
+        .form-group
+          label(for="phone") Số điện thoại
+          input#phone.form-control(
+            type="tel" name="phone"
+            placeholder="0901234567"
+          )
+        .form-group
+          label(for="password") Mật khẩu
+          input#password.form-control(
+            type="password" name="password"
+            placeholder="Ít nhất 6 ký tự"
+            required minlength="6"
+          )
+        .form-group
+          label(for="confirmPassword") Xác nhận mật khẩu
+          input#confirmPassword.form-control(
+            type="password" name="confirmPassword"
+            placeholder="Nhập lại mật khẩu"
+            required
+          )
+        button.btn.btn--primary.btn--block(type="submit") Tạo tài khoản
+
+      .auth-card__footer
+        | Đã có tài khoản?&nbsp;
+        a(href="/login") Đăng nhập

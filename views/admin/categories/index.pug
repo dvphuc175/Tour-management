@@ -1,0 +1,38 @@
+extends ../../admin/layout
+
+block content
+  .page-actions
+    a.btn.btn--primary(href="/admin/categories/create") + Thêm danh mục
+
+  .table-wrap
+    table.data-table
+      thead
+        tr
+          th #
+          th Tên danh mục
+          th Slug
+          th Mô tả
+          th Trạng thái
+          th Thao tác
+      tbody
+        if categories.length === 0
+          tr
+            td(colspan="6" style="text-align:center;padding:32px;color:#9ca3af") Chưa có danh mục nào
+        each cat, i in categories
+          tr
+            td= i + 1
+            td: strong= cat.name
+            td: code= cat.slug
+            td= cat.description || '—'
+            td
+              span(class=`badge badge--${cat.status}`)
+                = cat.status === 'active' ? 'Hiển thị' : 'Ẩn'
+            td.action-btns
+              a.btn.btn--outline.btn--sm(href=`/admin/categories/${cat.id}/edit`) Sửa
+              form(
+                action=`/admin/categories/${cat.id}?_method=DELETE`
+                method="POST"
+                data-confirm="Xóa danh mục này? Tours thuộc danh mục sẽ không bị xóa."
+                style="display:inline"
+              )
+                button.btn.btn--danger.btn--sm(type="submit") Xóa
