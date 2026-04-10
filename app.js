@@ -50,6 +50,8 @@ app.get('/admin', (req, res) => {
   });
 });
 
+app.use('/', require('./routes/auth'));
+app.use('/admin', require('./routes/admin'));
 //404 handler
 app.use((req, res) => { 
   res.status(404).render('404', { title: 'Không tìm thấy trang' }); 
