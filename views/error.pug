@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  .error-page
+    h1.error-page__code 500
+    h2.error-page__title Có lỗi xảy ra
+    p.error-page__desc= message || 'Lỗi máy chủ, vui lòng thử lại sau.'
+    a.btn.btn--primary(href="/") Về trang chủ

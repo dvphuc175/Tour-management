@@ -36,24 +36,27 @@ app.use((req, res, next) => {
     res.locals.success = req.flash('success'); 
     res.locals.error = req.flash('error'); 
     res.locals.user = req.session.user || null; 
+    res.locals.currentPath = req.path;
     next(); });
+
 //Routes (Sẽ thêm dần từ tuần 2)
 app.get('/', (req, res) => {
-  res.render("client/pages/home"), 
-  {pageTitle: "Trang chủ"}
-})
+  res.render('index', { title: 'Trang chủ' });
+});
 
-app.get('/tours', (req, res) => {
-  res.render("client/pages/tour-list"),
-  {pageTitle: "Danh sách tour"}
-})
+app.get('/admin', (req, res) => {
+  res.render('admin/dashboard', {
+    title: 'Dashboard',
+  });
+});
 
 //404 handler
 app.use((req, res) => { 
   res.status(404).render('404', { title: 'Không tìm thấy trang' }); 
 });
 //Error handler
-app.use((err, req, res, next) => { console.error(err.stack); res.status(500).render('error', { message: err.message }); 
+app.use((err, req, res, next) => { 
+  console.error(err.stack); res.status(500).render('error', { message: err.message }); 
 });
 
 const PORT = process.env.PORT || 3000; 
