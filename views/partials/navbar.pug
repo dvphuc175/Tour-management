@@ -1,0 +1,17 @@
+nav.navbar
+  .navbar__brand
+    a(href="/") Vi Vu Việt Nam
+
+  .navbar__menu
+    a(href="/tours") Khám phá tour
+    a(href="/") Liên hệ
+
+  .navbar__auth
+    if user
+      span.navbar__user Xin chào, #{user.fullname}
+      if user.role === 'admin'
+        a(href="/admin") Admin
+      a(href="/logout") Đăng xuất
+    else
+      a(href="/login") Đăng nhập
+      a.btn.btn--primary(href="/register") Đăng ký

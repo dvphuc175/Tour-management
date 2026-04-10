@@ -1,0 +1,20 @@
+aside.admin-sidebar
+  .sidebar__logo
+    a(href="/admin") &#9992; Tour Admin
+
+  nav.sidebar__nav
+    a(href="/admin" class=currentPath === '/admin' ? 'active' : '')
+      | Dashboard
+    a(href="/admin/tours" class=(currentPath && currentPath.startsWith('/admin/tours')) ? 'active' : '')
+      | Quản lý tour & lịch trình
+    a(href="/admin/categories" class=(currentPath && currentPath.startsWith('/admin/categories')) ? 'active' : '')
+      | Danh mục
+    a(href="/admin/bookings" class=(currentPath && currentPath.startsWith('/admin/bookings')) ? 'active' : '')
+      | Đơn đặt tour
+    a(href="/admin/users" class=(currentPath && currentPath.startsWith('/admin/users')) ? 'active' : '')
+      | Người dùng
+    a(href="/admin/reports")
+      | Báo cáo
+    hr
+    a(href="/") Xem trang web
+    a(href="/logout") Đăng xuất
