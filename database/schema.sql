@@ -18,6 +18,7 @@ CREATE TABLE CATEGORIES (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
     status ENUM('active','hidden') DEFAULT 'active'
 );
 
@@ -28,8 +29,8 @@ CREATE TABLE TOURS (
     name VARCHAR(200) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
-    price_adult DECIMAL(10, 2) NOT NULL,
-    price_child DECIMAL(10, 2) NOT NULL,
+    price_adult DECIMAL(12, 0) NOT NULL,
+    price_child DECIMAL(12, 0) NOT NULL,
     images TEXT, -- Lưu dạng JSON mảng URL ảnh
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES CATEGORIES(id) ON DELETE SET NULL
@@ -55,10 +56,10 @@ CREATE TABLE BOOKINGS (
     schedule_id INT NOT NULL,
     contact_name VARCHAR(100) NOT NULL,
     contact_email VARCHAR(100) NOT NULL,
-    contact_phone VARCHAR(100) NOT NULL,
+    contact_phone VARCHAR(20) NOT NULL,
     adult_count INT DEFAULT 1,
     child_count INT DEFAULT 0,
-    total_price DECIMAL(12, 2) NOT NULL,
+    total_price DECIMAL(12, 0) NOT NULL,
     special_request TEXT,
     status ENUM('pending', 'confirmed', 'cancelled','completed') DEFAULT 'pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -70,7 +71,7 @@ CREATE TABLE BOOKINGS (
 CREATE TABLE PAYMENTS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
-    amount DECIMAL(12,2) NOT NULL,
+    amount DECIMAL(12,0) NOT NULL,
     method ENUM('vnpay', 'cash') NOT NULL,
     status ENUM('pending', 'success', 'failed') DEFAULT 'pending',
     transaction_id VARCHAR(100),
