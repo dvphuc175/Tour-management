@@ -65,8 +65,12 @@ const AuthController = {
         req.flash('error', 'Mật khẩu xác nhận không khớp');
         return res.redirect('/register');
       }
-      if (password.length < 6) {
-        req.flash('error', 'Mật khẩu phải có ít nhất 6 ký tự');
+      if (password.length < 8) {
+        req.flash('error', 'Mật khẩu phải có ít nhất 8 ký tự');
+        return res.redirect('/register');
+      }
+      if (password.length > 72) {
+        req.flash('error', 'Mật khẩu chỉ được tối đa 72 ký tự');
         return res.redirect('/register');
       }
 
