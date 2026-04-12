@@ -30,7 +30,6 @@ const AuthController = {
         return res.redirect('/login');
       }
 
-      // Lưu vào session (KHÔNG lưu password)
       req.session.user = {
         id:       user.id,
         fullname: user.fullname,
@@ -57,37 +56,69 @@ const AuthController = {
 
   // POST /register
   async register(req, res) {
-    try {
-      const { fullname, email, password, confirmPassword, phone } = req.body;
+  try {
+    const { fullname, email, password, confirmPassword, phone } = req.body;
 
-      // Validate cơ bản phía server
-      if (password !== confirmPassword) {
-        req.flash('error', 'Mật khẩu xác nhận không khớp');
-        return res.redirect('/register');
-      }
-      if (password.length < 6) {
-        req.flash('error', 'Mật khẩu phải có ít nhất 6 ký tự');
-        return res.redirect('/register');
-      }
+    // Regex
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^0\d{9}$/;
 
-      // Kiểm tra email đã tồn tại chưa
-      const existing = await UserModel.findByEmail(email);
-      if (existing) {
-        req.flash('error', 'Email này đã được đăng ký');
-        return res.redirect('/register');
-      }
-
-      const hashed = await bcrypt.hash(password, 10);
-      await UserModel.create({ fullname, email, password: hashed, phone });
-
-      req.flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
-      res.redirect('/login');
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).render('error', { message: err.message });
+    // Validate fullname
+    if (!fullname || fullname.trim() === "") {
+      req.flash('error', 'Họ tên không được để trống');
+      return res.redirect('/register');
     }
-  },
+
+    // Validate email
+    if (!emailRegex.test(email)) {
+      req.flash('error', 'Email không hợp lệ');
+      return res.redirect('/register');
+    }
+
+    // Check email tồn tại
+    const existing = await UserModel.findByEmail(email);
+    if (existing) {
+      req.flash('error', 'Email này đã được đăng ký');
+      return res.redirect('/register');
+    }
+
+    // Validate phone
+    if (phone && !phoneRegex.test(phone)) {
+      req.flash('error', 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+      return res.redirect('/register');
+    }
+    
+    // Validate password
+    if (!passwordRegex.test(password)) {
+      req.flash('error', 'Mật khẩu phải 8-16 ký tự, gồm chữ và số');
+      return res.redirect('/register');
+    }
+
+    // Confirm password
+    if (password !== confirmPassword) {
+      req.flash('error', 'Mật khẩu xác nhận không khớp');
+      return res.redirect('/register');
+    }
+    // Hash password
+    const hashed = await bcrypt.hash(password, 10);
+
+    // Create user
+    await UserModel.create({
+      fullname: fullname.trim(),
+      email,
+      password: hashed,
+      phone
+    });
+
+    req.flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
+    res.redirect('/login');
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('error', { message: err.message });
+  }
+},
 
   // DELETE /logout  (method-override)
   logout(req, res) {

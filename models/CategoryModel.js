@@ -6,6 +6,15 @@ const CategoryModel = {
     return query('SELECT * FROM CATEGORIES ORDER BY name ASC');
   },
 
+  async totalCategory() {
+    const result = await query('SELECT COUNT(*) as total FROM CATEGORIES');
+    return result[0].total;
+  },
+
+  async pageCategory(limit, offset) {
+    return query(`SELECT * FROM CATEGORIES ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`);
+  },
+
   async getActive() {
     return query("SELECT * FROM CATEGORIES WHERE status = 'active' ORDER BY name ASC");
   },

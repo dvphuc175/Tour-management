@@ -11,20 +11,19 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     timezone: 'Asia/Ho_Chi_Minh' 
 });
-// Helper dùng cho toàn bộ dự án 
-// Luôn dùng ? placeholder — KHÔNG bao giờ nối chuỗi SQL
+
 async function query(sql, params = []) { 
     const [rows] = await pool.execute(sql, params); 
     return rows; }
-// Dùng cho transaction (booking + trừ slots) 
+
 async function getConnection() { 
     return pool.getConnection(); } 
 // Test connection
 pool.getConnection()
      .then(() => 
-        console.log('✓ MySQL connected')) 
+        console.log('MySQL connected')) 
      .catch(err => 
-        console.error('✗ MySQL error:', err.message));
+        console.error('MySQL error:', err.message));
 
 module.exports = { query, getConnection, pool };
 

@@ -19,7 +19,8 @@ CREATE TABLE CATEGORIES (
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    status ENUM('active','hidden') DEFAULT 'active'
+    status ENUM('active','hidden') DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. Bảng TOURS

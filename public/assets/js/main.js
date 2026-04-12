@@ -23,7 +23,7 @@ if (passwordInput) {
   const hintSpecial = document.getElementById('hint-special');
 
   function checkPasswordStrength(password) {
-    const hasLength = password.length >= 6 && password.length <= 18;
+    const hasLength = password.length >= 8 && password.length <= 16;
     const hasNumber = /\d/.test(password);
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);

@@ -1,14 +1,22 @@
 const CategoryModel = require('../models/CategoryModel');
 const { makeSlug }   = require('../helpers/slug');
-
 const CategoryController = {
   // GET /admin/categories
   async index(req, res, next) {
     try {
-      const categories = await CategoryModel.getAll();
+      
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5; 
+      const offset = (page - 1) * limit;
+
+      const totalCategories = await CategoryModel.totalCategory();
+      const totalPages = Math.ceil(totalCategories / limit);
+      const categories = await CategoryModel.pageCategory(limit, offset);
+      
       res.render('admin/categories/index', {
         title: 'Quản lý danh mục', categories,
-        currentPath: req.path
+        currentPage: page,
+        totalPages: totalPages
       });
     } catch (err) { next(err); }
   },
