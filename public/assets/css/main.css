@@ -173,7 +173,106 @@ h1,h2,h3,h4,h5 {
 .form-control:focus { 
     outline: none; 
     border-color: var(--color-primary); 
-} 
+}
+
+/* ── Password Toggle ────────────────────── */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-control {
+  padding-right: 42px;
+}
+
+/* Button toggle */
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-text-muted);
+  border-radius: 50%;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover + focus */
+.password-toggle:hover {
+  color: var(--color-primary);
+  background: rgba(0, 87, 184, 0.08);
+}
+
+.password-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Icon base */
+.password-toggle .icon-eye {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+/* Eye outline */
+.password-toggle .icon-eye::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 13px;
+  border: 1.6px solid currentColor;
+  border-radius: 50% / 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Pupil */
+.password-toggle .icon-eye::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== CLOSED STATE ===== */
+.password-toggle.active .icon-eye::after {
+  opacity: 0;
+}
+
+/* Slash */
+.password-toggle.active::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-40deg);
+}
+
+/* Animation smooth */
+.password-toggle .icon-eye::after,
+.password-toggle.active::after {
+  transition: all 0.2s ease;
+}
+
 /* ── Error pages ────────────────────────── */ 
 .error-page { 
     text-align: center; 
@@ -253,6 +352,18 @@ h1,h2,h3,h4,h5 {
   color: var(--color-success);
 }
 
+/* ── Password hide toggle default ──────────────────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Chrome */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
 /* ── Password Strength ──────────────────── */
 .password-strength {
   margin-top: 8px;

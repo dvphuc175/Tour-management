@@ -66,3 +66,24 @@ if (passwordInput) {
     checkPasswordStrength(e.target.value);
   });
 }
+
+// Password visibility toggle
+document.querySelectorAll('.password-toggle').forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    const wrapper = toggle.closest('.password-input-wrapper');
+    const input = wrapper.querySelector('input[type="password"], input[type="text"]');
+    
+    if (!input) return;
+    
+    // Toggle input type between password and text
+    if (input.type === 'password') {
+      input.type = 'text';
+      toggle.classList.add('active');
+    } else {
+      input.type = 'password';
+      toggle.classList.remove('active');
+    }
+  });
+});
