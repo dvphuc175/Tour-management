@@ -8,40 +8,63 @@ block content
         p.auth-card__sub Tham gia để đặt tour dễ dàng hơn
 
       form.auth-form(action="/register" method="POST")
-        .form-group
-          label(for="fullname") Họ và tên
-          input#fullname.form-control(
-            type="text" name="fullname"
-            placeholder="Nguyễn Văn A"
-            required
-          )
-        .form-group
-          label(for="email") Email
-          input#email.form-control(
-            type="email" name="email"
-            placeholder="example@email.com"
-            required
-          )
+        .form-row
+          .form-group.form-group--half
+            label(for="fullname") 
+              | Họ và tên
+              span.required *
+            input#fullname.form-control(
+              type="text" name="fullname"
+              placeholder="Nguyễn Văn A"
+              required
+            )
+          .form-group.form-group--half
+            label(for="email") 
+              | Email
+              span.required *
+            input#email.form-control(
+              type="email" name="email"
+              placeholder="example@email.com"
+              required
+            )
         .form-group
           label(for="phone") Số điện thoại
           input#phone.form-control(
             type="tel" name="phone"
-            placeholder="0901234567"
+            placeholder="Nhập số điện thoại"
           )
         .form-group
-          label(for="password") Mật khẩu
-          input#password.form-control(
-            type="password" name="password"
-            placeholder="Ít nhất 8 ký tự"
-            required minlength="8"
-          )
+          label(for="password") 
+            | Mật khẩu
+            span.required *
+          .password-input-wrapper
+            input#password.form-control(
+              type="password" name="password"
+              placeholder="Nhập mật khẩu"
+              required minlength="8"
+            )
+            button.password-toggle(type="button" aria-label="Hiển thị/ẩn mật khẩu")
+              i.icon-eye
+          .password-strength
+            .password-strength__bar
+              .password-strength__progress(id="passwordBar")
+          .form-hint
+            p Từ 8 - 16 ký tự
+            ul
+              li#hint-length Ít nhất phải bao gồm cả chữ số, chữ cái.
+              li#hint-special Có thể bao gồm ký tự đặc biệt
         .form-group
-          label(for="confirmPassword") Xác nhận mật khẩu
-          input#confirmPassword.form-control(
-            type="password" name="confirmPassword"
-            placeholder="Nhập lại mật khẩu"
-            required
-          )
+          label(for="confirmPassword") 
+            | Xác nhận mật khẩu
+            span.required *
+          .password-input-wrapper
+            input#confirmPassword.form-control(
+              type="password" name="confirmPassword"
+              placeholder="Nhập lại mật khẩu"
+              required
+            )
+            button.password-toggle(type="button" aria-label="Hiển thị/ẩn mật khẩu")
+              i.icon-eye
         button.btn.btn--primary.btn--block(type="submit") Tạo tài khoản
 
       .auth-card__footer
