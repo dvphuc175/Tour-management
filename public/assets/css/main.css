@@ -8,7 +8,8 @@
         --color-bg-soft: #f8f9fa; 
         --color-border: #e5e7eb; 
         --color-success: #16a34a; 
-        --color-danger: #dc2626; 
+        --color-danger: #dc2626;
+        --color-danger-soft: #dc5f5f;  
         --color-warning: #d97706; 
         --font-body: 'Be Vietnam Pro', sans-serif; 
         --font-heading: 'Sora', sans-serif; 
@@ -33,6 +34,10 @@ body {
     color: var(--color-text); 
     background: var(--color-bg); 
     line-height: 1.6; 
+}
+/* ── Title ─────────────────────────── */ 
+.title{
+  text-transform: uppercase;
 } 
 img { 
     max-width: 100%; 
@@ -150,6 +155,10 @@ h1,h2,h3,h4,h5 {
     font-weight: 500; 
     margin-bottom: 6px; 
     color: var(--color-text); 
+}
+.form-group label .required {
+    color: var(--color-danger);
+    margin-left: 4px;
 } 
 .form-control { 
     width: 100%; 
@@ -165,7 +174,118 @@ h1,h2,h3,h4,h5 {
 .form-control:focus { 
     outline: none; 
     border-color: var(--color-primary); 
-} 
+}
+
+/* ── Password hide toggle default ──────────────────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Chrome */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+/* ── Password Toggle ────────────────────── */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-control {
+  padding-right: 42px;
+}
+
+/* Button toggle */
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-text-muted);
+  border-radius: 50%;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover + focus */
+.password-toggle:hover {
+  color: var(--color-primary);
+  background: rgba(0, 87, 184, 0.08);
+}
+
+.password-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Icon base */
+.password-toggle .icon-eye {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+/* Eye outline */
+.password-toggle .icon-eye::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 13px;
+  border: 1.6px solid currentColor;
+  border-radius: 50% / 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Pupil */
+.password-toggle .icon-eye::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== CLOSED STATE ===== */
+.password-toggle.active .icon-eye::after {
+  opacity: 0;
+}
+
+/* Slash */
+.password-toggle.active::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-40deg);
+}
+
+/* Animation smooth */
+.password-toggle .icon-eye::after,
+.password-toggle.active::after {
+  transition: all 0.2s ease;
+}
+
 /* ── Error pages ────────────────────────── */ 
 .error-page { 
     text-align: center; 
@@ -193,15 +313,15 @@ h1,h2,h3,h4,h5 {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--color-bg-soft);
+  background: var(--color-bg);
 }
 .auth-card {
-  background: var(--color-bg);
+  background: var(--color-bg-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: 40px;
   width: 100%;
-  max-width: 420px;
+  max-width: 620px;
 }
 .auth-card__header { text-align: center; margin-bottom: 28px; }
 .auth-card__title  { font-size: 24px; margin-bottom: 6px; }
@@ -214,5 +334,79 @@ h1,h2,h3,h4,h5 {
 }
 .auth-card__footer a { color: var(--color-primary); font-weight: 500; }
 .auth-form { display: flex; flex-direction: column; gap: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group--half { grid-column: auto; }
 .btn--block { width: 100%; text-align: center; margin-top: 8px; padding: 12px; font-size: 15px; }
+
+/* ── Form hints ────────────────────────── */
+.form-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 5px;
+}
+.form-hint ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 4px 0 0 0;
+}
+.form-hint li {
+  padding: 2px 0;
+  margin-left: 0;
+}
+.form-hint li::before {
+  content: "• ";
+  margin-right: 6px;
+}
+.form-hint--error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+.form-hint--success {
+  color: var(--color-success);
+}
+
+
+/* ── Password Strength ──────────────────── */
+.password-strength {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.password-strength__bar {
+  width: 100%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.password-strength__progress {
+  height: 100%;
+  width: 0;
+  background: var(--color-danger);
+  transition: width 0.3s, background-color 0.3s;
+}
+.password-strength__progress.weak {
+  width: 33%;
+  background: var(--color-danger);
+}
+.password-strength__progress.medium {
+  width: 66%;
+  background: var(--color-warning);
+}
+.password-strength__progress.strong {
+  width: 100%;
+  background: var(--color-success);
+}
+
+/* ── Form Hint States ──────────────────– */
+.form-hint li {
+  transition: color 0.3s;
+}
+.form-hint li.checked {
+  color: var(--color-success);
+  font-weight: 500;
+}
+.form-hint li.checked::before {
+  content: "✓ ";
+  color: var(--color-success);
+}
 
