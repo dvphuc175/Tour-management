@@ -8,7 +8,8 @@
         --color-bg-soft: #f8f9fa; 
         --color-border: #e5e7eb; 
         --color-success: #16a34a; 
-        --color-danger: #dc2626; 
+        --color-danger: #dc2626;
+        --color-danger-soft: #dc5f5f;  
         --color-warning: #d97706; 
         --font-body: 'Be Vietnam Pro', sans-serif; 
         --font-heading: 'Sora', sans-serif; 
@@ -175,6 +176,18 @@ h1,h2,h3,h4,h5 {
     border-color: var(--color-primary); 
 }
 
+/* ── Password hide toggle default ──────────────────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Chrome */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
 /* ── Password Toggle ────────────────────── */
 .password-input-wrapper {
   position: relative;
@@ -352,18 +365,7 @@ h1,h2,h3,h4,h5 {
   color: var(--color-success);
 }
 
-/* ── Password hide toggle default ──────────────────── */
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
 
-/* Chrome */
-input[type="password"]::-webkit-credentials-auto-fill-button {
-  visibility: hidden;
-  display: none !important;
-  pointer-events: none;
-}
 /* ── Password Strength ──────────────────── */
 .password-strength {
   margin-top: 8px;
