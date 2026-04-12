@@ -37,6 +37,14 @@ const CategoryController = {
         req.flash('error', 'Tên danh mục không được để trống');
         return res.redirect('/admin/categories/create');
       }
+      if (name.length < 3 ||  name.length > 30) {
+        req.flash('error', 'Tên danh mục chỉ cho phép 3-30 kí tự');
+        return res.redirect(`/admin/categories/create`);
+      }
+      if (description.length > 50) {
+        req.flash('error', 'Mô tả vượt quá kí tự cho phép (0-50)');
+        return res.redirect('/admin/categories/create');
+      }
       const slug = makeSlug(name);
       const exists = await CategoryModel.isSlugExists(slug);
       if (exists) {
@@ -45,7 +53,9 @@ const CategoryController = {
       }
       await CategoryModel.create({ name: name.trim(), description });
       req.flash('success', 'Thêm danh mục thành công');
-      res.redirect('/admin/categories');
+      req.session.save(() => {
+        res.redirect('/admin/categories');
+      });
     } catch (err) { next(err); }
   },
 
@@ -73,6 +83,14 @@ const CategoryController = {
         req.flash('error', 'Tên danh mục không được để trống');
         return res.redirect(`/admin/categories/${id}/edit`);
       }
+      if (name.length < 3 ||  name.length > 30) {
+        req.flash('error', 'Tên danh mục chỉ cho phép 3-30 kí tự');
+        return res.redirect(`/admin/categories/${id}/edit`);
+      }
+      if (description.length > 50) {
+        req.flash('error', 'Mô tả vượt quá kí tự cho phép (0-50)');
+        return res.redirect(`/admin/categories/${id}/edit`);
+      }
       const slug   = makeSlug(name);
       const exists = await CategoryModel.isSlugExists(slug, id);
       if (exists) {
@@ -81,7 +99,9 @@ const CategoryController = {
       }
       await CategoryModel.update(id, { name: name.trim(), description, status });
       req.flash('success', 'Cập nhật danh mục thành công');
-      res.redirect('/admin/categories');
+      req.session.save(() => {
+        res.redirect('/admin/categories');
+      });
     } catch (err) { next(err); }
   },
 
@@ -90,7 +110,9 @@ const CategoryController = {
     try {
       await CategoryModel.delete(req.params.id);
       req.flash('success', 'Đã xóa danh mục');
-      res.redirect('/admin/categories');
+      req.session.save(() => {
+        res.redirect('/admin/categories');
+      });
     } catch (err) { next(err); }
   }
 };
