@@ -33,6 +33,10 @@ body {
     color: var(--color-text); 
     background: var(--color-bg); 
     line-height: 1.6; 
+}
+/* ── Title ─────────────────────────── */ 
+.title{
+  text-transform: uppercase;
 } 
 img { 
     max-width: 100%; 
@@ -150,6 +154,10 @@ h1,h2,h3,h4,h5 {
     font-weight: 500; 
     margin-bottom: 6px; 
     color: var(--color-text); 
+}
+.form-group label .required {
+    color: var(--color-danger);
+    margin-left: 4px;
 } 
 .form-control { 
     width: 100%; 
@@ -193,15 +201,15 @@ h1,h2,h3,h4,h5 {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--color-bg-soft);
+  background: var(--color-bg);
 }
 .auth-card {
-  background: var(--color-bg);
+  background: var(--color-bg-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: 40px;
   width: 100%;
-  max-width: 420px;
+  max-width: 620px;
 }
 .auth-card__header { text-align: center; margin-bottom: 28px; }
 .auth-card__title  { font-size: 24px; margin-bottom: 6px; }
@@ -214,5 +222,78 @@ h1,h2,h3,h4,h5 {
 }
 .auth-card__footer a { color: var(--color-primary); font-weight: 500; }
 .auth-form { display: flex; flex-direction: column; gap: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group--half { grid-column: auto; }
 .btn--block { width: 100%; text-align: center; margin-top: 8px; padding: 12px; font-size: 15px; }
+
+/* ── Form hints ────────────────────────── */
+.form-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 5px;
+}
+.form-hint ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 4px 0 0 0;
+}
+.form-hint li {
+  padding: 2px 0;
+  margin-left: 0;
+}
+.form-hint li::before {
+  content: "• ";
+  margin-right: 6px;
+}
+.form-hint--error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+.form-hint--success {
+  color: var(--color-success);
+}
+
+/* ── Password Strength ──────────────────── */
+.password-strength {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.password-strength__bar {
+  width: 100%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.password-strength__progress {
+  height: 100%;
+  width: 0;
+  background: var(--color-danger);
+  transition: width 0.3s, background-color 0.3s;
+}
+.password-strength__progress.weak {
+  width: 33%;
+  background: var(--color-danger);
+}
+.password-strength__progress.medium {
+  width: 66%;
+  background: var(--color-warning);
+}
+.password-strength__progress.strong {
+  width: 100%;
+  background: var(--color-success);
+}
+
+/* ── Form Hint States ──────────────────– */
+.form-hint li {
+  transition: color 0.3s;
+}
+.form-hint li.checked {
+  color: var(--color-success);
+  font-weight: 500;
+}
+.form-hint li.checked::before {
+  content: "✓ ";
+  color: var(--color-success);
+}
 
