@@ -39,14 +39,11 @@ block content
   if totalPages > 1
     .pagination(style="margin-top: 24px; display: flex; gap: 8px; justify-content: flex-end; align-items: center;")
       
-      //- Nút "Trang trước"
       if currentPage > 1
         a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage - 1}`) &laquo; Trở lại
         
-      //- Vòng lặp in ra các số trang (1, 2, 3...)
       - for (let i = 1; i <= totalPages; i++)
         a.btn.btn--sm(href=`/admin/categories?page=${i}` class=(currentPage === i ? 'btn--primary' : 'btn--outline'))= i
         
-      //- Nút "Trang sau"
       if currentPage < totalPages
         a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage + 1}`) Tiếp &raquo;
