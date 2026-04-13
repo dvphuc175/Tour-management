@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const TourController = require('../../controllers/TourController');
+const ScheduleController = require('../../controllers/ScheduleController');
 
 
 router.get('/', TourController.index);
@@ -9,6 +10,6 @@ router.post('/', (req, res) => res.send('Đang xử lý tạo tour...')); // T�
 router.get('/:id/edit', TourController.showEdit);
 
 
-router.get('/:tourId/schedules', (req, res) => res.render('admin/schedules/index', { title: 'Lịch trình tour' }));
-
+router.get('/:tourId/schedules', ScheduleController.index);
+router.get('/:tourId/schedules/create', ScheduleController.showCreate);
 module.exports = router;

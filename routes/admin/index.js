@@ -11,5 +11,7 @@ router.get('/', (req, res) =>
 );
 
 router.use('/categories', require('./categories'));
+router.use('/tours', require('./tours'));
+router.use('/schedules', require('./schedules'));
 
 module.exports = router;
