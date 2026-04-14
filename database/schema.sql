@@ -30,6 +30,7 @@ CREATE TABLE TOURS (
     name VARCHAR(200) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
+    status ENUM('active','hidden') DEFAULT 'active',
     price_adult DECIMAL(12, 0) NOT NULL,
     price_child DECIMAL(12, 0) NOT NULL,
     images TEXT, -- Lưu dạng JSON mảng URL ảnh

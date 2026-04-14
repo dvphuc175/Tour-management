@@ -1,5 +1,6 @@
 const CategoryModel = require('../models/CategoryModel');
 const { makeSlug }   = require('../helpers/slug');
+const categorySchema = require('../validators/categorySchema');
 const CategoryController = {
   // GET /admin/categories
   async index(req, res, next) {
@@ -33,16 +34,10 @@ const CategoryController = {
   async create(req, res, next) {
     try {
       const { name, description } = req.body;
-      if (!name?.trim()) {
-        req.flash('error', 'Tên danh mục không được để trống');
-        return res.redirect('/admin/categories/create');
-      }
-      if (name.length < 3 ||  name.length > 30) {
-        req.flash('error', 'Tên danh mục chỉ cho phép 3-30 kí tự');
-        return res.redirect(`/admin/categories/create`);
-      }
-      if (description.length > 50) {
-        req.flash('error', 'Mô tả vượt quá kí tự cho phép (0-50)');
+      const { error } = categorySchema.validate(req.body);
+
+      if (error) {
+        req.flash('error', error.details[0].message);
         return res.redirect('/admin/categories/create');
       }
       const slug = makeSlug(name);
@@ -74,22 +69,16 @@ const CategoryController = {
     } catch (err) { next(err); }
   },
 
-  // PUT /admin/categories/:id  (method-override)
+  // PUT /admin/categories/:id  
   async update(req, res, next) {
     try {
       const { name, description, status } = req.body;
       const { id } = req.params;
-      if (!name?.trim()) {
-        req.flash('error', 'Tên danh mục không được để trống');
-        return res.redirect(`/admin/categories/${id}/edit`);
-      }
-      if (name.length < 3 ||  name.length > 30) {
-        req.flash('error', 'Tên danh mục chỉ cho phép 3-30 kí tự');
-        return res.redirect(`/admin/categories/${id}/edit`);
-      }
-      if (description.length > 50) {
-        req.flash('error', 'Mô tả vượt quá kí tự cho phép (0-50)');
-        return res.redirect(`/admin/categories/${id}/edit`);
+      const { error } = categorySchema.validate(req.body);
+
+      if (error) {
+        req.flash('error', error.details[0].message);
+        return res.redirect('/admin/categories/create');
       }
       const slug   = makeSlug(name);
       const exists = await CategoryModel.isSlugExists(slug, id);
@@ -98,9 +87,9 @@ const CategoryController = {
         return res.redirect(`/admin/categories/${id}/edit`);
       }
       await CategoryModel.update(id, { name: name.trim(), description, status });
-      req.flash('success', 'Cập nhật danh mục thành công');
-      req.session.save(() => {
-        res.redirect('/admin/categories');
+        req.flash('success', 'Cập nhật danh mục thành công');
+        return req.session.save(() => {
+          res.redirect('/admin/categories');
       });
     } catch (err) { next(err); }
   },
