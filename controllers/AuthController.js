@@ -1,6 +1,6 @@
 const bcrypt    = require('bcryptjs');
 const UserModel = require('../models/UserModel');
-
+const registerSchema = require('../validators/registerSchema');
 const AuthController = {
   // GET /login
   showLogin(req, res) {
@@ -61,47 +61,21 @@ const AuthController = {
   // POST /register
   async register(req, res) {
   try {
-    const { fullname, email, password, confirmPassword, phone } = req.body;
+    const { error } = registerSchema.validate(req.body, { abortEarly: false });
 
-    // Regex
-    const fullnameRegex = /^[A-Za-zÀ-ỹ\s]{3,50}$/
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,16}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^0\d{9}$/;
+    if (error) {
+  const messages = error.details.map(e => e.message);
+  req.flash('error', messages);
+  return req.session.save(() => {
+    res.redirect('/register');
+  });
+}
 
-    if (!fullname || fullname.trim() === "") {
-      req.flash('error', 'Họ tên không được để trống');
-      return res.redirect('/register');
-    }
-
-    if (!fullnameRegex.test(fullname)) {
-      req.flash('error', 'Họ tên chỉ được chứa chữ cái và khoảng trắng (2-50 ký tự)');
-      return res.redirect('/register');
-    }
-
-    if (!emailRegex.test(email)) {
-      req.flash('error', 'Email không hợp lệ');
-      return res.redirect('/register');
-    }
-
+    const { fullname, email, password, phone } = req.body;
+    
     const existing = await UserModel.findByEmail(email);
     if (existing) {
       req.flash('error', 'Email này đã được đăng ký');
-      return res.redirect('/register');
-    }
-
-    if (phone && !phoneRegex.test(phone)) {
-      req.flash('error', 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
-      return res.redirect('/register');
-    }
-
-    if (!passwordRegex.test(password)) {
-      req.flash('error', 'Mật khẩu phải gồm chữ và số');
-      return res.redirect('/register');
-    }
-
-    if (password !== confirmPassword) {
-      req.flash('error', 'Mật khẩu xác nhận không khớp');
       return res.redirect('/register');
     }
 
@@ -116,7 +90,7 @@ const AuthController = {
     });
 
     req.flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
-    req.session.save(() => {
+    return req.session.save(() => {
       res.redirect('/login');
 });
 
