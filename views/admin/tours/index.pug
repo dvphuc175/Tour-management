@@ -1,0 +1,64 @@
+extends ../../admin/layout
+
+block content
+	//- Toolbar: filter + nút thêm
+	.toolbar
+		form.filter-form(method="GET" action="/admin/tours")
+			select.form-control.form-control--sm(name="category" onchange="this.form.submit()")
+				option(value="") Tất cả danh mục
+				each cat in categories
+					option(value=cat.id selected=query.category == cat.id) = cat.name
+			select.form-control.form-control--sm(name="status" onchange="this.form.submit()")
+				option(value="") Tất cả trạng thái
+				option(value="active"  selected=query.status==='active') Hiển thị
+				option(value="hidden"  selected=query.status==='hidden') Ẩn
+		a.btn.btn--primary(href="/admin/tours/create") + Thêm tour
+
+	.table-wrap
+		table.data-table
+			thead
+				tr
+					th(style="width:60px") Ảnh
+					th Tên tour
+					th Danh mục
+					th Giá người lớn
+					th Trạng thái
+					th(style="width:160px") Thao tác
+			tbody
+				if tours.length === 0
+					tr
+						td(colspan="6" style="text-align:center;padding:32px;color:#9ca3af") Chưa có tour nào
+				each tour in tours
+					tr
+						td
+							if tour.images && tour.images.length
+								img.tour-thumb(src=tour.images[0] alt=tour.name)
+							else
+								.tour-thumb.tour-thumb--empty
+						td
+							strong= tour.name
+							div: code= tour.slug
+						td= tour.category_name || '—'
+						td= Number(tour.price_adult).toLocaleString('vi-VN') + ' đ'
+						td
+							span(class=`badge badge--${tour.status}`)
+								= tour.status === 'active' ? 'Hiển thị' : 'Ẩn'
+						td.action-btns
+							a.btn.btn--outline.btn--sm(href=`/admin/tours/${tour.id}/edit`) Sửa
+							a.btn.btn--outline.btn--sm(href=`/admin/tours/${tour.id}/schedules`) Lịch
+							form(
+								action=`/admin/tours/${tour.id}?_method=DELETE`
+								method="POST"
+								data-confirm=`Xóa tour "${tour.name}"? Hành động này không thể hoàn tác.`
+								style="display:inline"
+							)
+								button.btn.btn--danger.btn--sm(type="submit") Xóa
+
+	//- Phân trang
+	if totalPages > 1
+		.pagination
+			each p in Array.from({length: totalPages}, (_, i) => i + 1)
+				a(
+					href=`/admin/tours?page=${p}&category=${query.category||''}&status=${query.status||''}`
+					class=`pagination__item${p === currentPage ? ' active' : ''}`
+				)= p
