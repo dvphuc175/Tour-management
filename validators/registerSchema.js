@@ -16,9 +16,11 @@ const registerSchema = Joi.object({
 
   email: Joi.string()
     .email()
+    .max(100)
     .required()
     .messages({
       'string.email': 'Email không hợp lệ',
+      'string.max': 'Email tối đa 100 ký tự',
       'string.empty': 'Email không được để trống'
     }),
 

@@ -1,27 +1,170 @@
-class ScheduleController {
-    async index(req, res) {
-        res.render('admin/schedules/index', { 
-            title: 'Danh sách lịch trình',
-            tour: { name: 'Tour mẫu' }, // Dữ liệu giả cho Dev 2
-            schedules: [] 
-        });
-    }
+const ScheduleModel = require('../models/ScheduleModel');
+const TourModel = require('../models/TourModel');
+const { scheduleSchema } = require('../validators/tourSchema');
+const ScheduleController = {
+  // GET /admin/tours/:tourId/schedules
+  async index(req, res, next) {
+    try {
+      const { tourId } = req.params;
 
-    async showCreate(req, res) {
-        res.render('admin/schedules/form', { 
-            title: 'Thêm lịch trình',
-            tour: { id: req.params.tourId, name: 'Tour mẫu' },
-            schedule: null
-        });
-    }
+      const [tour, schedules] = await Promise.all([
+        TourModel.findById(tourId),
+        ScheduleModel.getByTourId(tourId)
+      ]);
 
-    async showEdit(req, res) {
-        res.render('admin/schedules/form', { 
-            title: 'Sửa lịch trình',
-            tour: { name: 'Tour mẫu' },
-            schedule: { departure_location: 'Hà Nội' } // Dữ liệu giả
-        });
-    }
-}
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/admin/tours');
+      }
 
-module.exports = new ScheduleController();
+      res.render('admin/schedules/index', {
+        title: `Lịch trình: ${tour.name}`,
+        tour,
+        schedules,
+        currentPath: req.path
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // GET /admin/tours/:tourId/schedules/create
+  async showCreate(req, res, next) {
+    try {
+      const tour = await TourModel.findById(req.params.tourId);
+
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/admin/tours');
+      }
+
+      res.render('admin/schedules/form', {
+        title: 'Thêm lịch trình',
+        tour,
+        schedule: null,
+        currentPath: req.path
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // POST /admin/tours/:tourId/schedules
+  async create(req, res, next) {
+    try {
+      const { tourId } = req.params;
+      const { error, value } = scheduleSchema.validate(req.body);
+
+        if (error) {
+            req.flash('error', error.details[0].message);
+            return res.redirect(`/admin/tours/${tourId}/schedules/create`);
+        }
+      const {
+        departure_location,
+        start_date,
+        end_date,
+        total_slots
+      } = value;
+
+      if (new Date(end_date) <= new Date(start_date)) {
+        req.flash('error', 'Ngày kết thúc phải sau ngày khởi hành');
+        return res.redirect(`/admin/tours/${tourId}/schedules/create`);
+      }
+
+      await ScheduleModel.create({
+        tour_id: tourId,
+        departure_location,
+        start_date,
+        end_date,
+        total_slots: parseInt(total_slots)
+      });
+
+      req.flash('success', 'Thêm lịch trình thành công');
+      res.redirect(`/admin/tours/${tourId}/schedules`);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // GET /admin/schedules/:id/edit
+  async showEdit(req, res, next) {
+    try {
+      const schedule = await ScheduleModel.findById(req.params.id);
+
+      if (!schedule) {
+        req.flash('error', 'Không tìm thấy lịch trình');
+        return res.redirect('/admin/tours');
+      }
+
+      const tour = await TourModel.findById(schedule.tour_id);
+
+      res.render('admin/schedules/form', {
+        title: 'Sửa lịch trình',
+        tour,
+        schedule,
+        currentPath: req.path
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // PUT /admin/schedules/:id
+  async update(req, res, next) {
+    try {
+      const schedule = await ScheduleModel.findById(req.params.id);
+
+      if (!schedule) {
+        req.flash('error', 'Không tìm thấy lịch trình');
+        return res.redirect('/admin/tours');
+      }
+      const { error, value } = scheduleSchema.validate(req.body);
+
+        if (error) {
+            req.flash('error', error.details[0].message);
+            return res.redirect(`/admin/schedules/${categoryId}/edit`);
+        }
+      const {
+        departure_location,
+        start_date,
+        end_date,
+        total_slots
+      } = value;
+
+      await ScheduleModel.update(req.params.id, {
+        departure_location,
+        start_date,
+        end_date,
+        total_slots: parseInt(total_slots),
+        status
+      });
+
+      req.flash('success', 'Cập nhật lịch trình thành công');
+      res.redirect(`/admin/tours/${schedule.tour_id}/schedules`);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // DELETE /admin/schedules/:id
+  async delete(req, res, next) {
+    try {
+      const schedule = await ScheduleModel.findById(req.params.id);
+
+      if (schedule) {
+        await ScheduleModel.delete(req.params.id); // có thể throw nếu đã có booking
+
+        req.flash('success', 'Đã xóa lịch trình');
+        return res.redirect(`/admin/tours/${schedule.tour_id}/schedules`);
+      }
+
+      req.flash('error', 'Không tìm thấy lịch trình');
+      res.redirect('/admin/tours');
+    } catch (err) {
+      req.flash('error', err.message); // ví dụ: "Không thể xóa lịch trình đã có đặt chỗ"
+      res.redirect('back');
+    }
+  }
+};
+
+module.exports = ScheduleController;

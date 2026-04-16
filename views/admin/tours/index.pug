@@ -7,7 +7,7 @@ block content
 			select.form-control.form-control--sm(name="category" onchange="this.form.submit()")
 				option(value="") Tất cả danh mục
 				each cat in categories
-					option(value=cat.id selected=query.category == cat.id) = cat.name
+					option(value=cat.id selected=(query.category == cat.id))= cat.name
 			select.form-control.form-control--sm(name="status" onchange="this.form.submit()")
 				option(value="") Tất cả trạng thái
 				option(value="active"  selected=query.status==='active') Hiển thị
@@ -53,7 +53,6 @@ block content
 								style="display:inline"
 							)
 								button.btn.btn--danger.btn--sm(type="submit") Xóa
-
 	//- Phân trang
 	if totalPages > 1
 		.pagination

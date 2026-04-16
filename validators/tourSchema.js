@@ -1,0 +1,55 @@
+const Joi = require('joi');
+
+
+const tourSchema = Joi.object({
+    name: Joi.string().trim().min(5).max(200).required().messages({
+        'string.empty': 'Tên tour không được để trống.',
+        'string.min': 'Tên tour phải có ít nhất 5 ký tự.',
+        'string.max': 'Tên tour không được vượt quá 200 ký tự.',
+        'any.required': 'Vui lòng nhập tên tour.'
+    }),
+    category_id: Joi.number().integer().positive().required().messages({
+        'number.base': 'Danh mục không hợp lệ.',
+        'any.required': 'Vui lòng chọn danh mục cho tour.'
+    }),
+    price_adult: Joi.number().integer().min(0).required().messages({
+        'number.min': 'Giá người lớn không được là số âm.',
+        'number.base': 'Giá người lớn phải là một số.',
+        'any.required': 'Vui lòng nhập giá người lớn.'
+    }),
+    price_child: Joi.number().integer().min(0).required().messages({
+        'number.min': 'Giá trẻ em không được là số âm.',
+        'number.base': 'Giá trẻ em phải là một số.',
+        'any.required': 'Vui lòng nhập giá trẻ em.'
+    }),
+    description: Joi.string().allow('', null),
+    status: Joi.string().valid('active', 'hidden').default('active'),
+    
+
+    keep_images: Joi.any() 
+});
+
+const scheduleSchema = Joi.object({
+    departure_location: Joi.string().trim().min(2).max(30).required().messages({
+        'string.empty': 'Điểm khởi hành không được để trống.',
+        'string.min': 'Điểm khởi hành phải từ 2 ký tự trở lên.',
+        'string.max': 'Điểm khởi hành không được vượt quá 30 ký tự.'
+    }),
+    start_date: Joi.date().min('now').required().messages({
+        'date.min': 'Ngày khởi hành không được nằm trong quá khứ.',
+        'any.required': 'Vui lòng chọn ngày khởi hành.'
+    }),
+    end_date: Joi.date().min(Joi.ref('start_date')).required().messages({
+        'date.min': 'Ngày kết thúc phải diễn ra sau hoặc cùng ngày khởi hành.',
+        'any.required': 'Vui lòng chọn ngày kết thúc.'
+    }),
+    total_slots: Joi.number().integer().min(1).max(100).required().messages({
+        'number.min': 'Tổng số chỗ phải lớn hơn 0.',
+        'number.max': 'Một lịch trình không được vượt quá 100 chỗ.',
+        'number.base': 'Tổng số chỗ phải là một số.',
+        'any.required': 'Vui lòng nhập tổng số chỗ.'
+    }),
+    status: Joi.string().valid('active', 'full', 'cancelled').optional()
+});
+
+module.exports = { tourSchema, scheduleSchema };
