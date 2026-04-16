@@ -35,8 +35,7 @@ const TourModel = {
       params.push(status);
     }
 
-    sql += ' ORDER BY t.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    sql += ` ORDER BY t.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
     const rows = await query(sql, params);
     return rows.map(parseTour);
