@@ -1,0 +1,46 @@
+extends ../../admin/layout
+
+block content
+	.breadcrumb
+		a(href="/admin/tours") Quản lý tour
+		span  /  Lịch trình: #{tour.name}
+
+	.page-actions
+		a.btn.btn--primary(href=`/admin/tours/${tour.id}/schedules/create`) + Thêm lịch trình
+
+	.table-wrap
+		table.data-table
+			thead
+				tr
+					th Điểm khởi hành
+					th Ngày đi
+					th Ngày về
+					th Tổng chỗ
+					th Còn lại
+					th Trạng thái
+					th Thao tác
+			tbody
+				if schedules.length === 0
+					tr
+						td(colspan="7" style="text-align:center;padding:32px;color:#9ca3af") Chưa có lịch trình nào
+				each s in schedules
+					tr
+						td= s.departure_location
+						td= new Date(s.start_date).toLocaleDateString('vi-VN')
+						td= new Date(s.end_date).toLocaleDateString('vi-VN')
+						td= s.total_slots
+						td
+							span(class=s.available_slots === 0 ? 'text-danger' : '')
+								= s.available_slots
+						td
+							span(class=`badge badge--${s.status}`)
+								= {active:'Mở',full:'Hết chỗ',cancelled:'Đã hủy'}[s.status]
+						td.action-btns
+							a.btn.btn--outline.btn--sm(href=`/admin/schedules/${s.id}/edit`) Sửa
+							form(
+								action=`/admin/schedules/${s.id}?_method=DELETE`
+								method="POST"
+								data-confirm="Xóa lịch trình này? Không thể xóa nếu đã có đặt chỗ."
+								style="display:inline"
+							)
+								button.btn.btn--danger.btn--sm(type="submit") Xóa
