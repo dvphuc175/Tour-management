@@ -89,7 +89,9 @@ const TourController = {
       });
 
       req.flash('success', 'Thêm tour thành công');
-      res.redirect('/admin/tours');
+      return req.session.save(() => {
+        res.redirect('/admin/tours');
+      });
     } catch (err) {
       next(err);
     }
@@ -159,14 +161,22 @@ const TourController = {
           keepImages = [keepImages]; 
       }
 
+      const newImages = (req.files || []).map(f => f.path);
+
+      if (keepImages.length + newImages.length > 10) {
+          for (const url of newImages) {
+              const publicId = url.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
+              await cloudinary.uploader.destroy(publicId).catch(() => {});
+          }
+          req.flash('error', `Tổng số ảnh không được vượt quá 10 ảnh! (Hiện đang là ${keepImages.length + newImages.length})`);
+          return res.redirect(`/admin/tours/${id}/edit`);
+      }
+
       const imagesToDelete = (tour.images || []).filter(img => !keepImages.includes(img));
-      
       for (const url of imagesToDelete) {
           const publicId = url.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
           await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
-
-      const newImages = (req.files || []).map(f => f.path);
       const images = [...keepImages, ...newImages];
 
       await TourModel.update(id, {
@@ -207,7 +217,9 @@ const TourController = {
       }
 
       req.flash('success', 'Đã xóa tour');
-      res.redirect('/admin/tours');
+      return req.session.save(() => {
+        res.redirect('/admin/tours');
+      });
     } catch (err) {
       next(err);
     }

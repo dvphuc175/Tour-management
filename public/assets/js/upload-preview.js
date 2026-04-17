@@ -23,3 +23,4 @@ function toggleImgKeep(checkbox) {
 	const img = checkbox.closest('.image-preview-item').querySelector('img');
 	img.style.opacity = checkbox.checked ? '1' : '0.3';
 }
+
