@@ -28,7 +28,7 @@ const registerSchema = Joi.object({
     .pattern(/^(?=.*[A-Za-z])(?=.*\d).{8,16}$/)
     .required()
     .messages({
-      'string.pattern.base': 'Mật khẩu phải 8-16 ký tự, gồm chữ và số'
+      'string.pattern.base': 'Mật khẩu phải 8-16 ký tự, gồm ít nhất chữ và số'
     }),
 
   confirmPassword: Joi.valid(Joi.ref('password'))
