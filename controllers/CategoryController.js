@@ -97,12 +97,23 @@ const CategoryController = {
   // DELETE /admin/categories/:id  (method-override)
   async delete(req, res, next) {
     try {
-      await CategoryModel.delete(req.params.id);
-      req.flash('success', 'Đã xóa danh mục');
+      const categoryId = req.params.id;
+      const hasTours = await CategoryModel.checkHasTours(categoryId);
+      if (hasTours) {
+        req.flash('error', 'Không thể xóa! Danh mục này đang chứa các tour du lịch.');
+        return req.session.save(() => {
+          res.redirect('/admin/categories');
+        });
+      }
+      await CategoryModel.delete(categoryId);
+      req.flash('success', 'Đã xóa danh mục thành công!');
       req.session.save(() => {
         res.redirect('/admin/categories');
       });
-    } catch (err) { next(err); }
+      
+    } catch (err) { 
+      next(err); 
+    }
   }
 };
 

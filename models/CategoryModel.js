@@ -40,9 +40,13 @@ const CategoryModel = {
       [name, slug, description || null, status, id]
     );
   },
+  
+  async checkHasTours(categoryId) {
+    const rows = await query('SELECT COUNT(*) AS total FROM TOURS WHERE category_id = ?', [categoryId]);
+    return rows[0].total > 0; 
+  },
 
   async delete(id) {
-    // Khi xóa, tours thuộc category này sẽ có category_id = NULL (ON DELETE SET NULL)
     return query('DELETE FROM CATEGORIES WHERE id = ?', [id]);
   },
 
