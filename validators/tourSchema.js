@@ -12,14 +12,15 @@ const tourSchema = Joi.object({
         'number.base': 'Danh mục không hợp lệ.',
         'any.required': 'Vui lòng chọn danh mục cho tour.'
     }),
-    price_adult: Joi.number().integer().min(500000).required().messages({
-        'number.min': 'Giá người lớn không được là số âm.',
+    price_adult: Joi.number().integer().min(500000).max(100000000).required().messages({
+        'number.max': 'Giá người lớn quá lớn, vui lòng kiểm tra lại.',
         'number.base': 'Giá người lớn phải là một số.',
         'number.min': 'Giá vé người lớn phải từ 500.000đ trở lên.',
         'any.required': 'Vui lòng nhập giá người lớn.'
     }),
-    price_child: Joi.number().integer().min(0).required().messages({
+    price_child: Joi.number().integer().min(0).max(100000000).required().messages({
         'number.min': 'Giá trẻ em không được là số âm.',
+        'number.max': 'Giá trẻ em quá lớn, vui lòng kiểm tra lại.',
         'number.base': 'Giá trẻ em phải là một số.',
         'any.required': 'Vui lòng nhập giá trẻ em.'
     }),
