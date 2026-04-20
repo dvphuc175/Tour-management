@@ -100,7 +100,15 @@ const ScheduleModel = {
       'DELETE FROM TOUR_SCHEDULES WHERE id = ?',
       [id]
     );
-  }
+  },
+  async getAvailableByTourId(tourId) 
+  { 
+    return query( 
+      `SELECT * 
+      FROM TOUR_SCHEDULES
+      WHERE tour_id = ? AND status = 'active' AND start_date >= CURDATE()
+      ORDER BY start_date ASC`, 
+      [tourId] ); }
 };
 
 module.exports = ScheduleModel;

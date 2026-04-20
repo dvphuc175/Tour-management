@@ -37,12 +37,28 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error'); 
     res.locals.user = req.session.user || null; 
     res.locals.currentPath = req.path;
+
+    // Helper dùng trong tất cả Pug: #{formatPrice(tour.price_adult)}
+  res.locals.formatPrice = (n) =>
+    new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(n);
+
+  // Helper format ngày: #{formatDate(schedule.start_date)}
+  res.locals.formatDate = (d) =>
+    new Date(d).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
     next(); });
 
 //Routes (Sẽ thêm dần từ tuần 2)
-app.get('/', (req, res) => {
-  res.render('index', { title: 'Trang chủ' });
-});
+//app.get('/', (req, res) => {
+  //res.render('index', { title: 'Trang chủ' });
+//});
 
 app.get('/admin', (req, res) => {
   res.render('admin/dashboard', {
@@ -52,6 +68,7 @@ app.get('/admin', (req, res) => {
 
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/client'));
 //404 handler
 app.use((req, res) => { 
   res.status(404).render('404', { title: 'Không tìm thấy trang' }); 
