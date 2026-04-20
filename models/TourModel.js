@@ -173,5 +173,131 @@ const TourModel = {
     return rows.length > 0;
   }
 };
+// Public: lấy tour active có filter + search + phân trang
+async function getPublic({
+  limit = 9,
+  offset = 0,
+  categoryId = null,
+  search = null,
+  minPrice = null,
+  maxPrice = null
+} = {}) {
+  let sql = `
+    SELECT 
+      t.id,
+      t.name,
+      t.slug,
+      t.description,
+      t.price_adult,
+      t.price_child,
+      t.images,
+      c.name AS category_name,
+      MIN(s.start_date) AS next_departure,
+      SUM(s.available_slots) AS total_available
+    FROM TOURS t
+    LEFT JOIN CATEGORIES c 
+      ON t.category_id = c.id
+    LEFT JOIN TOUR_SCHEDULES s 
+      ON s.tour_id = t.id
+      AND s.status = 'active'
+      AND s.start_date >= CURDATE()
+    WHERE t.status = 'active'
+  `;
 
+  const params = [];
+
+  if (categoryId) {
+    sql += ` AND t.category_id = ?`;
+    params.push(categoryId);
+  }
+
+  if (search) {
+    sql += ` AND t.name LIKE ?`;
+    params.push(`%${search}%`);
+  }
+
+  if (minPrice !== null) {
+  sql += ` AND t.price_adult >= ?`;
+  params.push(Number(minPrice));
+}
+
+  if (maxPrice !== null) {
+  sql += ` AND t.price_adult <= ?`;
+  params.push(Number(maxPrice));
+}
+
+  sql += `
+  GROUP BY t.id
+  ORDER BY t.created_at DESC
+  LIMIT ${Number(limit)} OFFSET ${Number(offset)}
+`;
+  const rows = await query(sql, params);
+  return rows.map(parseTour);
+}
+
+
+// Đếm tổng số tour public (phục vụ phân trang)
+async function countPublic({
+  categoryId = null,
+  search = null,
+  minPrice = null,
+  maxPrice = null
+} = {}) {
+  let sql = `
+    SELECT COUNT(*) AS total
+    FROM TOURS t
+    WHERE t.status = 'active'
+  `;
+
+  const params = [];
+
+  if (categoryId) {
+    sql += ` AND t.category_id = ?`;
+    params.push(categoryId);
+  }
+
+  if (search) {
+    sql += ` AND t.name LIKE ?`;
+    params.push(`%${search}%`);
+  }
+
+  if (minPrice !== null) {
+  sql += ` AND t.price_adult >= ?`;
+  params.push(Number(minPrice));
+}
+
+  if (maxPrice !== null) {
+  sql += ` AND t.price_adult <= ?`;
+  params.push(Number(maxPrice));
+}
+
+  const rows = await query(sql, params);
+  return rows[0].total;
+}
+
+
+// Public: lấy tour nổi bật cho trang chủ
+async function getFeatured(limit = 6) {
+  const sql = `
+    SELECT 
+      t.id,
+      t.name,
+      t.slug,
+      t.price_adult,
+      t.images,
+      c.name AS category_name
+    FROM TOURS t
+    LEFT JOIN CATEGORIES c 
+      ON t.category_id = c.id
+    WHERE t.status = 'active'
+    ORDER BY t.created_at DESC
+    LIMIT ${Number(limit)}
+  `;
+
+  const rows = await query(sql);
+  return rows;
+}
+TourModel.getPublic = getPublic;
+TourModel.countPublic = countPublic;
+TourModel.getFeatured = getFeatured;
 module.exports = TourModel;
