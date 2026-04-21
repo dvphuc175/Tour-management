@@ -54,35 +54,38 @@ const ScheduleController = {
     try {
       const { tourId } = req.params;
       const { error, value } = scheduleSchema.validate(req.body);
+      if (error) {
+        req.flash('error', error.details[0].message);
+        return res.redirect(`/admin/tours/${tourId}/schedules/create`);
+      }
 
-        if (error) {
-            req.flash('error', error.details[0].message);
-            return res.redirect(`/admin/tours/${tourId}/schedules/create`);
-        }
-      const {
-        departure_location,
-        start_date,
-        end_date,
-        total_slots
-      } = value;
+      const { departure_location, start_date, end_date, total_slots } = value;
 
-      if (new Date(end_date) <= new Date(start_date)) {
-        req.flash('error', 'Ngày kết thúc phải sau ngày khởi hành');
+      const isDuplicate = await ScheduleModel.checkDuplicate(
+        tourId, 
+        departure_location, 
+        start_date, 
+        end_date
+      );
+
+      if (isDuplicate) {
+        req.flash('error', 'Lịch trình này đã tồn tại! Vui lòng kiểm tra lại ngày và điểm khởi hành.');
         return res.redirect(`/admin/tours/${tourId}/schedules/create`);
       }
 
       await ScheduleModel.create({
-        tour_id: tourId,
+        tour_id: tourId, 
         departure_location,
-        start_date,
+        start_date, 
         end_date,
         total_slots: parseInt(total_slots)
       });
-
+      
       req.flash('success', 'Thêm lịch trình thành công');
       res.redirect(`/admin/tours/${tourId}/schedules`);
-    } catch (err) {
-      next(err);
+      
+    } catch (err) { 
+      next(err); 
     }
   },
 
@@ -119,13 +122,27 @@ const ScheduleController = {
         req.flash('error', 'Không tìm thấy lịch trình'); 
         return res.redirect('/admin/tours'); 
       }
+
       const { error, value } = scheduleSchema.validate(req.body);
       if (error) {
           req.flash('error', error.details[0].message);
           return res.redirect(`/admin/schedules/${id}/edit`);
       }
       const { departure_location, start_date, end_date, total_slots, status } = value;
-      
+
+      const isDuplicate = await ScheduleModel.checkDuplicate(
+        schedule.tour_id, 
+        departure_location, 
+        start_date, 
+        end_date,
+        id 
+      );
+
+      if (isDuplicate) {
+        req.flash('error', 'Cập nhật thất bại! Thông tin ngày và địa điểm này trùng với một lịch trình khác đã tồn tại.');
+        return res.redirect(`/admin/schedules/${id}/edit`);
+      }
+
       const newTotalSlots = parseInt(total_slots);
       const bookedSlots = schedule.total_slots - schedule.available_slots;
       const newAvailableSlots = newTotalSlots - bookedSlots;

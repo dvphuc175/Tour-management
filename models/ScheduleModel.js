@@ -88,7 +88,25 @@ const ScheduleModel = {
       FROM TOUR_SCHEDULES
       WHERE tour_id = ? AND status = 'active' AND start_date >= CURDATE()
       ORDER BY start_date ASC`, 
-      [tourId] ); }
+      [tourId] ); },
+  async checkDuplicate(tour_id, departure_location, start_date, end_date, excludeId = null) {
+    let sql = `
+      SELECT id FROM TOUR_SCHEDULES 
+      WHERE tour_id = ? 
+        AND departure_location = ? 
+        AND DATE(start_date) = DATE(?) 
+        AND DATE(end_date) = DATE(?)
+    `;
+    const params = [tour_id, departure_location, start_date, end_date];
+
+    if (excludeId) {
+      sql += ` AND id != ?`;
+      params.push(excludeId);
+    }
+
+    const rows = await query(sql, params);
+    return rows.length > 0; 
+  }
 };
 
 module.exports = ScheduleModel;
