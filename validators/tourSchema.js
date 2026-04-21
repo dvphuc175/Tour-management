@@ -54,7 +54,9 @@ const scheduleSchema = Joi.object({
         'number.base': 'Tổng số chỗ phải là một số.',
         'any.required': 'Vui lòng nhập tổng số chỗ.'
     }),
-    status: Joi.string().valid('active', 'full', 'cancelled').optional()
+    status: Joi.string().valid('auto', 'cancelled').optional().messages({
+        'any.only': 'Trạng thái truyền lên không hợp lệ.'
+    })
 });
 
 module.exports = { tourSchema, scheduleSchema };

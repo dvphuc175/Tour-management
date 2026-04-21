@@ -1,60 +1,58 @@
 extends ../../admin/layout
 
 block content
-	.breadcrumb
-		a(href="/admin/tours") Quản lý tour
-		span  /  
-		a(href=`/admin/tours/${tour.id}/schedules`)= tour.name
-		span  /  #{schedule ? 'Sửa lịch trình' : 'Thêm lịch trình'}
+    .breadcrumb
+        a(href="/admin/tours") Quản lý tour
+        span  /  
+        a(href=`/admin/tours/${tour.id}/schedules`)= tour.name
+        span  /  #{schedule ? 'Sửa lịch trình' : 'Thêm lịch trình'}
 
-	.form-card
-		-
-			const isEdit = schedule != null
-			const action = isEdit
-				? `/admin/schedules/${schedule.id}?_method=PUT`
-				: `/admin/tours/${tour.id}/schedules`
+    .form-card
+        -
+            const isEdit = schedule != null
+            const action = isEdit
+                ? `/admin/schedules/${schedule.id}?_method=PUT`
+                : `/admin/tours/${tour.id}/schedules`
 
-		form(action=action method="POST")
-			.form-group
-				label Điểm khởi hành
-				input.form-control(
-					type="text" name="departure_location"
-					value=schedule ? schedule.departure_location : ''
-					placeholder="Ví dụ: Hà Nội, TP.HCM"
-					required
-				)
-			.form-row
-				.form-group
-					label Ngày khởi hành
-					input.form-control(
-						type="date" name="start_date"
-						value=schedule ? schedule.start_date.toISOString().split('T')[0] : ''
-						required
-					)
-				.form-group
-					label Ngày về
-					input.form-control(
-						type="date" name="end_date"
-						value=schedule ? schedule.end_date.toISOString().split('T')[0] : ''
-						required
-					)
-			.form-row
-				.form-group
-					label Tổng số chỗ
-					input.form-control(
-						type="number" name="total_slots" min="1"
-						value=schedule ? schedule.total_slots : ''
-						placeholder="20"
-						required
-					)
-				if isEdit
-					.form-group
-						label Trạng thái
-						select.form-control(name="status")
-							option(value="active"    selected=schedule.status==='active')    Mở đặt chỗ
-							option(value="full"      selected=schedule.status==='full')      Hết chỗ
-							option(value="cancelled" selected=schedule.status==='cancelled') Đã hủy
-
-			.form-actions
-				button.btn.btn--primary(type="submit")= isEdit ? 'Cập nhật' : 'Thêm lịch trình'
-				a.btn.btn--outline(href=`/admin/tours/${tour.id}/schedules`) Hủy
+        form(action=action method="POST")
+            .form-group
+                label Điểm khởi hành
+                input.form-control(
+                    type="text" name="departure_location"
+                    value=schedule ? schedule.departure_location : ''
+                    placeholder="Ví dụ: Hà Nội, TP.HCM"
+                    required
+                )
+            .form-row
+                .form-group
+                    label Ngày khởi hành
+                    input.form-control(
+                        type="date" name="start_date"
+                        value=schedule ? schedule.start_date.toISOString().split('T')[0] : ''
+                        required
+                    )
+                .form-group
+                    label Ngày về
+                    input.form-control(
+                        type="date" name="end_date"
+                        value=schedule ? schedule.end_date.toISOString().split('T')[0] : ''
+                        required
+                    )
+            .form-row
+                .form-group
+                    label Tổng số chỗ
+                    input.form-control(
+                        type="number" name="total_slots" min="1"
+                        value=schedule ? schedule.total_slots : ''
+                        placeholder="20"
+                        required
+                    )
+                if isEdit
+                  .form-group
+                    label Trạng thái
+                    select.form-control(name="status")
+                      option(value="auto" selected=(schedule.status !== 'cancelled')) Tự động (Mở bán / Hết chỗ)
+                      option(value="cancelled" selected=(schedule.status === 'cancelled')) Đã hủy (Ngừng nhận khách)
+            .form-actions
+                button.btn.btn--primary(type="submit")= isEdit ? 'Cập nhật' : 'Thêm lịch trình'
+                a.btn.btn--outline(href=`/admin/tours/${tour.id}/schedules`) Hủy

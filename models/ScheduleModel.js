@@ -53,32 +53,12 @@ const ScheduleModel = {
     return result.insertId;
   },
 
-  async update(
-    id,
-    {
-      departure_location,
-      start_date,
-      end_date,
-      total_slots,
-      status
-    }
-  ) {
+  async update(id, { departure_location, start_date, end_date, total_slots, available_slots, status }) {
     return query(
-      `UPDATE TOUR_SCHEDULES SET
-         departure_location = ?,
-         start_date = ?,
-         end_date = ?,
-         total_slots = ?,
-         status = ?
-       WHERE id = ?`,
-      [
-        departure_location,
-        start_date,
-        end_date,
-        total_slots,
-        status,
-        id
-      ]
+      `UPDATE TOUR_SCHEDULES
+       SET departure_location=?, start_date=?, end_date=?, total_slots=?, available_slots=?, status=?
+       WHERE id=?`,
+      [departure_location, start_date, end_date, total_slots, available_slots, status, id]
     );
   },
 
