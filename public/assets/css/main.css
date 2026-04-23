@@ -410,3 +410,227 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   color: var(--color-success);
 }
 
+/* ── Hero ───────────────────────────────── */
+.hero {
+	background: linear-gradient(135deg, #003E8A 0%, #0057B8 60%, #1a7fd4 100%);
+	color: #fff;
+	padding: 80px 20px;
+	text-align: center;
+}
+.hero__content { max-width: 640px; margin: 0 auto; }
+.hero__title { font-size: clamp(28px, 5vw, 48px); font-weight: 700; margin-bottom: 12px; }
+.hero__sub    { font-size: 18px; opacity: .85; margin-bottom: 32px; }
+.hero__search {
+	display: flex; gap: 8px;
+	background: #fff;
+	border-radius: var(--radius-md);
+	padding: 6px 6px 6px 16px;
+	box-shadow: var(--shadow-md);
+}
+.hero__search .form-control {
+	border: none; background: transparent;
+	flex: 1; padding: 8px 0; font-size: 15px;
+}
+.hero__search .form-control:focus { outline: none; }
+.btn--accent { background: var(--color-accent); color: #fff; white-space: nowrap; }
+.btn--accent:hover { background: #e55a28; }
+
+/* ── Sections ───────────────────────────── */
+.section { padding: 60px 0; }
+.section--gray { background: var(--color-bg-soft); }
+.section__title { font-size: 26px; margin-bottom: 28px; }
+.section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
+.section__link  { font-size: 14px; color: var(--color-primary); font-weight: 500; }
+
+/* ── Category grid (trang chủ) ──────────── */
+.category-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 12px;
+}
+.category-card {
+	display: block;
+	padding: 16px 12px;
+	text-align: center;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	font-weight: 500;
+	font-size: 14px;
+	transition: all .2s;
+	color: var(--color-text);
+}
+.category-card:hover {
+	border-color: var(--color-primary);
+	color: var(--color-primary);
+	background: #f0f7ff;
+}
+
+/* ── Tour grid ──────────────────────────── */
+.tour-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 20px;
+}
+.tour-card {
+	display: flex; flex-direction: column;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	border: 1px solid var(--color-border);
+	background: var(--color-bg);
+	transition: transform .2s, box-shadow .2s;
+	color: var(--color-text);
+}
+.tour-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.tour-card__img { height: 200px; overflow: hidden; background: var(--color-bg-soft); }
+.tour-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.tour-card:hover .tour-card__img img { transform: scale(1.04); }
+.tour-card__img-placeholder { width: 100%; height: 100%; background: var(--color-bg-soft); }
+.tour-card__body { flex: 1; padding: 16px; }
+.tour-card__cat  { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-primary); }
+.tour-card__name { font-size: 15px; font-weight: 600; margin: 6px 0 10px; line-height: 1.4; }
+.tour-card__meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--color-text-muted); }
+.tour-card__slots       { font-size: 12px; color: var(--color-success); }
+.tour-card__slots--full { color: var(--color-danger); }
+.tour-card__footer {
+	display: flex; align-items: center; justify-content: space-between;
+	padding: 12px 16px;
+	border-top: 1px solid var(--color-border);
+}
+.tour-card__price { font-size: 16px; font-weight: 700; color: var(--color-accent); }
+.tour-card__cta   { font-size: 13px; color: var(--color-primary); font-weight: 500; }
+
+/* ── Tour list layout ───────────────────── */
+.tour-list-layout {
+	display: grid;
+	grid-template-columns: 260px 1fr;
+	gap: 28px;
+	padding: 32px 0;
+	align-items: start;
+}
+@media (max-width: 768px) {
+	.tour-list-layout { grid-template-columns: 1fr; }
+	.filter-sidebar   { display: none; } /* ẩn trên mobile, tuần 8 làm drawer */
+}
+.tour-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.tour-count { font-size: 13px; color: var(--color-text-muted); }
+
+/* ── Filter sidebar ─────────────────────── */
+.filter-sidebar {
+	background: var(--color-bg);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	padding: 20px;
+	position: sticky;
+	top: 80px;
+}
+.filter-sidebar__title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+.filter-group { margin-bottom: 20px; }
+.filter-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+.filter-check { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 4px 0; cursor: pointer; }
+.price-range  { display: flex; align-items: center; gap: 8px; }
+.price-range .form-control { flex: 1; padding: 8px 10px; }
+.empty-state  { text-align: center; padding: 60px 0; color: var(--color-text-muted); }
+
+/* ── Tour detail ─────────────────────────── */
+.tour-detail-layout {
+	display: grid;
+	grid-template-columns: 1fr 360px;
+	gap: 32px;
+	padding: 32px 0 60px;
+	align-items: start;
+}
+@media (max-width: 900px) {
+	.tour-detail-layout { grid-template-columns: 1fr; }
+}
+.tour-gallery { margin-bottom: 24px; }
+.tour-gallery__main {
+	width: 100%; height: 400px;
+	object-fit: cover;
+	border-radius: var(--radius-md);
+}
+.tour-gallery__thumbs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.tour-gallery__thumb {
+	width: 72px; height: 54px;
+	object-fit: cover;
+	border-radius: 6px;
+	cursor: pointer;
+	border: 2px solid transparent;
+	transition: border-color .15s;
+	opacity: .75;
+}
+.tour-gallery__thumb.active,
+.tour-gallery__thumb:hover { border-color: var(--color-primary); opacity: 1; }
+.tour-detail-header { margin-bottom: 16px; }
+.tour-detail__title { font-size: 28px; margin-top: 6px; }
+.price-box {
+	display: flex; gap: 20px;
+	background: #f0f7ff;
+	border-radius: var(--radius-md);
+	padding: 16px 20px;
+	margin-bottom: 24px;
+}
+.price-box__item { display: flex; flex-direction: column; gap: 2px; }
+.price-box__label { font-size: 12px; color: var(--color-text-muted); }
+.price-box__value { font-size: 20px; font-weight: 700; color: var(--color-accent); }
+.tour-detail__desc { line-height: 1.8; }
+.tour-detail__desc h2 { font-size: 18px; margin-bottom: 12px; }
+
+/* ── Booking sidebar ────────────────────── */
+.tour-booking-box {
+	background: var(--color-bg);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	padding: 24px;
+	position: sticky;
+	top: 80px;
+	box-shadow: var(--shadow-sm);
+}
+.booking-box__title { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+.booking-box__empty { font-size: 14px; color: var(--color-text-muted); margin-bottom: 12px; }
+.schedule-item {
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	padding: 14px;
+	margin-bottom: 10px;
+	transition: border-color .15s;
+}
+.schedule-item:hover { border-color: var(--color-primary); }
+.schedule-item--full { opacity: .6; }
+.schedule-item__info { margin-bottom: 10px; }
+.schedule-item__info strong { font-size: 14px; }
+.schedule-item__meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--color-text-muted); margin-top: 6px; }
+.schedule-item__slots { font-weight: 500; color: var(--color-success); }
+.schedule-item--full .schedule-item__slots { color: var(--color-danger); }
+
+/* ── Pagination ─────────────────────────── */
+.pagination {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	margin-top: 32px;
+	flex-wrap: wrap;
+}
+.pagination__item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	font-size: 14px;
+	color: var(--color-text);
+	background: var(--color-bg);
+	transition: all .15s;
+}
+.pagination__item:hover {
+	border-color: var(--color-primary);
+	color: var(--color-primary);
+}
+.pagination__item.active {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
+	color: #fff;
+	font-weight: 500;
+}

@@ -1,0 +1,20 @@
+a.tour-card(href=`/tours/${tour.slug}`)
+	.tour-card__img
+		if tour.images && tour.images.length
+			img(src=tour.images[0] alt=tour.name loading="lazy")
+		else
+			.tour-card__img-placeholder
+	.tour-card__body
+		if tour.category_name
+			span.tour-card__cat= tour.category_name
+		h3.tour-card__name= tour.name
+		.tour-card__meta
+			if tour.next_departure
+				span 📅 #{formatDate(tour.next_departure)}
+			if tour.total_available > 0
+				span.tour-card__slots #{tour.total_available} chỗ còn
+			else
+				span.tour-card__slots.tour-card__slots--full Hết chỗ
+	.tour-card__footer
+		span.tour-card__price= formatPrice(tour.price_adult)
+		span.tour-card__cta Xem chi tiết
