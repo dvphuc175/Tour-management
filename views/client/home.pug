@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+
+	//- ── Hero ─────────────────────────────────
+	section.hero
+		.hero__content
+			h1.hero__title Khám phá Việt Nam theo cách của bạn
+			p.hero__sub Hàng trăm tour chất lượng — đặt dễ, đi vui
+			form.hero__search(action="/tours" method="GET")
+				input.form-control(
+					type="text" name="search"
+					placeholder="Tìm tour, điểm đến..."
+				)
+				button.btn.btn--accent(type="submit") Tìm kiếm
+
+	//- ── Danh mục ─────────────────────────────
+	section.section
+		.container
+			h2.section__title Danh mục tour
+			.category-grid
+				each cat in categories
+					a.category-card(href=`/tours?category=${cat.id}`)
+						span.category-card__name= cat.name
+
+	//- ── Tour nổi bật ─────────────────────────
+	section.section.section--gray
+		.container
+			.section-header
+				h2.section__title Tour nổi bật
+				a.section__link(href="/tours") Xem tất cả →
+			.tour-grid
+				each tour in featuredTours
+					include ../partials/tour-card

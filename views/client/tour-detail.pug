@@ -1,0 +1,74 @@
+extends ../layout
+
+block content
+	.container
+		.tour-detail-layout
+
+			//- ── Cột trái: thông tin tour ─────────────
+			.tour-detail-main
+
+				//- Gallery ảnh
+				if tour.images && tour.images.length
+					.tour-gallery
+						img.tour-gallery__main(
+							id="mainImg"
+							src=tour.images[0]
+							alt=tour.name
+						)
+						if tour.images.length > 1
+							.tour-gallery__thumbs
+								each img, i in tour.images
+									img.tour-gallery__thumb(
+										src=img
+										alt=`Ảnh ${i+1}`
+										class=i===0 ? 'active' : ''
+										onclick=`switchImg(this, '${img}')`
+									)
+
+				//- Tên + category
+				.tour-detail-header
+					if tour.category_name
+						span.tour-card__cat= tour.category_name
+					h1.tour-detail__title= tour.name
+
+				//- Giá
+				.price-box
+					.price-box__item
+						span.price-box__label Người lớn
+						span.price-box__value= formatPrice(tour.price_adult)
+					.price-box__item
+						span.price-box__label Trẻ em
+						span.price-box__value= formatPrice(tour.price_child)
+
+				//- Mô tả
+				if tour.description
+					.tour-detail__desc
+						h2 Mô tả & Lịch trình
+						!= tour.description
+
+			//- ── Cột phải: chọn lịch trình ────────────
+			aside.tour-booking-box
+				h3.booking-box__title Chọn lịch trình
+
+				if schedules.length === 0
+					p.booking-box__empty Hiện chưa có lịch trình khả dụng.
+					a.btn.btn--outline.btn--block(href="/tours") Xem tour khác
+
+				else
+					each s in schedules
+						.schedule-item(class=s.available_slots===0 ? 'schedule-item--full' : '')
+							.schedule-item__info
+								strong= formatDate(s.start_date)
+								span  →  #{formatDate(s.end_date)}
+								div.schedule-item__meta
+									span 📍 #{s.departure_location}
+									span.schedule-item__slots
+										= s.available_slots > 0 ? `Còn ${s.available_slots} chỗ` : 'Hết chỗ'
+							if s.available_slots > 0
+								a.btn.btn--primary.btn--block(href=`/booking/${s.id}`)
+									| Đặt ngay
+							else
+								button.btn.btn--outline.btn--block(disabled) Hết chỗ
+
+block scripts
+	script(src="/js/tour-gallery.js")

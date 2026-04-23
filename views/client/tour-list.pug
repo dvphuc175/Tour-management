@@ -1,0 +1,84 @@
+extends ../layout
+
+block content
+	.container
+		.tour-list-layout
+
+			//- Sidebar filter
+			aside.filter-sidebar
+				form#filterForm(method="GET" action="/tours")
+					h3.filter-sidebar__title Lọc tour
+
+					.filter-group
+						label.filter-label Từ khóa
+						input.form-control(
+							type="text" name="search"
+							value=query.search || ''
+							placeholder="Tên tour..."
+						)
+
+					.filter-group
+						label.filter-label Danh mục
+						each cat in categories
+							label.filter-check
+								input(
+									type="radio" name="category"
+									value=cat.id
+									checked=query.category == cat.id
+									onchange="this.form.submit()"
+								)
+								span= cat.name
+						label.filter-check
+							input(
+								type="radio" name="category" value=""
+								checked=!query.category
+								onchange="this.form.submit()"
+							)
+							span Tất cả danh mục
+
+					.filter-group
+						label.filter-label Giá (người lớn)
+						.price-range
+							input.form-control(
+								type="number" name="min_price"
+								value=query.min_price || ''
+								placeholder="Từ" min="0" step="100000"
+							)
+							span —
+							input.form-control(
+								type="number" name="max_price"
+								value=query.max_price || ''
+								placeholder="Đến" min="0" step="100000"
+							)
+
+					button.btn.btn--primary.btn--block(type="submit") Áp dụng
+					a.btn.btn--outline.btn--block(href="/tours") Xóa bộ lọc
+
+			//- Main content
+			.tour-list-main
+				.tour-list-header
+					p.tour-count Tìm thấy #{totalTours} tour
+
+				if tours.length === 0
+					.empty-state
+						p Không tìm thấy tour phù hợp.
+						a.btn.btn--outline(href="/tours") Xem tất cả tour
+
+				else
+					.tour-grid
+						each tour in tours
+							include ../partials/tour-card
+
+					//- Phân trang
+					if totalPages > 1
+						.pagination
+							- const base = `/tours?search=${query.search||''}&category=${query.category||''}&min_price=${query.min_price||''}&max_price=${query.max_price||''}`
+							if currentPage > 1
+								a.pagination__item(href=`${base}&page=${currentPage-1}`) ← Trước
+							each p in Array.from({length: totalPages}, (_, i) => i + 1)
+								a(
+									href=`${base}&page=${p}`
+									class=`pagination__item${p === currentPage ? ' active' : ''}`
+								)= p
+							if currentPage < totalPages
+								a.pagination__item(href=`${base}&page=${currentPage+1}`) Tiếp →

@@ -295,7 +295,7 @@ async function getFeatured(limit = 6) {
   `;
 
   const rows = await query(sql);
-  return rows;
+  return rows.map(parseTour);
 }
 TourModel.getPublic = getPublic;
 TourModel.countPublic = countPublic;
