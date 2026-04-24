@@ -44,7 +44,7 @@ block content
 				if tour.description
 					.tour-detail__desc
 						h2 Mô tả & Lịch trình
-						!= tour.description
+						!= cleanHtml(tour.description)
 
 			//- ── Cột phải: chọn lịch trình ────────────
 			aside.tour-booking-box
