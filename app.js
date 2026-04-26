@@ -41,12 +41,37 @@ app.use((req, res, next) => {
 
     // Tạo helper cleanHtml để dùng trong Pug
   res.locals.cleanHtml = (html) => {
+    if (!html) return '';
     return sanitizeHtml(html, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['h1', 'h2', 'img']), // Cho phép thêm một số thẻ bạn muốn
+      allowedTags: [
+        // Headings
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        // Text formatting
+        'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'strike', 's', 'del',
+        // Lists
+        'ul', 'ol', 'li',
+        // Links
+        'a',
+        // Block elements
+        'blockquote', 'div', 'span', 'hr',
+        // Tables
+        'table', 'thead', 'tbody', 'tr', 'td', 'th',
+        // Media
+        'img', 'figure', 'figcaption',
+        // Section markers (HTML comments handled separately)
+      ],
       allowedAttributes: {
-        'a': ['href', 'name', 'target'],
-        'img': ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading']
-      }
+        'a': ['href', 'name', 'target', 'rel', 'title'],
+        'img': ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading', 'class'],
+        'div': ['class', 'id'],
+        'span': ['class', 'style'],
+        'p': ['class'],
+        'h1': ['class'], 'h2': ['class'], 'h3': ['class'], 'h4': ['class'], 'h5': ['class'], 'h6': ['class'],
+        'ul': ['class'], 'ol': ['class'], 'li': ['class'],
+        'table': ['class'], 'thead': ['class'], 'tbody': ['class'], 'tr': ['class'], 'td': ['class', 'colspan', 'rowspan'], 'th': ['class', 'colspan', 'rowspan']
+      },
+      // Preserve HTML comments (section markers like <!-- SECTION:overview -->)
+      allowComments: true
     });
   };
 

@@ -14,32 +14,163 @@ block content
               alt=tour.name
             )
             if tour.images.length > 1
-              .tour-gallery__thumbs
-                each img, i in tour.images
-                  img.tour-gallery__thumb(
-                    src=img
-                    alt=`Ảnh ${i+1}`
-                    class=i===0 ? 'active' : ''
-                    onclick=`switchImg(this, '${img}')`
-                  )
+              .tour-gallery__thumbs-wrapper
+                button.tour-gallery__nav-btn.tour-gallery__nav-btn--prev(
+                  type="button"
+                  onclick="scrollThumbs('left')"
+                  aria-label="Previous images"
+                ) ←
+                .tour-gallery__thumbs(id="thumbsContainer")
+                  each img, i in tour.images
+                    img.tour-gallery__thumb(
+                      src=img
+                      alt=`Ảnh ${i+1}`
+                      class=i===0 ? 'active' : ''
+                      onclick=`switchImg(this, '${img}')`
+                    )
+                button.tour-gallery__nav-btn.tour-gallery__nav-btn--next(
+                  type="button"
+                  onclick="scrollThumbs('right')"
+                  aria-label="Next images"
+                ) →
 
         .tour-detail-header
           if tour.category_name
             span.tour-card__cat= tour.category_name
           h1.tour-detail__title= tour.name
 
-        .price-box
-          .price-box__item
-            span.price-box__label Người lớn
-            span.price-box__value= formatPrice(tour.price_adult)
-          .price-box__item
-            span.price-box__label Trẻ em
-            span.price-box__value= formatPrice(tour.price_child)
 
-        if tour.description
-          .tour-detail__desc
-            h2 Mô tả & Lịch trình
-            != cleanHtml(tour.description)
+        // Anchor Navigation
+        nav.tour-nav-sticky
+          .tour-nav-links
+            if sections.overview
+              a.tour-nav-link(href="#overview") GIỚI THIỆU
+            if sections.highlights
+              a.tour-nav-link(href="#highlights") ĐIỂM NỔI BẬT
+            if sections.itinerary
+              a.tour-nav-link(href="#itinerary") LỊCH TRÌNH
+            if schedules.length
+              a.tour-nav-link(href="#pricing") BẢNG GIÁ
+            if sections.services
+              a.tour-nav-link(href="#services") DỊCH VỤ BAO GỒM
+            if sections.notes
+              a.tour-nav-link(href="#notes") LƯU Ý
+            if tour.images && tour.images.length
+              a.tour-nav-link(href="#gallery") HÌNH ẢNH
+
+        // Content Sections - Continuous Scroll Layout
+        .tour-content-sections
+
+          // Section: Overview
+          if sections.overview
+            section.tour-section#overview
+              h3.tour-section__title GIỚI THIỆU
+              .tour-overview!= cleanHtml(sections.overview)
+
+          // Section: Highlights
+          if sections.highlights
+            section.tour-section#highlights
+              h3.tour-section__title ĐIỂM NỔI BẬT
+              .tour-highlights!= cleanHtml(sections.highlights)
+
+          // Section: Itinerary
+          if sections.itinerary
+            section.tour-section#itinerary
+              h3.tour-section__title LỊCH TRÌNH
+              .tour-itinerary
+                != cleanHtml(sections.itinerary)
+
+          // Section: Pricing
+          if schedules.length
+            section.tour-section#pricing
+              h3.tour-section__title BẢNG GIÁ
+              .tour-pricing-table
+                table.schedule-table.schedule-table--expandable
+                  thead
+                    tr
+                      th STT
+                      th Ngày khởi hành
+                      th Số chỗ còn
+                      th Giá từ
+                      th Đặc điểm
+                      th Hành động
+                  tbody
+                    each s, index in schedules
+                      // Main row
+                      tr.schedule-row(data-schedule-id=s.id)
+                        td
+                          button.schedule-toggle(type="button" onclick=`toggleScheduleDetail('${s.id}')`)
+                            span.schedule-toggle__icon.schedule-toggle__icon--plus(id=`icon-plus-${s.id}`) +
+                            span.schedule-toggle__icon.schedule-toggle__icon--minus.hidden(id=`icon-minus-${s.id}`) −
+                          span.schedule-number= index + 1
+                        td
+                          strong 📅 #{formatDate(s.start_date)}
+                        td
+                          if s.available_slots > 0
+                            span.text-success= s.available_slots
+                          else
+                            span.text-danger Hết chỗ
+                        td= formatPrice(tour.price_adult)
+                        td
+                          button.schedule-eye-toggle(type="button" onclick=`togglePriceDetail('${s.id}')` title="Xem chi tiết giá")
+                            i.fa-regular.fa-eye.schedule-eye(id=`eye-${s.id}`)
+                            i.fa-regular.fa-eye-slash.schedule-eye-slash.hidden(id=`eye-slash-${s.id}`)
+                        td
+                          if s.available_slots > 0
+                            a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                          else
+                            button.btn.btn--outline.btn--sm(disabled) Đã đầy
+                      // Expandable price detail row
+                      tr.schedule-detail-row.hidden(id=`detail-${s.id}`)
+                        td(colspan="6")
+                          .schedule-price-detail
+                            table.price-detail-table
+                              thead
+                                tr
+                                  th Loại giá/Độ tuổi
+                                  th Người lớn (>11 tuổi)
+                                  th Trẻ em (5-11 tuổi)
+                                  th Trẻ nhỏ (2-5 tuổi)
+                                  th Sơ sinh (<2 tuổi)
+                              tbody
+                                tr
+                                  td Giá
+                                  td= formatPrice(tour.price_adult)
+                                  td= formatPrice(Math.round(tour.price_adult * 0.9))
+                                  td= formatPrice(Math.round(tour.price_adult * 0.5))
+                                  td 0₫
+                                tr
+                                  td Phụ thu
+                                  td 0₫
+                                  td 0₫
+                                  td 0₫
+                                  td 0₫
+                                tr
+                                  td Giảm giá
+                                  td 0₫
+                                  td 0₫
+                                  td 0₫
+                                  td 0₫
+
+          // Section: Services
+          if sections.services
+            section.tour-section#services
+              h3.tour-section__title DỊCH VỤ BAO GỒM
+              .tour-services!= cleanHtml(sections.services)
+
+          // Section: Notes
+          if sections.notes
+            section.tour-section#notes
+              h3.tour-section__title LƯU Ý
+              .tour-notes!= cleanHtml(sections.notes)
+
+          // Section: Gallery
+          if tour.images && tour.images.length
+            section.tour-section#gallery
+              h3.tour-section__title HÌNH ẢNH
+              .tour-gallery-grid
+                each img, i in tour.images
+                  img.tour-gallery-grid__img(src=img alt=`Ảnh ${i+1}` onclick=`switchImg(this, '${img}')`)
 
       aside.tour-booking-box
         if schedules.length === 0
@@ -116,7 +247,7 @@ block content
                     button.btn.btn--outline.btn--sm(disabled) Đã đầy
 
 block scripts
-  script(src="/js/tour-gallery.js")
+  script(src="/assets/js/tour-gallery.js")
   script.
     function openScheduleModal() {
       document.getElementById('scheduleModal').classList.add('show');
