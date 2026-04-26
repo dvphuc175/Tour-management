@@ -251,3 +251,28 @@ code {
 	color: #fff;
 }
 .text-danger { color: var(--color-danger); font-weight: 500; }
+/* Làm mờ dòng đã kết thúc */
+.schedule-expired {
+  background-color: #f9f9f9;
+  color: #999;
+}
+
+.schedule-expired img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+
+.badge--gray {
+  background-color: #e0e0e0;
+  color: #757575;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+
+.schedule-expired:hover {
+  background-color: #f1f1f1;
+}
