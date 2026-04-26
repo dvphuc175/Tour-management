@@ -1,89 +1,94 @@
 extends ../../admin/layout
 
 block content
-	.form-card.form-card--wide
-		-
-			const isEdit   = tour != null
-			const action   = isEdit ? `/admin/tours/${tour.id}?_method=PUT` : '/admin/tours'
+    .form-card.form-card--wide
+        -
+            const isEdit   = tour != null
+            const action   = isEdit ? `/admin/tours/${tour.id}?_method=PUT` : '/admin/tours'
 
-		form(action=action method="POST" enctype="multipart/form-data")
+        form(action=action method="POST" enctype="multipart/form-data")
 
-			.form-row
-				.form-group.form-group--grow
-					label Tên tour
-					input.form-control(
-						type="text" name="name"
-						value=tour ? tour.name : ''
-						placeholder="Ví dụ: Tour Hạ Long 3N2Đ"
-						required
-					)
-				.form-group
-					label Danh mục
-					select.form-control(name="category_id")
-						option(value="") -- Chọn danh mục --
-						each cat in categories
-							option(value=cat.id selected=tour && tour.category_id == cat.id)= cat.name
+            .form-row
+                .form-group.form-group--grow
+                    label Tên tour
+                    input.form-control(
+                        type="text" name="name"
+                        value=tour ? tour.name : ''
+                        placeholder="Ví dụ: Tour Hạ Long 3N2Đ"
+                        required
+                    )
+                .form-group
+                    label Danh mục
+                    select.form-control(name="category_id")
+                        option(value="") -- Chọn danh mục --
+                        each cat in categories
+                            option(value=cat.id selected=tour && tour.category_id == cat.id)= cat.name
 
-			.form-row
-				.form-group
-					label Giá người lớn (VNĐ)
-					input.form-control(
-						type="number" name="price_adult" min="0" step="1000"
-						value=tour ? tour.price_adult : ''
-						placeholder="2500000"
-						required
-					)
-				.form-group
-					label Giá trẻ em (VNĐ)
-					input.form-control(
-						type="number" name="price_child" min="0" step="1000"
-						value=tour ? tour.price_child : ''
-						placeholder="1500000"
-						required
-					)
-				.form-group
-					label Trạng thái
-					select.form-control(name="status")
-						option(value="active" selected=!tour || tour.status==='active') Hiển thị
-						option(value="hidden" selected=tour && tour.status==='hidden') Ẩn
+            .form-row
+                .form-group
+                    label Giá người lớn (VNĐ)
+                    input.form-control(
+                        type="number" name="price_adult" min="0" step="1000"
+                        value=tour ? tour.price_adult : ''
+                        placeholder="2500000"
+                        required
+                    )
+                .form-group
+                    label Giá trẻ em (VNĐ)
+                    input.form-control(
+                        type="number" name="price_child" min="0" step="1000"
+                        value=tour ? tour.price_child : ''
+                        placeholder="1500000"
+                        required
+                    )
+                .form-group
+                    label Trạng thái
+                    select.form-control(name="status")
+                        option(value="active" selected=!tour || tour.status==='active') Hiển thị
+                        option(value="hidden" selected=tour && tour.status==='hidden') Ẩn
 
-			.form-group
-				label Mô tả lịch trình
-				textarea.form-control(
-					name="description" rows="6"
-					placeholder="Mô tả chi tiết về tour, lịch trình từng ngày..."
-				)= tour ? tour.description : ''
+            .form-group
+                label Mô tả lịch trình
+                textarea#description.form-control(name="description")= isEdit ? tour.description : ''
+            //- Ảnh hiện tại (khi edit)
+            if isEdit && tour.images && tour.images.length
+                .form-group
+                    label Ảnh hiện tại
+                    .image-preview-grid
+                        each imgUrl, idx in tour.images
+                            .image-preview-item
+                                img(src=imgUrl alt=`Ảnh ${idx+1}`)
+                                label.img-remove-label
+                                    input(
+                                        type="checkbox"
+                                        name="keep_images"
+                                        value=imgUrl
+                                        checked
+                                        onchange="toggleImgKeep(this)"
+                                    )
+                                    span Giữ ảnh
 
-			//- Ảnh hiện tại (khi edit)
-			if isEdit && tour.images && tour.images.length
-				.form-group
-					label Ảnh hiện tại
-					.image-preview-grid
-						each imgUrl, idx in tour.images
-							.image-preview-item
-								img(src=imgUrl alt=`Ảnh ${idx+1}`)
-								label.img-remove-label
-									input(
-										type="checkbox"
-										name="keep_images"
-										value=imgUrl
-										checked
-										onchange="toggleImgKeep(this)"
-									)
-									span Giữ ảnh
+            //- Upload ảnh mới
+            .form-group
+                label= isEdit ? 'Thêm ảnh mới (tối đa 10 ảnh)' : 'Ảnh tour (tối đa 10 ảnh)'
+                input#imageUpload.form-control(
+                    type="file" name="images"
+                    accept="image/*" multiple
+                )
+                .upload-preview#uploadPreview
 
-			//- Upload ảnh mới
-			.form-group
-				label= isEdit ? 'Thêm ảnh mới (tối đa 10 ảnh)' : 'Ảnh tour (tối đa 10 ảnh)'
-				input#imageUpload.form-control(
-					type="file" name="images"
-					accept="image/*" multiple
-				)
-				.upload-preview#uploadPreview
-
-			.form-actions
-				button.btn.btn--primary(type="submit")= isEdit ? 'Cập nhật tour' : 'Thêm tour'
-				a.btn.btn--outline(href="/admin/tours") Hủy
+            .form-actions
+                button.btn.btn--primary(type="submit")= isEdit ? 'Cập nhật tour' : 'Thêm tour'
+                a.btn.btn--outline(href="/admin/tours") Hủy
 
 block scripts
-	script(src="/assets/js/upload-preview.js")
+  script(src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js")
+  script.
+    ClassicEditor
+      .create(document.querySelector('#description'), {
+        toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  script(src="/assets/js/upload-preview.js")
