@@ -49,6 +49,14 @@ block content
 
             .form-group
                 label Mô tả lịch trình
+                // Section Marker Toolbar
+                .section-toolbar
+                    span.section-toolbar__label Chèn phần:
+                    button.section-btn(type="button" onclick="insertSection('overview')" title="Giới thiệu tour") 📋 Giới thiệu
+                    button.section-btn(type="button" onclick="insertSection('highlights')" title="Điểm nổi bật") ⭐ Điểm nổi bật
+                    button.section-btn(type="button" onclick="insertSection('itinerary')" title="Lịch trình") 🗓️ Lịch trình
+                    button.section-btn(type="button" onclick="insertSection('services')" title="Dịch vụ") 🛎️ Dịch vụ
+                    button.section-btn(type="button" onclick="insertSection('notes')" title="Lưu ý") 📝 Lưu ý
                 textarea#description.form-control(name="description")= isEdit ? tour.description : ''
             //- Ảnh hiện tại (khi edit)
             if isEdit && tour.images && tour.images.length
@@ -84,11 +92,69 @@ block content
 block scripts
   script(src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js")
   script.
+    let editorInstance;
+
     ClassicEditor
       .create(document.querySelector('#description'), {
         toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+        heading: {
+          options: [
+            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+          ]
+        },
+        htmlSupport: {
+          allow: [
+            { name: /.*/, attributes: true, classes: true, styles: true }
+          ]
+        }
+      })
+      .then(editor => {
+        editorInstance = editor;
       })
       .catch(error => {
         console.error(error);
       });
+
+    // Section templates - properly formatted HTML
+    const sectionTemplates = {
+      overview: '<!-- SECTION:overview --><h3>Giới thiệu tour</h3><p>Mô tả tổng quan về tour...</p><!-- ENDSECTION -->',
+      highlights: '<!-- SECTION:highlights --><h3>Điểm nổi bật</h3><ul><li>Điểm nổi bật 1</li><li>Điểm nổi bật 2</li><li>Điểm nổi bật 3</li></ul><!-- ENDSECTION -->',
+      itinerary: '<!-- SECTION:itinerary --><h3>Ngày 1:</h3><ul><li>Hoạt động sáng</li><li>Hoạt động chiều</li><li>Hoạt động tối</li></ul><!-- ENDSECTION -->',
+      services: '<!-- SECTION:services --><h3>Dịch vụ bao gồm</h3><ul><li>Dịch vụ 1</li><li>Dịch vụ 2</li><li>Dịch vụ 3</li></ul><h3>Dịch vụ không bao gồm</h3><ul><li>Không bao gồm 1</li><li>Không bao gồm 2</li></ul><!-- ENDSECTION -->',
+      pricing: '<!-- SECTION:pricing --><h3>Bảng giá chi tiết</h3><ul><li>Người lớn: ...</li><li>Trẻ em (5-11 tuổi): ...</li><li>Trẻ em dưới 5 tuổi: ...</li></ul><!-- ENDSECTION -->',
+      notes: '<!-- SECTION:notes --><h3>Lưu ý quan trọng</h3><ul><li>Lưu ý 1</li><li>Lưu ý 2</li><li>Lưu ý 3</li></ul><!-- ENDSECTION -->'
+    };
+
+    async function insertSection(sectionName) {
+      if (!editorInstance) return;
+
+      const template = sectionTemplates[sectionName];
+      if (!template) return;
+
+      const currentData = editorInstance.getData();
+
+      // Add paragraph after section to prevent heading continuation
+      const sectionWithParagraph = template + '<p>&nbsp;</p>';
+
+      // Append to existing content
+      const separator = currentData && !currentData.endsWith('<p>&nbsp;</p>') ? '' : '';
+      const newData = currentData + separator + sectionWithParagraph;
+
+      await editorInstance.setData(newData);
+
+      // Focus back to editor
+      editorInstance.editing.view.focus();
+    }
+
+    function toggleImgKeep(checkbox) {
+      const label = checkbox.closest('.img-remove-label');
+      if (checkbox.checked) {
+        label.classList.remove('removing');
+      } else {
+        label.classList.add('removing');
+      }
+    }
   script(src="/assets/js/upload-preview.js")

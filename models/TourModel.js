@@ -279,17 +279,24 @@ async function countPublic({
 // Public: lấy tour nổi bật cho trang chủ
 async function getFeatured(limit = 6) {
   const sql = `
-    SELECT 
+    SELECT
       t.id,
       t.name,
       t.slug,
       t.price_adult,
       t.images,
-      c.name AS category_name
+      c.name AS category_name,
+      MIN(s.start_date) AS next_departure,
+      SUM(s.available_slots) AS total_available
     FROM TOURS t
-    LEFT JOIN CATEGORIES c 
+    LEFT JOIN CATEGORIES c
       ON t.category_id = c.id
+    LEFT JOIN TOUR_SCHEDULES s
+      ON s.tour_id = t.id
+      AND s.status = 'active'
+      AND s.start_date >= CURDATE()
     WHERE t.status = 'active'
+    GROUP BY t.id
     ORDER BY t.created_at DESC
     LIMIT ${Number(limit)}
   `;
