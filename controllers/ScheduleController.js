@@ -21,6 +21,7 @@ const ScheduleController = {
         title: `Lịch trình: ${tour.name}`,
         tour,
         schedules,
+        today: new Date(),
         currentPath: req.path
       });
     } catch (err) {
