@@ -1,74 +1,134 @@
 extends ../layout
 
 block content
-	.container
-		.tour-detail-layout
+  .container
+    .tour-detail-layout
 
-			//- ── Cột trái: thông tin tour ─────────────
-			.tour-detail-main
+      .tour-detail-main
 
-				//- Gallery ảnh
-				if tour.images && tour.images.length
-					.tour-gallery
-						img.tour-gallery__main(
-							id="mainImg"
-							src=tour.images[0]
-							alt=tour.name
-						)
-						if tour.images.length > 1
-							.tour-gallery__thumbs
-								each img, i in tour.images
-									img.tour-gallery__thumb(
-										src=img
-										alt=`Ảnh ${i+1}`
-										class=i===0 ? 'active' : ''
-										onclick=`switchImg(this, '${img}')`
-									)
+        if tour.images && tour.images.length
+          .tour-gallery
+            img.tour-gallery__main(
+              id="mainImg"
+              src=tour.images[0]
+              alt=tour.name
+            )
+            if tour.images.length > 1
+              .tour-gallery__thumbs
+                each img, i in tour.images
+                  img.tour-gallery__thumb(
+                    src=img
+                    alt=`Ảnh ${i+1}`
+                    class=i===0 ? 'active' : ''
+                    onclick=`switchImg(this, '${img}')`
+                  )
 
-				//- Tên + category
-				.tour-detail-header
-					if tour.category_name
-						span.tour-card__cat= tour.category_name
-					h1.tour-detail__title= tour.name
+        .tour-detail-header
+          if tour.category_name
+            span.tour-card__cat= tour.category_name
+          h1.tour-detail__title= tour.name
 
-				//- Giá
-				.price-box
-					.price-box__item
-						span.price-box__label Người lớn
-						span.price-box__value= formatPrice(tour.price_adult)
-					.price-box__item
-						span.price-box__label Trẻ em
-						span.price-box__value= formatPrice(tour.price_child)
+        .price-box
+          .price-box__item
+            span.price-box__label Người lớn
+            span.price-box__value= formatPrice(tour.price_adult)
+          .price-box__item
+            span.price-box__label Trẻ em
+            span.price-box__value= formatPrice(tour.price_child)
 
-				//- Mô tả
-				if tour.description
-					.tour-detail__desc
-						h2 Mô tả & Lịch trình
-						!= cleanHtml(tour.description)
+        if tour.description
+          .tour-detail__desc
+            h2 Mô tả & Lịch trình
+            != cleanHtml(tour.description)
 
-			//- ── Cột phải: chọn lịch trình ────────────
-			aside.tour-booking-box
-				h3.booking-box__title Chọn lịch trình
+      aside.tour-booking-box
+        if schedules.length === 0
+          h3.booking-box__title Lịch trình khởi hành
+          p.booking-box__empty Hiện chưa có lịch trình khả dụng.
+          a.btn.btn--outline.btn--block(href="/tours") Xem tour khác
+        else
+          - const nearestSchedule = schedules[0]
+          - const upcomingDates = schedules.slice(0, 4)
 
-				if schedules.length === 0
-					p.booking-box__empty Hiện chưa có lịch trình khả dụng.
-					a.btn.btn--outline.btn--block(href="/tours") Xem tour khác
+          .booking-box__price-header
+            span.label Giá chỉ từ
+            .price= formatPrice(tour.price_adult)
 
-				else
-					each s in schedules
-						.schedule-item(class=s.available_slots===0 ? 'schedule-item--full' : '')
-							.schedule-item__info
-								strong= formatDate(s.start_date)
-								span  →  #{formatDate(s.end_date)}
-								div.schedule-item__meta
-									span 📍 #{s.departure_location}
-									span.schedule-item__slots
-										= s.available_slots > 0 ? `Còn ${s.available_slots} chỗ` : 'Hết chỗ'
-							if s.available_slots > 0
-								a.btn.btn--primary.btn--block(href=`/booking/${s.id}`)
-									| Đặt ngay
-							else
-								button.btn.btn--outline.btn--block(disabled) Hết chỗ
+          .booking-box__summary
+            .summary-item
+              span.icon-calendar 📅 Ngày đi: 
+              strong
+                each s, index in upcomingDates
+                  span #{formatDate(s.start_date).substring(0, 5)}
+                  if index < upcomingDates.length - 1
+                    | , 
+                if schedules.length > 4
+                  | ...
+            .summary-item
+              span.icon-location 📍 Điểm khởi hành: 
+              strong #{nearestSchedule.departure_location}
+            .summary-item
+              span.icon-user 👤 Số chỗ còn nhận (gần nhất): 
+              strong.text-danger #{nearestSchedule.available_slots} chỗ
+
+          button.btn.btn--danger.btn--block.btn--outline(type="button" onclick="openScheduleModal()") 
+            | XEM LỊCH ĐI CÁC NGÀY KHÁC
+          
+          a.btn.btn--primary.btn--block(href=`/booking/${nearestSchedule.id}` style="margin-top: 12px;")
+            | ĐẶT GIỮ CHỖ NGAY
+            small(style="display:block; font-size:11px; font-weight:normal") Đặt ngay ngày #{formatDate(nearestSchedule.start_date)}
+
+  #scheduleModal.modal
+    .modal-content
+      .modal-header
+        h3 Danh sách lịch trình khởi hành
+        button.modal-close(onclick="closeScheduleModal()") &times;
+      .modal-body
+        table.schedule-table
+          thead
+            tr
+              th STT
+              th Ngày khởi hành
+              th Ngày kết thúc
+              th Điểm khởi hành
+              th Số chỗ còn
+              th Giá người lớn
+              th Hành động
+          tbody
+            each s, index in schedules
+              tr
+                td= index + 1
+                td
+                  strong 📅 #{formatDate(s.start_date)}
+                td 
+                  strong #{formatDate(s.end_date)}
+                td #{s.departure_location}
+                td
+                  if s.available_slots > 0
+                    span.text-success= s.available_slots
+                  else
+                    span.text-danger Hết chỗ
+                td= formatPrice(tour.price_adult)
+                td
+                  if s.available_slots > 0
+                    a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                  else
+                    button.btn.btn--outline.btn--sm(disabled) Đã đầy
 
 block scripts
-	script(src="/js/tour-gallery.js")
+  script(src="/js/tour-gallery.js")
+  script.
+    function openScheduleModal() {
+      document.getElementById('scheduleModal').classList.add('show');
+      document.body.style.overflow = 'hidden'; 
+    }
+    function closeScheduleModal() {
+      document.getElementById('scheduleModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+    window.onclick = function(event) {
+      const modal = document.getElementById('scheduleModal');
+      if (event.target == modal) {
+        closeScheduleModal();
+      }
+    }
