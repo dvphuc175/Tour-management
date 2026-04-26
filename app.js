@@ -5,6 +5,7 @@ require('./config/db');
 const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride= require('method-override');
+const sanitizeHtml = require('sanitize-html');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const app = express()
@@ -37,6 +38,17 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error'); 
     res.locals.user = req.session.user || null; 
     res.locals.currentPath = req.path;
+
+    // Tạo helper cleanHtml để dùng trong Pug
+  res.locals.cleanHtml = (html) => {
+    return sanitizeHtml(html, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['h1', 'h2', 'img']), // Cho phép thêm một số thẻ bạn muốn
+      allowedAttributes: {
+        'a': ['href', 'name', 'target'],
+        'img': ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading']
+      }
+    });
+  };
 
     // Helper dùng trong tất cả Pug: #{formatPrice(tour.price_adult)}
   res.locals.formatPrice = (n) =>
