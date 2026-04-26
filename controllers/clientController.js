@@ -3,20 +3,29 @@ const CategoryModel = require('../models/CategoryModel');
 const ScheduleModel = require('../models/ScheduleModel');
 
 const LIMIT = 9; 
+const HOME_LIMIT = 6; // 6 tours per page on homepage
 
 const ClientController = {
   // GET /
   async home(req, res, next) {
     try {
-      const [featuredTours, categories] = await Promise.all([
-        TourModel.getFeatured(6),
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const offset = (page - 1) * HOME_LIMIT;
+
+      const [tours, total, categories] = await Promise.all([
+        TourModel.getPublic({ limit: HOME_LIMIT, offset }),
+        TourModel.countPublic({}),
         CategoryModel.getActive()
       ]);
 
       return res.render('client/home', {
         title: 'Trang chủ',
-        featuredTours,
-        categories
+        tours,
+        categories,
+        currentPage: page,
+        totalPages: Math.ceil(total / HOME_LIMIT),
+        totalTours: total,
+        query: req.query
       });
     } catch (err) {
       next(err);

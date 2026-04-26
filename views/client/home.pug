@@ -32,3 +32,16 @@ block content
 			.tour-grid
 				each tour in featuredTours
 					include ../partials/tour-card
+
+			//- Phân trang
+			if totalPages > 1
+				.pagination
+					if currentPage > 1
+						a.pagination__item(href=`/?page=${currentPage-1}`) ← Trước
+					each p in Array.from({length: totalPages}, (_, i) => i + 1)
+						a(
+							href=`/?page=${p}`
+							class=`pagination__item${p === currentPage ? ' active' : ''}`
+						)= p
+					if currentPage < totalPages
+						a.pagination__item(href=`/?page=${currentPage+1}`) Tiếp →
