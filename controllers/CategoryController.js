@@ -78,7 +78,7 @@ const CategoryController = {
 
       if (error) {
         req.flash('error', error.details[0].message);
-        return res.redirect('/admin/categories/${id}/edit');
+        return res.redirect(`/admin/categories/${id}/edit`);
       }
       const slug   = makeSlug(name);
       const exists = await CategoryModel.isSlugExists(slug, id);

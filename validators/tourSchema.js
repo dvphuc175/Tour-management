@@ -34,13 +34,15 @@ const tourSchema = Joi.object({
     keep_images: Joi.any() 
 });
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 const scheduleSchema = Joi.object({
     departure_location: Joi.string().trim().min(2).max(30).required().messages({
         'string.empty': 'Điểm khởi hành không được để trống.',
         'string.min': 'Điểm khởi hành phải từ 2 ký tự trở lên.',
         'string.max': 'Điểm khởi hành không được vượt quá 30 ký tự.'
     }),
-    start_date: Joi.date().min('now').required().messages({
+    start_date: Joi.date().min(today).required().messages({
         'date.min': 'Ngày khởi hành không được nằm trong quá khứ.',
         'any.required': 'Vui lòng chọn ngày khởi hành.'
     }),
