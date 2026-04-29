@@ -1,0 +1,144 @@
+extends ../layout
+
+block content
+  .container
+    .booking-layout
+
+      //- ── Cột trái: form điền thông tin ────────
+      .booking-form-col
+        h1.booking-title Thông tin đặt tour
+
+        form#bookingForm(action="/booking" method="POST")
+          input(type="hidden" name="schedule_id" value=schedule.id)
+
+          h3.form-section-title Thông tin liên hệ
+          .form-row
+            .form-group
+              label Họ và tên *
+              input.form-control(
+                type="text" name="contact_name"
+                value=prefill.contact_name
+                required
+              )
+            .form-group
+              label Số điện thoại *
+              input.form-control(
+                type="tel" name="contact_phone"
+                placeholder="0901234567"
+                required
+              )
+          .form-group
+            label Email liên hệ *
+            input.form-control(
+              type="email" name="contact_email"
+              value=prefill.contact_email
+              required
+            )
+
+          h3.form-section-title Số lượng hành khách
+          .form-row
+            .form-group
+              label Người lớn
+              .quantity-control
+                button.quantity-btn(type="button" onclick="updateCount('adult', -1)") −
+                input#adultCount.quantity-input(
+                  type="number" name="adult_count"
+                  value="1" min="1"
+                  max=schedule.available_slots
+                  data-max-slots=schedule.available_slots
+                  readonly
+                )
+                button.quantity-btn(type="button" onclick="updateCount('adult', 1)") +
+              small.form-hint #{formatPrice(tour.price_adult)} / người
+            .form-group
+              label Trẻ em
+              .quantity-control
+                button.quantity-btn(type="button" onclick="updateCount('child', -1)") −
+                input#childCount.quantity-input(
+                  type="number" name="child_count"
+                  value="0" min="0"
+                  max=schedule.available_slots
+                  data-max-slots=schedule.available_slots
+                  readonly
+                )
+                button.quantity-btn(type="button" onclick="updateCount('child', 1)") +
+              small.form-hint #{formatPrice(tour.price_child)} / bé
+
+          .slots-warning(id="slotsWarning" style="display:none;color:#d32f2f;font-size:12px;margin-top:8px")
+            ⚠️ Tổng số khách không được vượt quá #{schedule.available_slots} chỗ còn trống
+
+          .form-group
+            label Yêu cầu đặc biệt
+            textarea.form-control(
+              name="special_request" rows="3"
+              placeholder="Ăn chay, hỗ trợ xe lăn..."
+            )
+
+          button.btn.btn--primary.btn--block.btn--lg(type="submit")
+            | Xác nhận đặt tour
+
+      //- ── Cột phải: tóm tắt đơn ───────────────
+      aside.booking-summary
+        h3.booking-summary__title Tóm tắt đặt chỗ
+
+        if tour.images && tour.images.length
+          img.booking-summary__img(src=tour.images[0] alt=tour.name)
+
+        .booking-summary__tour= tour.name
+        .booking-summary__info
+          .summary-row
+            span Ngày đi
+            strong= formatDate(schedule.start_date)
+          .summary-row
+            span Ngày về
+            strong= formatDate(schedule.end_date)
+          .summary-row
+            span Khởi hành
+            strong= schedule.departure_location
+          .summary-row
+            span Còn
+            strong= schedule.available_slots + ' chỗ'
+
+        .booking-summary__price
+          .summary-row
+            span Tổng tiền
+            strong#totalPrice= formatPrice(tour.price_adult)
+
+block scripts
+  script.
+    const priceAdult = !{tour.price_adult};
+    const priceChild = !{tour.price_child};
+    const maxSlots = !{schedule.available_slots};
+
+    function updateCount(type, change) {
+      const input = document.getElementById(type === 'adult' ? 'adultCount' : 'childCount');
+      const currentVal = parseInt(input.value) || 0;
+      const newVal = currentVal + change;
+
+      const minVal = type === 'adult' ? 1 : 0;
+
+      if (newVal < minVal) return;
+
+      const otherInput = document.getElementById(type === 'adult' ? 'childCount' : 'adultCount');
+      const otherVal = parseInt(otherInput.value) || 0;
+      const totalAfterChange = newVal + otherVal;
+
+      if (totalAfterChange > maxSlots) {
+        document.getElementById('slotsWarning').style.display = 'block';
+        return;
+      } else {
+        document.getElementById('slotsWarning').style.display = 'none';
+      }
+
+      input.value = newVal;
+      calcPrice();
+    }
+
+    function calcPrice() {
+      const adults   = parseInt(document.getElementById('adultCount').value)  || 0;
+      const children = parseInt(document.getElementById('childCount').value) || 0;
+      const total    = adults * priceAdult + children * priceChild;
+      document.getElementById('totalPrice').textContent =
+        new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(total);
+    }
+    calcPrice();

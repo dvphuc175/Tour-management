@@ -330,6 +330,29 @@ code {
   border-radius: 0 0 8px 8px !important;
 }
 
+/* CKEditor list styling - show bullets/numbers in editor */
+.ck-editor__editable ul {
+  list-style-type: disc !important;
+  padding-left: 24px !important;
+  margin-bottom: 12px !important;
+}
+
+.ck-editor__editable ol {
+  list-style-type: decimal !important;
+  padding-left: 24px !important;
+  margin-bottom: 12px !important;
+}
+
+.ck-editor__editable li {
+  margin-bottom: 4px !important;
+  line-height: 1.6 !important;
+}
+
+.ck-editor__editable ul li,
+.ck-editor__editable ol li {
+  display: list-item !important;
+}
+
 .ck.ck-editor {
   margin-top: 0 !important;
 }

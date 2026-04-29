@@ -1,0 +1,39 @@
+extends ../layout
+
+block content
+  .container
+    .my-bookings-page
+      h1.page-title Đơn đặt của tôi
+
+      if bookings.length === 0
+        .empty-state
+          p Bạn chưa có đơn đặt tour nào.
+          a.btn.btn--primary(href="/tours") Khám phá tour ngay
+
+      else
+        .booking-list
+          each b in bookings
+            .booking-item
+              .booking-item__img
+                if b.tour_images && b.tour_images.length
+                  img(src=b.tour_images[0] alt=b.tour_name)
+                else
+                  .booking-item__img-empty
+              .booking-item__info
+                a.booking-item__tour(href=`/tours/${b.tour_slug}`)= b.tour_name
+                .booking-item__meta
+                  span 📅 #{formatDate(b.start_date)} → #{formatDate(b.end_date)}
+                  span 📍 #{b.departure_location}
+                  span 👥 #{b.adult_count} NL / #{b.child_count} TE
+                .booking-item__price= formatPrice(b.total_price)
+              .booking-item__status
+                span(class=`badge badge--${b.status}`)
+                  = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
+                a.btn.btn--outline.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
+                if b.status === 'pending'
+                  form(
+                    action=`/my-bookings/${b.id}?_method=PUT`
+                    method="POST"
+                    data-confirm="Bạn chắc chắn muốn hủy đơn này?"
+                  )
+                    button.btn.btn--danger.btn--sm(type="submit") Hủy đơn
