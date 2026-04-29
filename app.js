@@ -30,7 +30,13 @@ app.use(session({
     resave: false, 
     saveUninitialized: false, 
     store: sessionStore, 
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } }));
+        cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+    }
+}));
 
 app.use(flash()); 
 app.use((req, res, next) => { 
@@ -91,11 +97,6 @@ app.use((req, res, next) => {
     });
 
     next(); });
-
-//Routes (Sẽ thêm dần từ tuần 2)
-//app.get('/', (req, res) => {
-  //res.render('index', { title: 'Trang chủ' });
-//});
 
 app.get('/admin', (req, res) => {
   res.render('admin/dashboard', {
