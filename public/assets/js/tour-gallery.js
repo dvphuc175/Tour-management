@@ -1,8 +1,69 @@
+// Gallery state
+let galleryImages = [];
+let currentImageIndex = 0;
+
+function initGallery() {
+	const thumbs = document.querySelectorAll('.tour-gallery__thumb');
+	galleryImages = Array.from(thumbs).map(thumb => thumb.src);
+	
+	// Find current index based on main image
+	const mainImg = document.getElementById('mainImg');
+	if (mainImg) {
+		currentImageIndex = galleryImages.findIndex(src => src === mainImg.src);
+		if (currentImageIndex === -1) currentImageIndex = 0;
+	}
+}
+
 function switchImg(thumb, src) {
 	document.getElementById('mainImg').src = src;
 	document.querySelectorAll('.tour-gallery__thumb')
 		.forEach(t => t.classList.remove('active'));
 	thumb.classList.add('active');
+	
+	// Update current index
+	const thumbs = document.querySelectorAll('.tour-gallery__thumb');
+	galleryImages = Array.from(thumbs).map(t => t.src);
+	currentImageIndex = galleryImages.findIndex(s => s === src);
+}
+
+function showImageAtIndex(index) {
+	if (!galleryImages.length) initGallery();
+	if (index < 0 || index >= galleryImages.length) return;
+	
+	const src = galleryImages[index];
+	const mainImg = document.getElementById('mainImg');
+	if (mainImg) mainImg.src = src;
+	
+	// Update active thumbnail
+	document.querySelectorAll('.tour-gallery__thumb').forEach((t, i) => {
+		t.classList.toggle('active', i === index);
+	});
+	
+	// Scroll thumbnail into view
+	const activeThumb = document.querySelectorAll('.tour-gallery__thumb')[index];
+	if (activeThumb) {
+		activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+	}
+	
+	currentImageIndex = index;
+}
+
+function nextImage() {
+	if (!galleryImages.length) initGallery();
+	if (!galleryImages.length) return;
+	
+	// Loop back to first if at end
+	const nextIndex = (currentImageIndex + 1) % galleryImages.length;
+	showImageAtIndex(nextIndex);
+}
+
+function prevImage() {
+	if (!galleryImages.length) initGallery();
+	if (!galleryImages.length) return;
+	
+	// Loop to last if at beginning
+	const prevIndex = currentImageIndex <= 0 ? galleryImages.length - 1 : currentImageIndex - 1;
+	showImageAtIndex(prevIndex);
 }
 
 function scrollThumbs(direction) {
@@ -115,6 +176,9 @@ function updateActiveNavLink() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+	// Initialize gallery
+	initGallery();
+	
 	const container = document.getElementById('thumbsContainer');
 	if (container) {
 		container.addEventListener('scroll', updateActiveThumbFromScroll);
@@ -143,9 +207,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Keyboard navigation for gallery
 	document.addEventListener('keydown', function(e) {
 		if (e.key === 'ArrowLeft') {
-			scrollThumbs('left');
+			e.preventDefault();
+			prevImage();
 		} else if (e.key === 'ArrowRight') {
-			scrollThumbs('right');
+			e.preventDefault();
+			nextImage();
 		}
 	});
 });

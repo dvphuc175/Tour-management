@@ -17,8 +17,8 @@ block content
               .tour-gallery__thumbs-wrapper
                 button.tour-gallery__nav-btn.tour-gallery__nav-btn--prev(
                   type="button"
-                  onclick="scrollThumbs('left')"
-                  aria-label="Previous images"
+                  onclick="prevImage()"
+                  aria-label="Previous image"
                 ) ←
                 .tour-gallery__thumbs(id="thumbsContainer")
                   each img, i in tour.images
@@ -30,8 +30,8 @@ block content
                     )
                 button.tour-gallery__nav-btn.tour-gallery__nav-btn--next(
                   type="button"
-                  onclick="scrollThumbs('right')"
-                  aria-label="Next images"
+                  onclick="nextImage()"
+                  aria-label="Next image"
                 ) →
 
         .tour-detail-header
