@@ -52,11 +52,9 @@ block content
             if schedules.length
               a.tour-nav-link(href="#pricing") BẢNG GIÁ
             if sections.services
-              a.tour-nav-link(href="#services") DỊCH VỤ BAO GỒM
+              a.tour-nav-link(href="#services") DỊCH VỤ
             if sections.notes
               a.tour-nav-link(href="#notes") LƯU Ý
-            if tour.images && tour.images.length
-              a.tour-nav-link(href="#gallery") HÌNH ẢNH
 
         // Content Sections - Continuous Scroll Layout
         .tour-content-sections
@@ -155,7 +153,7 @@ block content
           // Section: Services
           if sections.services
             section.tour-section#services
-              h3.tour-section__title DỊCH VỤ BAO GỒM
+              h3.tour-section__title DỊCH VỤ 
               .tour-services!= cleanHtml(sections.services)
 
           // Section: Notes
@@ -163,14 +161,6 @@ block content
             section.tour-section#notes
               h3.tour-section__title LƯU Ý
               .tour-notes!= cleanHtml(sections.notes)
-
-          // Section: Gallery
-          if tour.images && tour.images.length
-            section.tour-section#gallery
-              h3.tour-section__title HÌNH ẢNH
-              .tour-gallery-grid
-                each img, i in tour.images
-                  img.tour-gallery-grid__img(src=img alt=`Ảnh ${i+1}` onclick=`switchImg(this, '${img}')`)
 
       aside.tour-booking-box
         if schedules.length === 0
