@@ -30,7 +30,13 @@ app.use(session({
     resave: false, 
     saveUninitialized: false, 
     store: sessionStore, 
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } }));
+        cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+    }
+}));
 
 app.use(flash()); 
 app.use((req, res, next) => { 
@@ -92,11 +98,6 @@ app.use((req, res, next) => {
 
     next(); });
 
-//Routes (Sẽ thêm dần từ tuần 2)
-//app.get('/', (req, res) => {
-  //res.render('index', { title: 'Trang chủ' });
-//});
-
 app.get('/admin', (req, res) => {
   res.render('admin/dashboard', {
     title: 'Dashboard',
@@ -105,6 +106,7 @@ app.get('/admin', (req, res) => {
 
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/booking'));
 app.use('/', require('./routes/client'));
 //404 handler
 app.use((req, res) => { 
@@ -117,5 +119,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => 
-  console.log(`✓ Server chạy tại http://localhost:${PORT}`) 
+  console.log(`Server chạy tại http://localhost:${PORT}`) 
 );

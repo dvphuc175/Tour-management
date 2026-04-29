@@ -7,7 +7,7 @@ const ScheduleModel = {
       `SELECT *
        FROM TOUR_SCHEDULES
        WHERE tour_id = ?
-       ORDER BY start_date ASC`,
+       ORDER BY start_date DESC`,
       [tourId]
     );
   },

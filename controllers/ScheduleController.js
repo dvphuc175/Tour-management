@@ -193,7 +193,7 @@ const ScheduleController = {
       res.redirect('/admin/tours');
     } catch (err) {
       req.flash('error', err.message); // ví dụ: "Không thể xóa lịch trình đã có đặt chỗ"
-      res.redirect('back');
+      return res.redirect('/admin/tours');
     }
   }
 };
