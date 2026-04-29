@@ -106,6 +106,7 @@ app.get('/admin', (req, res) => {
 
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/booking'));
 app.use('/', require('./routes/client'));
 //404 handler
 app.use((req, res) => { 
@@ -118,5 +119,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => 
-  console.log(`✓ Server chạy tại http://localhost:${PORT}`) 
+  console.log(`Server chạy tại http://localhost:${PORT}`) 
 );
