@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  .container
+    .success-page
+      .success-icon ✓
+      h1.success-title Đặt tour thành công!
+      p.success-sub Đơn đặt ##{booking.id} đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận sớm nhất.
+
+      .success-card
+        .summary-row
+          span Tour
+          strong= booking.tour_name
+        .summary-row
+          span Ngày đi
+          strong= formatDate(booking.start_date)
+        .summary-row
+          span Khởi hành
+          strong= booking.departure_location
+        .summary-row
+          span Người lớn / Trẻ em
+          strong #{booking.adult_count} / #{booking.child_count}
+        .summary-row
+          span Tổng tiền
+          strong.price= formatPrice(booking.total_price)
+        .summary-row
+          span Trạng thái
+          strong
+            span.badge.badge--pending Chờ xác nhận
+
+      .success-actions
+        a.btn.btn--primary(href="/my-bookings") Xem đơn của tôi
+        a.btn.btn--outline(href="/tours") Khám phá thêm tour
