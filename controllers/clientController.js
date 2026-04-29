@@ -113,65 +113,72 @@ function parseTourDescription(description) {
   if (!description) return {};
 
   // Decode HTML entities if content is HTML-encoded (e.g., &lt; → <)
-  if (description.includes('&lt;') || description.includes('&gt;') || description.includes('&amp;')) {
-    description = description
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'");
-  }
+  // This handles cases where HTML comments got encoded in the database
+  description = description
+    .replace(/&lt;!--/g, '<!--')
+    .replace(/--&gt;/g, '-->')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
 
   const sections = {};
 
   // Try format with section markers first
-  const sectionRegex = /<!--\s*SECTION:(\w+)\s*-->([\s\S]*?)(?=<!--\s*(?:SECTION:\w+|ENDSECTION)\s*-->|$)/gi;
+  // More flexible regex: handles extra whitespace, different comment formats
+  const sectionRegex = /<!--\s*SECTION:\s*(\w+)\s*-->([\s\S]*?)(?=<!--\s*(?:SECTION:\s*\w+|ENDSECTION)\s*-->|$)/gi;
   let hasMarkers = false;
   let match;
 
   while ((match = sectionRegex.exec(description)) !== null) {
     hasMarkers = true;
-    const sectionName = match[1];
+    const sectionName = match[1].toLowerCase().trim();
     const sectionContent = match[2].trim();
     sections[sectionName] = sectionContent;
   }
 
-  // If no markers found, parse from HTML headings
+  // If no markers found, parse from HTML headings (h2, h3, h4)
   if (!hasMarkers) {
     // Map Vietnamese headings to section keys
     const headingMap = {
       'giới thiệu': 'overview',
       'giới thiệu tour': 'overview',
+      'tổng quan': 'overview',
       'điểm nổi bật': 'highlights',
+      'điểm đặc biệt': 'highlights',
       'lịch trình': 'itinerary',
       'lịch trình chi tiết': 'itinerary',
+      'chương trình': 'itinerary',
+      'chương trình tour': 'itinerary',
       'dịch vụ': 'services',
       'dịch vụ bao gồm': 'services',
+      'dịch vụ đi kèm': 'services',
       'bảng giá': 'pricing',
       'bảng giá chi tiết': 'pricing',
+      'giá tour': 'pricing',
       'lưu ý': 'notes',
-      'lưu ý quan trọng': 'notes'
+      'lưu ý quan trọng': 'notes',
+      'lưu ý khi đi tour': 'notes',
+      'chính sách': 'notes'
     };
 
-    // Split by h3 tags
-    const h3Regex = /<h3[^>]*>(.*?)<\/h3>([\s\S]*?)(?=<h3|$)/gi;
-    let currentSectionKey = null;
-    let matched = false;
+    // Split by h2, h3, h4 tags
+    const headingRegex = /<h[2-4][^>]*>(.*?)<\/h[2-4]>([\s\S]*?)(?=<h[2-4]|$)/gi;
 
-    while ((match = h3Regex.exec(description)) !== null) {
+    while ((match = headingRegex.exec(description)) !== null) {
       const headingText = match[1].replace(/<[^>]*>/g, '').trim().toLowerCase();
       const content = match[2].trim();
-      matched = false;
+      let matched = false;
 
       // Find matching section key
       for (const [key, sectionKey] of Object.entries(headingMap)) {
         if (headingText.includes(key.toLowerCase())) {
-          currentSectionKey = sectionKey;
           matched = true;
 
-          // For services and itinerary, append content
+          // For services and itinerary, append multiple sub-sections
           if ((sectionKey === 'services' || sectionKey === 'itinerary') && sections[sectionKey]) {
-            sections[sectionKey] += '<h4>' + match[1] + '</h4>' + content;
+            sections[sectionKey] += match[1] + content;
           } else {
             sections[sectionKey] = content;
           }
@@ -179,25 +186,44 @@ function parseTourDescription(description) {
         }
       }
 
-      // If no match but content exists, put in 'overview' as default
-      if (!matched && content && !sections.overview) {
-        sections.overview = content;
+      // If no match but content exists and has substantial length, put in 'overview' as default
+      if (!matched && content && content.length > 20 && !sections.overview) {
+        sections.overview = match[1] + content;
       }
+    }
+
+    // If still no sections parsed but we have content, put it all in overview
+    if (Object.keys(sections).length === 0 && description.trim().length > 0) {
+      sections.overview = description.trim();
     }
 
     // Also check if there's any itinerary content in the highlights section
     // that should be moved to itinerary
+    // Pattern matches: <h3>Ngày 1:, <h4>Ngày 1:, <strong>Ngày 1:, or plain text "Ngày 1:"
     if (sections.highlights && !sections.itinerary) {
-      const ngayPattern = /<(?:h4|strong|b)[^>]*>\s*(?:ngày|ngay)\s*\d+/i;
+      const ngayPattern = /<h[3-4][^>]*>\s*(?:ngày|ngay|day)\s*\d+|<(?:h4|strong|b)[^>]*>\s*(?:ngày|ngay|day)\s*\d+/i;
       if (ngayPattern.test(sections.highlights)) {
         sections.itinerary = sections.highlights;
         // Keep only the content before Ngày in highlights
-        const splitIndex = sections.highlights.search(/<(?:h4|strong|b)[^>]*>\s*(?:ngày|ngay)\s*\d+/i);
+        const splitIndex = sections.highlights.search(/<h[3-4][^>]*>\s*(?:ngày|ngay|day)\s*\d+|<(?:h4|strong|b)[^>]*>\s*(?:ngày|ngay|day)\s*\d+/i);
         if (splitIndex > 0) {
           sections.highlights = sections.highlights.substring(0, splitIndex).trim();
         } else {
           sections.highlights = '';
         }
+      }
+    }
+
+    // Additional parsing: if no itinerary yet, check full description for standalone "Ngày X:" sections
+    if (!sections.itinerary) {
+      const standaloneItineraryPattern = /(<h[2-4][^>]*>\s*(?:ngày|ngay|day)\s*\d+[\s\S]*?)(?=<h[2-4]|$)/gi;
+      let itineraryMatch;
+      let itineraryContent = '';
+      while ((itineraryMatch = standaloneItineraryPattern.exec(description)) !== null) {
+        itineraryContent += itineraryMatch[1];
+      }
+      if (itineraryContent) {
+        sections.itinerary = itineraryContent.trim();
       }
     }
   }
