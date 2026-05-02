@@ -107,6 +107,7 @@ app.get('/admin', (req, res) => {
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
 app.use('/', require('./routes/booking'));
+app.use('/payment',    require('./routes/payment'));
 app.use('/', require('./routes/client'));
 //404 handler
 app.use((req, res) => { 

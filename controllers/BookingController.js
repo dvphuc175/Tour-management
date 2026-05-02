@@ -45,7 +45,8 @@ const BookingController = {
         contact_email,
         adult_count,
         child_count,
-        special_request
+        special_request,
+        payment_method
       } = req.body;
 
       // 1. Validate input 
@@ -56,6 +57,10 @@ const BookingController = {
         req.flash('error', 'Vui lòng nhập đầy đủ thông tin liên hệ');
         return res.redirect(`/booking/${schedule_id}`);
       }
+      // Validate payment_method (fallback = 'cash')
+      const method = ['vnpay', 'cash'].includes(payment_method)
+        ? payment_method
+        : 'cash';
 
       // 2. Lấy schedule + tour 
       const schedule = await ScheduleModel.findById(schedule_id);
@@ -82,12 +87,16 @@ const BookingController = {
         adult_count: adults,
         child_count: children,
         total_price,
-        special_request
+        special_request,
+        payment_method: method
       });
 
-      req.flash('success', 'Đặt tour thành công!');
-
-      return res.redirect(`/booking/success/${bookingId}`);
+      if (method === 'vnpay') {
+        return res.redirect(`/payment/vnpay/${bookingId}`);
+      } else {
+        req.flash('success', 'Đặt tour thành công! Vui lòng chờ xác nhận.');
+        return res.redirect(`/booking/success/${bookingId}`);
+      }
 
     } catch (err) {
       req.flash('error', err.message);

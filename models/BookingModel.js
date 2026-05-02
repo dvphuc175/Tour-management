@@ -16,7 +16,8 @@ const BookingModel = {
       adult_count,
       child_count,
       total_price,
-      special_request
+      special_request,
+      payment_method
     } = data;
 
     const neededSlots = adult_count + child_count;
@@ -94,8 +95,8 @@ const BookingModel = {
           amount,
           method,
           status
-        ) VALUES (?, ?, 'cash', 'pending')`,
-        [bookingId, total_price]
+        ) VALUES (?, ?, ?, ?)`,
+        [bookingId, total_price, payment_method, 'pending']
       );
 
       await conn.commit();
