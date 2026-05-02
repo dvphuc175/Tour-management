@@ -32,7 +32,7 @@ block content
                 a.btn.btn--outline.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
                 if b.status === 'pending'
                   form(
-                    action=`/my-bookings/${b.id}?_method=PUT`
+                    action=`/my-bookings/${b.id}/cancel?_method=PUT`
                     method="POST"
                     data-confirm="Bạn chắc chắn muốn hủy đơn này?"
                   )

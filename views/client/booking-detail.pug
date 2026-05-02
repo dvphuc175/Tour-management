@@ -70,7 +70,7 @@ block content
         a.btn.btn--outline(href="/my-bookings") ← Quay lại
         if booking.status === 'pending'
           form(
-            action=`/my-bookings/${booking.id}?_method=PUT`
+            action=`/my-bookings/${booking.id}/cancel?_method=PUT`
             method="POST"
             data-confirm="Bạn chắc chắn muốn hủy đơn này?"
           )
