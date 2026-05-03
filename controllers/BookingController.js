@@ -1,7 +1,7 @@
 const BookingModel = require('../models/BookingModel');
 const ScheduleModel = require('../models/ScheduleModel');
 const TourModel = require('../models/TourModel');
-
+const { bookingSchema } = require('../validators/bookingSchema');
 const BookingController = {
 
   //GET/booking/:scheduleId

@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path');
 require('dotenv').config();
+require('./cron');
 require('./config/db');
 const session = require('express-session');
 const flash = require('connect-flash');

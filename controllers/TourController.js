@@ -3,6 +3,7 @@ const CategoryModel = require('../models/CategoryModel');
 const { cloudinary } = require('../config/cloudinary');
 const { makeSlug } = require('../helpers/slug');
 const { tourSchema } = require('../validators/tourSchema');
+const { query } = require('../config/db');
 const LIMIT = 10;
 
 const TourController = {
@@ -199,27 +200,26 @@ const TourController = {
   // DELETE /admin/tours/:id
   async delete(req, res, next) {
     try {
-      const tour = await TourModel.findById(req.params.id);
+      const tourId = req.params.id;
 
-      if (tour) {
-        // Xóa ảnh trên Cloudinary
-        for (const url of (tour.images || [])) {
-          const publicId = url
-            .split('/')
-            .slice(-2)
-            .join('/')
-            .replace(/\.[^/.]+$/, '');
+      const result = await query(
+        `SELECT b.id FROM BOOKINGS b 
+         JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id 
+         WHERE s.tour_id = ? LIMIT 1`, 
+        [tourId]
+      );
 
-          await cloudinary.uploader.destroy(publicId).catch(() => {});
-        }
+      const rows = Array.isArray(result[0]) ? result[0] : result;
 
-        await TourModel.delete(req.params.id);
+      if (rows && rows.length > 0) {
+        req.flash('error', 'Không thể xóa Tour này vì đang có khách đặt. Bạn chỉ có thể ẩn nó đi.');
+        return res.redirect('/admin/tours');
       }
 
-      req.flash('success', 'Đã xóa tour');
-      return req.session.save(() => {
-        res.redirect('/admin/tours');
-      });
+      await TourModel.delete(tourId);
+      req.flash('success', 'Đã xóa tour thành công');
+      res.redirect('/admin/tours');
+
     } catch (err) {
       next(err);
     }
