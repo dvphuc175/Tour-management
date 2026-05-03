@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+  .container
+    .result-page
+
+      if success
+        .result-icon.result-icon--success ✓
+        h1.result-title Thanh toán thành công!
+        p.result-sub= message
+        if amount
+          p.result-amount Số tiền: #{formatPrice(amount)}
+        .result-actions
+          a.btn.btn--primary(href=`/my-bookings/${bookingId}`) Xem đơn đặt
+          a.btn.btn--outline(href="/tours") Khám phá tour khác
+
+      else
+        .result-icon.result-icon--fail ✕
+        h1.result-title Thanh toán thất bại
+        p.result-sub= message
+        .result-actions
+          if bookingId
+            a.btn.btn--primary(href=`/my-bookings/${bookingId}`) Xem đơn & thử lại
+          a.btn.btn--outline(href="/") Về trang chủ

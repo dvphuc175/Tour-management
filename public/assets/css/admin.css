@@ -360,3 +360,56 @@ code {
 .ck.ck-toolbar {
   border-radius: 0 !important;
 }
+
+/* ── Filter tabs ─────────────────────────── */
+.filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.filter-tab {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: all .15s;
+}
+.filter-tab:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.filter-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ── Admin booking detail ────────────────── */
+.booking-detail-admin { padding: 4px 0 40px; }
+.booking-detail-header {
+  display: flex; align-items: center;
+  gap: 14px; margin-bottom: 24px;
+}
+.booking-detail-header h2 { font-size: 22px; }
+.booking-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.booking-detail-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* ── Summary row ─────────────────────────── */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row span { color: var(--color-text-muted); }
+.summary-row strong { color: var(--color-text); font-weight: 500; }
+.summary-row--total {
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 2px solid var(--color-border);
+  font-weight: 600;
+}
+.summary-row--total .price {
+  color: var(--color-accent);
+  font-size: 16px;
+}

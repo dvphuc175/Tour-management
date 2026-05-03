@@ -60,11 +60,24 @@ block content
             span(class=`badge badge--${booking.payment_status}`)
               = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[booking.payment_status]
 
-          //- Nút thanh toán VNPay (tuần 6 sẽ dùng)
-          if booking.status === 'confirmed' && booking.payment_status === 'pending'
-            .payment-actions(style="margin-top:16px")
-              a.btn.btn--primary(href=`/payment/vnpay/${booking.id}`) Thanh toán VNPay
-              p.form-hint Hoặc thanh toán tiền mặt tại văn phòng
+          .payment-actions(style="margin-top:16px")
+            //- VNPay: hiện nún TT khi còn pending + chưa trả tiền
+            if booking.payment_method === 'vnpay' && booking.payment_status === 'pending' && booking.status === 'pending'
+              a.btn.btn--primary.btn--block(href=`/payment/vnpay/${booking.id}`)
+                | Thanh toán ngay qua VNPay
+
+            //- Cash: thông báo chờ admin
+            if booking.payment_method === 'cash' && booking.status === 'pending'
+              .info-box
+                p Đơn đặt của bạn đang chờ xác nhận.
+                p Vui lòng đến văn phòng thanh toán tiền mặt để được xác nhận sớm nhất.
+
+            //- Đã thanh toán thành công
+            if booking.payment_status === 'success'
+              .tip-box
+                p ✓ Đã thanh toán thành công
+                if booking.paid_at
+                  p Thời gian: #{formatDate(booking.paid_at)}
 
       .booking-detail-actions
         a.btn.btn--outline(href="/my-bookings") ← Quay lại

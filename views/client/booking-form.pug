@@ -74,8 +74,32 @@ block content
               placeholder="Ăn chay, hỗ trợ xe lăn..."
             )
 
-          button.btn.btn--primary.btn--block.btn--lg(type="submit")
-            | Xác nhận đặt tour
+          h3.form-section-title Phương thức thanh toán
+          .payment-method-group
+            label.payment-method-option
+              input(
+                type="radio" name="payment_method"
+                value="vnpay" checked
+                onchange="updatePayBtn(this.value)"
+              )
+              .payment-method-card
+                .payment-method-card__logo VNPAY
+                .payment-method-card__name Thanh toán VNPay
+                .payment-method-card__desc Chuyển khoản qua cổng VNPay — xác nhận tức thì
+
+            label.payment-method-option
+              input(
+                type="radio" name="payment_method"
+                value="cash"
+                onchange="updatePayBtn(this.value)"
+              )
+              .payment-method-card
+                .payment-method-card__logo 💵
+                .payment-method-card__name Thanh toán tiền mặt
+                .payment-method-card__desc Đến văn phòng thanh toán — chờ admin xác nhận
+
+          button#submitBtn.btn.btn--primary.btn--block.btn--lg(type="submit")
+            | Đặt tour & Thanh toán VNPay
 
       //- ── Cột phải: tóm tắt đơn ───────────────
       aside.booking-summary
@@ -142,3 +166,11 @@ block scripts
         new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(total);
     }
     calcPrice();
+
+    // Cập nhật label nút submit theo phương thức chọn
+    function updatePayBtn(method) {
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = method === 'vnpay'
+        ? 'Đặt tour & Thanh toán VNPay'
+        : 'Đặt tour — Thanh toán tiền mặt sau';
+    }

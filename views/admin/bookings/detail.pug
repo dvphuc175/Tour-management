@@ -1,0 +1,113 @@
+extends ../../admin/layout
+
+block content
+  .booking-detail-admin
+
+    .booking-detail-header
+      h2 Đơn ##{booking.id}
+      span(class=`badge badge--${booking.status} badge--lg`)
+        = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[booking.status]
+
+    .booking-detail-grid
+
+      .detail-card
+        h3.detail-card__title Thông tin khách hàng
+        .summary-row
+          span Tài khoản
+          strong= booking.user_name
+        .summary-row
+          span Email
+          strong= booking.user_email
+        .summary-row
+          span SĐT TK
+          strong= booking.user_phone || '—'
+        hr
+        .summary-row
+          span Người liên hệ
+          strong= booking.contact_name
+        .summary-row
+          span SĐT LH
+          strong= booking.contact_phone
+        .summary-row
+          span Email LH
+          strong= booking.contact_email
+        if booking.special_request
+          .summary-row
+            span Yêu cầu
+            strong= booking.special_request
+
+      .detail-card
+        h3.detail-card__title Thông tin tour
+        .summary-row
+          span Tour
+          strong: a(href=`/tours/${booking.tour_slug}` target="_blank")= booking.tour_name
+        .summary-row
+          span Ngày đi
+          strong= formatDate(booking.start_date)
+        .summary-row
+          span Ngày về
+          strong= formatDate(booking.end_date)
+        .summary-row
+          span Điểm KH
+          strong= booking.departure_location
+        .summary-row
+          span Hành khách
+          strong #{booking.adult_count} NL / #{booking.child_count} TE
+        .summary-row.summary-row--total
+          span Tổng tiền
+          strong.price= formatPrice(booking.total_price)
+
+      .detail-card
+        h3.detail-card__title Thanh toán
+        .summary-row
+          span Phương thức
+          strong= booking.payment_method === 'vnpay' ? 'VNPay' : 'Tiền mặt'
+        .summary-row
+          span Trạng thái
+          span(class=`badge badge--${booking.payment_status}`)
+            = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[booking.payment_status]
+        if booking.transaction_id
+          .summary-row
+            span Mã GD
+            strong= booking.transaction_id
+        if booking.paid_at
+          .summary-row
+            span Thời gian TT
+            strong= formatDate(booking.paid_at)
+
+    .booking-detail-actions
+      a.btn.btn--outline(href="/admin/bookings") ← Quay lại
+
+      //- Chỉ hiện "Xác nhận đơn" với đơn CASH đang pending
+      if booking.status === 'pending' && booking.payment_method === 'cash'
+        form(
+          action=`/admin/bookings/${booking.id}/confirm?_method=PUT`
+          method="POST"
+          data-confirm="Xác nhận đã nhận tiền mặt và duyệt đơn này?"
+          style="display:inline"
+        )
+          button.btn.btn--primary(type="submit") ✓ Xác nhận & Nhận tiền mặt
+
+      //- VNPay pending: chỉ hiển thị trạng thái, không có nút duyệt
+      if booking.status === 'pending' && booking.payment_method === 'vnpay'
+        span.badge.badge--pending(style="padding:8px 14px") Chờ khách thanh toán VNPay
+
+      //- Nút "Hoàn thành tour" — cả 2 luồng, khi đã confirmed
+      if booking.status === 'confirmed'
+        form(
+          action=`/admin/bookings/${booking.id}/complete?_method=PUT`
+          method="POST"
+          data-confirm="Đánh dấu tour này đã hoàn thành?"
+          style="display:inline"
+        )
+          button.btn.btn--primary(type="submit") ✓ Hoàn thành tour
+
+      //- Hủy đơn — không hủy khi đã completed
+      if booking.status !== 'cancelled' && booking.status !== 'completed'
+        form(
+          action=`/admin/bookings/${booking.id}/cancel?_method=PUT`
+          method="POST"
+          data-confirm="Hủy đơn này và hoàn lại chỗ cho lịch trình?"
+          style="display:inline"
+        )
+          button.btn.btn--danger(type="submit") Hủy đơn
