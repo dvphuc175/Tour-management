@@ -1,0 +1,45 @@
+extends ../../admin/layout
+
+block content
+  .toolbar
+    .filter-tabs
+      a(href="/admin/bookings" class=!currentStatus?'filter-tab active':'filter-tab') Tất cả
+      each s in ['pending','confirmed','cancelled','completed']
+        a(
+          href=`/admin/bookings?status=${s}`
+          class=currentStatus===s?'filter-tab active':'filter-tab'
+        )= {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[s]
+
+  .table-wrap
+    table.data-table
+      thead
+        tr
+          th #
+          th Khách hàng
+          th Tour
+          th Ngày đi
+          th Tổng tiền
+          th Đặt cọc
+          th Trạng thái
+          th
+      tbody
+        if bookings.length === 0
+          tr
+            td(colspan="8" style="text-align:center;padding:32px;color:#9ca3af") Không có đơn nào
+        each b in bookings
+          tr
+            td= b.id
+            td
+              div= b.user_name
+              small= b.user_email
+            td= b.tour_name
+            td= formatDate(b.start_date)
+            td= formatPrice(b.total_price)
+            td
+              span(class=`badge badge--${b.payment_status}`)
+                = {pending:'Chưa TT',success:'Đã TT',failed:'Thất bại'}[b.payment_status]
+            td
+              span(class=`badge badge--${b.status}`)
+                = {pending:'Chờ XN',confirmed:'Xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
+            td
+              a.btn.btn--outline.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
