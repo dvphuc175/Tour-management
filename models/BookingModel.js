@@ -246,6 +246,53 @@ const BookingModel = {
     } finally {
       conn.release();
     }
+  },
+  // Job tự động hủy đơn VNPay treo quá 15 phút
+  async autoCancelUnpaidVnpay() {
+    const conn = await getConnection();
+    try {
+      await conn.beginTransaction();
+      
+      // Tìm các đơn vnpay, đang pending, tạo cách đây hơn 15 phút
+      const [expired] = await conn.execute(
+        `SELECT b.id, b.schedule_id, b.adult_count, b.child_count
+         FROM BOOKINGS b
+         JOIN PAYMENTS p ON p.booking_id = b.id
+         WHERE b.status = 'pending' AND p.method = 'vnpay'
+           AND b.created_at <= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+         FOR UPDATE`
+      );
+
+      if (expired.length === 0) {
+        await conn.rollback();
+        return 0;
+      }
+
+      for (const b of expired) {
+        // Đổi trạng thái đơn và thanh toán
+        await conn.execute("UPDATE BOOKINGS SET status='cancelled' WHERE id=?", [b.id]);
+        await conn.execute("UPDATE PAYMENTS SET status='failed' WHERE booking_id=?", [b.id]);
+        
+        // Trả lại slots cho lịch trình
+        const returnSlots = b.adult_count + b.child_count;
+        await conn.execute(
+          `UPDATE TOUR_SCHEDULES
+           SET available_slots = available_slots + ?,
+               status = IF(status = 'full', 'active', status)
+           WHERE id = ?`,
+          [returnSlots, b.schedule_id]
+        );
+      }
+
+      await conn.commit();
+      return expired.length;
+    } catch (err) {
+      await conn.rollback();
+      console.error('[DB_ERROR] Lỗi autoCancelUnpaidVnpay:', err);
+      throw err;
+    } finally {
+      conn.release();
+    }
   }
 };
 

@@ -1,6 +1,7 @@
 const ScheduleModel = require('../models/ScheduleModel');
 const TourModel = require('../models/TourModel');
 const { scheduleSchema } = require('../validators/tourSchema');
+const { query } = require('../config/db');
 const ScheduleController = {
   // GET /admin/tours/:tourId/schedules
   async index(req, res, next) {
@@ -180,20 +181,27 @@ const ScheduleController = {
   // DELETE /admin/schedules/:id
   async delete(req, res, next) {
     try {
-      const schedule = await ScheduleModel.findById(req.params.id);
+      const scheduleId = req.params.id;
 
-      if (schedule) {
-        await ScheduleModel.delete(req.params.id); // có thể throw nếu đã có booking
+      const result = await query(
+        `SELECT id FROM BOOKINGS WHERE schedule_id = ? LIMIT 1`,
+        [scheduleId]
+      );
 
-        req.flash('success', 'Đã xóa lịch trình');
-        return res.redirect(`/admin/tours/${schedule.tour_id}/schedules`);
+      const rows = Array.isArray(result[0]) ? result[0] : result;
+
+      if (rows && rows.length > 0) {
+        req.flash('error', 'Không thể xóa lịch trình này vì đã có khách đặt. Bạn có thể chuyển trạng thái thành "Đã hủy".');
+        return res.redirect(`/admin/tours/${schedule.tour_id}/schedules`); 
       }
 
-      req.flash('error', 'Không tìm thấy lịch trình');
-      res.redirect('/admin/tours');
+      await query('DELETE FROM TOUR_SCHEDULES WHERE id = ?', [scheduleId]);
+      
+      req.flash('success', 'Đã xóa lịch trình thành công');
+      res.redirect(`/admin/tours/${schedule.tour_id}/schedules`);
+
     } catch (err) {
-      req.flash('error', err.message); // ví dụ: "Không thể xóa lịch trình đã có đặt chỗ"
-      return res.redirect('/admin/tours');
+      next(err);
     }
   }
 };
