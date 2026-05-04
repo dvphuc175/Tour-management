@@ -293,6 +293,51 @@ const BookingModel = {
     } finally {
       conn.release();
     }
+  },
+  async autoCancelUnpaidCash() {
+    const conn = await getConnection();
+    try {
+      await conn.beginTransaction();
+      
+      // TÌM CÁC ĐƠN TIỀN MẶT QUÁ 24 GIỜ
+      const [expired] = await conn.execute(
+        `SELECT b.id, b.schedule_id, b.adult_count, b.child_count
+         FROM BOOKINGS b
+         JOIN PAYMENTS p ON p.booking_id = b.id
+         WHERE b.status = 'pending' AND p.method = 'cash'
+           AND b.created_at <= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+         FOR UPDATE`
+      );
+
+      if (expired.length === 0) {
+        await conn.rollback();
+        return 0;
+      }
+
+      for (const b of expired) {
+        // Đổi trạng thái
+        await conn.execute("UPDATE BOOKINGS SET status='cancelled' WHERE id=?", [b.id]);
+        await conn.execute("UPDATE PAYMENTS SET status='failed' WHERE booking_id=?", [b.id]);
+        
+        // Trả lại slots
+        const returnSlots = b.adult_count + b.child_count;
+        await conn.execute(
+          `UPDATE TOUR_SCHEDULES
+           SET available_slots = available_slots + ?,
+               status = IF(status = 'full', 'active', status)
+           WHERE id = ?`,
+          [returnSlots, b.schedule_id]
+        );
+      }
+
+      await conn.commit();
+      return expired.length;
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
   }
 };
 

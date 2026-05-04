@@ -38,61 +38,37 @@ const BookingController = {
   //POST /booking
   async create(req, res, next) {
     try {
-      const {
-        schedule_id,
-        contact_name,
-        contact_phone,
-        contact_email,
-        adult_count,
-        child_count,
-        special_request,
-        payment_method
-      } = req.body;
+      const { error, value } = bookingSchema.validate(req.body, { abortEarly: true });
 
-      // 1. Validate input 
-      const adults = Math.max(1, parseInt(adult_count) || 1);
-      const children = Math.max(0, parseInt(child_count) || 0);
-
-      if (!contact_name?.trim() || !contact_phone?.trim() || !contact_email?.trim()) {
-        req.flash('error', 'Vui lòng nhập đầy đủ thông tin liên hệ');
-        return res.redirect(`/booking/${schedule_id}`);
+      if (error) {
+        req.flash('error', error.details[0].message);
+        return res.redirect(`/booking/${req.body.schedule_id || ''}`);
       }
-      // Validate payment_method (fallback = 'cash')
-      const method = ['vnpay', 'cash'].includes(payment_method)
-        ? payment_method
-        : 'cash';
 
-      // 2. Lấy schedule + tour 
+      const { 
+        schedule_id, contact_name, contact_phone, contact_email,
+        adult_count: adults, child_count: children, 
+        special_request, payment_method 
+      } = value;
+
       const schedule = await ScheduleModel.findById(schedule_id);
-
       if (!schedule) {
         req.flash('error', 'Lịch trình không tồn tại');
         return res.redirect('/tours');
       }
-
+      
       const tour = await TourModel.findById(schedule.tour_id);
+      const total_price = adults * tour.price_adult + children * tour.price_child;
 
-      // 3. Tính giá  
-      const total_price =
-        adults * tour.price_adult +
-        children * tour.price_child;
-
-      // 4. Tạo booking (transaction) =====
       const bookingId = await BookingModel.createWithTransaction({
-        schedule_id,
-        user_id: req.session.user.id,
-        contact_name: contact_name.trim(),
-        contact_phone: contact_phone.trim(),
-        contact_email: contact_email.trim(),
-        adult_count: adults,
-        child_count: children,
-        total_price,
-        special_request,
-        payment_method: method
+        schedule_id, user_id: req.session.user.id,
+        contact_name, contact_phone, contact_email,
+        adult_count: adults, child_count: children,
+        total_price, special_request, payment_method
       });
 
-      if (method === 'vnpay') {
-        return res.redirect(`/payment/vnpay/${bookingId}`);
+      if (payment_method === 'vnpay') {
+        return res.redirect(`my-bookings/${bookingId}`);
       } else {
         req.flash('success', 'Đặt tour thành công! Vui lòng chờ xác nhận.');
         return res.redirect(`/booking/success/${bookingId}`);
@@ -100,7 +76,8 @@ const BookingController = {
 
     } catch (err) {
       req.flash('error', err.message);
-      return res.redirect(`/booking/${req.body.schedule_id}`);
+      const backUrl = req.body.schedule_id ? `/booking/${req.body.schedule_id}` : '/tours';
+      res.redirect(backUrl);
     }
   },
 

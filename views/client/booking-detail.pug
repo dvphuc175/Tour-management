@@ -3,6 +3,7 @@ extends ../layout
 block content
   .container
     .booking-detail-page
+
       .booking-detail-header
         h1 Đơn đặt ##{booking.id}
         span(class=`badge badge--${booking.status} badge--lg`)
@@ -43,44 +44,73 @@ block content
 
         .detail-card
           h3.detail-card__title Thanh toán
+
           .summary-row
             span Người lớn
             strong #{booking.adult_count} × #{formatPrice(booking.price_adult)}
+
           .summary-row
             span Trẻ em
             strong #{booking.child_count} × #{formatPrice(booking.price_child)}
+
           .summary-row.summary-row--total
             span Tổng tiền
             strong.price= formatPrice(booking.total_price)
+
           .summary-row
             span Phương thức
             strong= booking.payment_method === 'vnpay' ? 'VNPay' : 'Tiền mặt'
+
           .summary-row
             span Trạng thái TT
             span(class=`badge badge--${booking.payment_status}`)
               = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[booking.payment_status]
 
           .payment-actions(style="margin-top:16px")
-            //- VNPay: hiện nún TT khi còn pending + chưa trả tiền
+
+            // VNPay
             if booking.payment_method === 'vnpay' && booking.payment_status === 'pending' && booking.status === 'pending'
-              a.btn.btn--primary.btn--block(href=`/payment/vnpay/${booking.id}`)
-                | Thanh toán ngay qua VNPay
+              .vnpay-timer-box(
+                data-created-at=booking.created_at
+                style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-bottom:15px; text-align:center;"
+              )
+                p(style="margin:0; font-weight:bold;")
+                  | Thời gian thanh toán còn lại:
+                  span#countdown-clock(style="color:red; font-size:1.1em;") Đang tính...
 
-            //- Cash: thông báo chờ admin
+              a#btn-vnpay-submit.btn.btn--primary.btn--block(
+                href=`/payment/vnpay/${booking.id}`
+              ) Thanh toán ngay qua VNPay
+
+            // CASH
             if booking.payment_method === 'cash' && booking.status === 'pending'
-              .info-box
-                p Đơn đặt của bạn đang chờ xác nhận.
-                p Vui lòng đến văn phòng thanh toán tiền mặt để được xác nhận sớm nhất.
+              .info-box(style="background:#d1ecf1; color:#0c5460; padding:15px; border-radius:5px;")
+                p(style="font-weight:bold; margin-bottom:5px;")
+                  | ℹ️ Đơn đặt của bạn đang chờ xác nhận.
+                p(style="margin:0;")
+                  | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng
+                  strong 24 giờ.
+                  |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
 
-            //- Đã thanh toán thành công
+            // SUCCESS
             if booking.payment_status === 'success'
               .tip-box
                 p ✓ Đã thanh toán thành công
                 if booking.paid_at
                   p Thời gian: #{formatDate(booking.paid_at)}
 
+            // BUTTON HỖ TRỢ (FIX INDENT)
+            if booking.status === 'confirmed'
+              button.btn.btn--outline-danger.btn--block(
+                type="button"
+                onclick="document.getElementById('cancelPolicyModal').style.display='block'"
+                style="margin-top:10px;"
+              ) ⚠️ Hỗ trợ Hủy / Dời ngày đi
+
+      // ACTIONS
       .booking-detail-actions
         a.btn.btn--outline(href="/my-bookings") ← Quay lại
+
         if booking.status === 'pending'
           form(
             action=`/my-bookings/${booking.id}/cancel?_method=PUT`
@@ -88,3 +118,81 @@ block content
             data-confirm="Bạn chắc chắn muốn hủy đơn này?"
           )
             button.btn.btn--danger(type="submit") Hủy đơn
+
+  #cancelPolicyModal.modal(
+    style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);"
+  )
+    .modal-content(
+      style="background-color:#fff; margin:10% auto; padding:20px; width:90%; max-width:500px; border-radius:8px; position:relative;"
+    )
+      span.close-btn(
+        onclick="document.getElementById('cancelPolicyModal').style.display='none'"
+        style="position:absolute; right:15px; top:10px; font-size:24px; cursor:pointer; color:#aaa;"
+      ) &times;
+
+      h3(style="color:#d32f2f; margin-top:0;") Quy định Hủy / Đổi ngày tour
+
+      p(style="font-size:14px; color:#555;")
+        | Do đặc thù dịch vụ du lịch, hệ thống không hỗ trợ tự động hủy đơn.
+
+      ul(style="font-size:14px; padding-left:20px;")
+        li 🟢 Trước 5 ngày: Hoàn 100%
+        li 🟡 2-5 ngày: Phí 50%
+        li 🔴 <48h: Không hoàn
+
+      hr
+
+      h4 Liên hệ CSKH
+      p Cung cấp mã ##{booking.id}
+
+      .contact-actions(style="display:flex; gap:10px; margin-top:15px;")
+        a.btn.btn--primary(
+          href="https://zalo.me/0345043213"
+          target="_blank"
+          style="flex:1; text-align:center; background:#0068ff; border:none;"
+        ) 💬 Zalo
+
+        a.btn.btn--outline(
+          href="tel:0345043213"
+          style="flex:1; text-align:center;"
+        ) 📞 Hotline
+
+block scripts
+  script.
+    document.addEventListener("DOMContentLoaded", function () {
+      const timerBox = document.querySelector('.vnpay-timer-box');
+      if (!timerBox) return;
+
+      const createdAtTime = new Date(timerBox.getAttribute('data-created-at')).getTime();
+      const expireTime = createdAtTime + (15 * 60 * 1000);
+
+      const clockEl = document.getElementById('countdown-clock');
+      const btnVnpay = document.getElementById('btn-vnpay-submit');
+
+      const countdown = setInterval(function () {
+        const now = Date.now();
+        const distance = expireTime - now;
+
+        if (distance < 0) {
+          clearInterval(countdown);
+          clockEl.innerHTML = "Đã quá hạn thanh toán";
+
+          if (btnVnpay) {
+            btnVnpay.style.backgroundColor = '#ccc';
+            btnVnpay.style.pointerEvents = 'none';
+            btnVnpay.innerHTML = "Đơn hàng đã bị hủy";
+          }
+
+          setTimeout(() => window.location.reload(), 3000);
+          return;
+        }
+
+        const minutes = Math.floor((distance / 1000 / 60) % 60);
+        const seconds = Math.floor((distance / 1000) % 60);
+
+        clockEl.innerHTML =
+          (minutes < 10 ? '0' : '') + minutes + ':' +
+          (seconds < 10 ? '0' : '') + seconds;
+
+      }, 1000);
+    });
