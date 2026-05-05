@@ -9,7 +9,8 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    timezone: 'Asia/Ho_Chi_Minh' 
+    timezone: '+07:00',
+    dateStrings: true
 });
 
 async function query(sql, params = []) { 

@@ -338,6 +338,24 @@ const BookingModel = {
     } finally {
       conn.release();
     }
+  },
+  async autoCompleteTours() {
+    const conn = await getConnection();
+    try {
+      const [result] = await conn.execute(
+        `UPDATE BOOKINGS b
+         JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
+         SET b.status = 'completed'
+         WHERE b.status = 'confirmed' AND s.end_date < NOW()`
+      );
+
+      return result.affectedRows || 0;
+    } catch (err) {
+      console.error('[DB_ERROR] Lỗi autoCompleteTours:', err);
+      throw err;
+    } finally {
+      conn.release();
+    }
   }
 };
 

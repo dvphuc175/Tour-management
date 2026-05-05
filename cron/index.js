@@ -18,3 +18,13 @@ cron.schedule('* * * * *', async () => {
     console.error('[CRON] Lỗi khi chạy tác vụ dọn dẹp:', error);
   }
 });
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const completedCount = await BookingModel.autoCompleteTours();
+    if (completedCount > 0) {
+      console.log(`[CRON] Đã tự động đánh dấu hoàn thành ${completedCount} đơn đặt tour (đã qua ngày kết thúc).`);
+    }
+  } catch (error) {
+    console.error('[CRON] Lỗi khi tự động hoàn thành tour:', error);
+  }
+});

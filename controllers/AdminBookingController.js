@@ -188,13 +188,44 @@ async detail(req, res, next) {
   // PUT /admin/bookings/:id/complete 
   async complete(req, res, next) {
     try {
-      await query(
-        "UPDATE BOOKINGS SET status='completed' WHERE id=? AND status='confirmed'",
-        [req.params.id]
+      const bookingId = req.params.id;
+
+      const result = await query(
+        `SELECT b.status, s.start_date, s.end_date 
+         FROM BOOKINGS b
+         JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
+         WHERE b.id = ?`,
+        [bookingId]
       );
-      req.flash('success', 'Đã đánh dấu tour hoàn thành');
+
+      const rows = Array.isArray(result[0]) ? result[0] : result;
+      const bookingData = rows && rows.length > 0 ? rows[0] : null;
+
+      if (!bookingData) {
+        req.flash('error', 'Không tìm thấy đơn hàng.');
+        return res.redirect('/admin/bookings');
+      }
+
+      if (bookingData.status !== 'confirmed') {
+        req.flash('error', 'Chỉ có thể hoàn thành các đơn đã được xác nhận.');
+        return res.redirect(`/admin/bookings/${req.params.id}`);
+      }
+
+      const now = new Date();
+      const startDate = new Date(bookingData.start_date);
+
+      if (now < startDate) {
+        req.flash('error', 'Tour này chưa khởi hành! Không thể đánh dấu hoàn thành sớm.');
+        return res.redirect(`/admin/bookings/${req.params.id}`);
+      }
+
+      await query("UPDATE BOOKINGS SET status = 'completed' WHERE id = ?", [bookingId]);
+      
+      req.flash('success', 'Đã đánh dấu hoàn thành đơn đặt tour!');
       res.redirect(`/admin/bookings/${req.params.id}`);
-    } catch (err) { next(err); }
+    } catch (err) {
+      next(err);
+    }
   }
 };
 
