@@ -17,4 +17,6 @@ aside.admin-sidebar
       | Báo cáo
     hr
     a(href="/") Xem trang web
-    a(href="/logout") Đăng xuất
+    form.sidebar__logout(action="/logout?_method=DELETE" method="POST")
+      input(type="hidden" name="_csrf" value=csrfToken)
+      button(type="submit") Đăng xuất

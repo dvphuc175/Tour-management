@@ -13,6 +13,7 @@ nav.navbar
       if user.role === 'admin'
         a(href="/admin") Admin
       form(action="/logout?_method=DELETE" method="POST" style="display:inline")
+        input(type="hidden" name="_csrf" value=csrfToken)
         button.btn.btn--outline.btn--sm(type="submit") Đăng xuất
     else
       a(href="/login") Đăng nhập

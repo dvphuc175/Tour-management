@@ -1,7 +1,14 @@
 const cron = require('node-cron');
 const BookingModel = require('../models/BookingModel');
 
+let isCleanupRunning = false;
+let isCompleteRunning = false;
+ 
 cron.schedule('* * * * *', async () => {
+  if (isCleanupRunning) {
+    return;
+  }
+  isCleanupRunning = true;
   try {
     // Quét VNPay (15 phút)
     const canceledVnpay = await BookingModel.autoCancelUnpaidVnpay();
@@ -16,9 +23,15 @@ cron.schedule('* * * * *', async () => {
     }
   } catch (error) {
     console.error('[CRON] Lỗi khi chạy tác vụ dọn dẹp:', error);
+  } finally {
+    isCleanupRunning = false;
   }
 });
 cron.schedule('0 0 * * *', async () => {
+  if (isCompleteRunning) {
+    return;
+  }
+  isCompleteRunning = true;
   try {
     const completedCount = await BookingModel.autoCompleteTours();
     if (completedCount > 0) {
@@ -26,5 +39,7 @@ cron.schedule('0 0 * * *', async () => {
     }
   } catch (error) {
     console.error('[CRON] Lỗi khi tự động hoàn thành tour:', error);
+  } finally {
+    isCompleteRunning = false;
   }
 });

@@ -8,6 +8,7 @@ block content
         p.auth-card__sub Chào mừng bạn trở lại
 
       form.auth-form(action="/login" method="POST")
+        input(type="hidden" name="_csrf" value=csrfToken)
         .form-group
           label(for="email") Email
           input#email.form-control(

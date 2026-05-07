@@ -8,6 +8,7 @@ block content
       const btnLabel = isEdit ? 'Cập nhật' : 'Thêm mới'
 
     form(action=action method="POST")
+      input(type="hidden" name="_csrf" value=csrfToken)
       .form-group
         label Tên danh mục
         input.form-control(
