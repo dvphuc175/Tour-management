@@ -86,6 +86,7 @@ block content
           data-confirm="Xác nhận đã nhận tiền mặt và duyệt đơn này?"
           style="display:inline"
         )
+          input(type="hidden" name="_csrf" value=csrfToken)
           button.btn.btn--primary(type="submit") ✓ Xác nhận & Nhận tiền mặt
 
       //- VNPay pending: chỉ hiển thị trạng thái, không có nút duyệt
@@ -100,6 +101,7 @@ block content
           data-confirm="Đánh dấu tour này đã hoàn thành?"
           style="display:inline"
         )
+          input(type="hidden" name="_csrf" value=csrfToken)
           button.btn.btn--primary(type="submit") ✓ Hoàn thành tour
 
       //- Hủy đơn — không hủy khi đã completed
@@ -110,4 +112,5 @@ block content
           data-confirm="Hủy đơn này và hoàn lại chỗ cho lịch trình?"
           style="display:inline"
         )
+          input(type="hidden" name="_csrf" value=csrfToken)
           button.btn.btn--danger(type="submit") Hủy đơn
