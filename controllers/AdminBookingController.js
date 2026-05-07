@@ -1,5 +1,5 @@
 const { query, getConnection } = require('../config/db');
-
+const EmailService = require('../services/emailService');
 const AdminBookingController = {
 
   async index(req, res, next) {
@@ -178,6 +178,7 @@ async detail(req, res, next) {
       await conn.execute("UPDATE PAYMENTS SET status='success', paid_at=NOW() WHERE booking_id=?", [req.params.id]);
 
       await conn.commit();
+      EmailService.sendSuccessEmail(bookingId, bookingData.contact_email, bookingData.contact_name).catch(console.error);
       req.flash('success', 'Đã xác nhận đơn và ghi nhận thanh toán tiền mặt');
       res.redirect(`/admin/bookings/${req.params.id}`);
     } catch (err) {

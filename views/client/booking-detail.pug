@@ -67,20 +67,20 @@ block content
               = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[booking.payment_status]
 
           .payment-actions(style="margin-top:16px")
-
-            // VNPay
-            if booking.payment_method === 'vnpay' && booking.payment_status === 'pending' && booking.status === 'pending'
-              .vnpay-timer-box(
-                data-created-at=booking.created_at
-                style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-bottom:15px; text-align:center;"
-              )
-                p(style="margin:0; font-weight:bold;")
-                  | Thời gian thanh toán còn lại:
+            
+            //- Cho phép hiện nút khi payment_status là 'pending' HOẶC 'failed'
+            if booking.payment_method === 'vnpay' && (booking.payment_status === 'pending' || booking.payment_status === 'failed') && booking.status === 'pending'
+              
+              .vnpay-timer-box(data-created-at=booking.created_at, style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-bottom:15px; text-align:center;")
+                p(style="margin:0; font-weight:bold;") ⏳ Thời gian giữ chỗ còn lại: 
                   span#countdown-clock(style="color:red; font-size:1.1em;") Đang tính...
-
-              a#btn-vnpay-submit.btn.btn--primary.btn--block(
-                href=`/payment/vnpay/${booking.id}`
-              ) Thanh toán ngay qua VNPay
+              
+              //- Đổi text linh hoạt: Nếu failed thì hiện "Thanh toán lại"
+              a#btn-vnpay-submit.btn.btn--primary.btn--block(href=`/payment/vnpay/${booking.id}`) 
+                if booking.payment_status === 'failed'
+                  | 🔄 Thanh toán lại qua VNPay
+                else
+                  | Thanh toán ngay qua VNPay
 
             // CASH
             if booking.payment_method === 'cash' && booking.status === 'pending'
@@ -181,40 +181,55 @@ block content
 
 block scripts
   script.
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const timerBox = document.querySelector('.vnpay-timer-box');
       if (!timerBox) return;
 
-      const createdAtTime = new Date(timerBox.getAttribute('data-created-at')).getTime();
-      const expireTime = createdAtTime + (15 * 60 * 1000);
+      const createdAtStr = timerBox.getAttribute('data-created-at');
+      const createdAtTime = new Date(createdAtStr).getTime();
+      const expireTime = createdAtTime + (15 * 60 * 1000); 
 
       const clockEl = document.getElementById('countdown-clock');
       const btnVnpay = document.getElementById('btn-vnpay-submit');
 
-      const countdown = setInterval(function () {
-        const now = Date.now();
+      function updateClock() {
+        const now = new Date().getTime();
         const distance = expireTime - now;
 
-        if (distance < 0) {
-          clearInterval(countdown);
+        if (distance <= 0) {
           clockEl.innerHTML = "Đã quá hạn thanh toán";
-
-          if (btnVnpay) {
+          
+          if(btnVnpay) {
             btnVnpay.style.backgroundColor = '#ccc';
             btnVnpay.style.pointerEvents = 'none';
-            btnVnpay.innerHTML = "Đơn hàng đã bị hủy";
+            btnVnpay.innerHTML = "Đơn hàng đã bị hủy do quá hạn";
+            btnVnpay.removeAttribute('href'); 
           }
-
-          setTimeout(() => window.location.reload(), 3000);
-          return;
+          return true; 
         }
 
-        const minutes = Math.floor((distance / 1000 / 60) % 60);
-        const seconds = Math.floor((distance / 1000) % 60);
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        const mDisplay = minutes < 10 ? "0" + minutes : minutes;
+        const sDisplay = seconds < 10 ? "0" + seconds : seconds;
+        
+        clockEl.innerHTML = mDisplay + ":" + sDisplay;
+        return false;
+      }
 
-        clockEl.innerHTML =
-          (minutes < 10 ? '0' : '') + minutes + ':' +
-          (seconds < 10 ? '0' : '') + seconds;
+      const isExpiredOnLoad = updateClock();
 
-      }, 1000);
+      if (!isExpiredOnLoad) {
+        const countdown = setInterval(function() {
+          const isExpiredNow = updateClock();
+          
+          if (isExpiredNow) {
+            clearInterval(countdown);
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }
+        }, 1000);
+      }
     });

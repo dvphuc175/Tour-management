@@ -2,6 +2,7 @@ const BookingModel = require('../models/BookingModel');
 const ScheduleModel = require('../models/ScheduleModel');
 const TourModel = require('../models/TourModel');
 const { bookingSchema } = require('../validators/bookingSchema');
+const EmailService = require('../services/emailService');
 const BookingController = {
 
   //GET/booking/:scheduleId
@@ -66,6 +67,13 @@ const BookingController = {
         adult_count: adults, child_count: children,
         total_price, special_request, payment_method
       });
+
+      EmailService.sendPendingEmail({
+        id: bookingId,
+        contact_name: contact_name,
+        payment_method: payment_method,
+        total_price: total_price
+      }, contact_email).catch(console.error);
 
       if (payment_method === 'vnpay') {
         return res.redirect(`/payment/vnpay/${bookingId}`);
