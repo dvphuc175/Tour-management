@@ -28,5 +28,80 @@ html(lang="vi")
       block content
 
     //- include partials/footer (Sẽ làm sau)
+
+    //- Zalo Widget
+    #zalo-widget(
+      style="position:fixed; bottom:50px; right:20px; z-index:1000;"
+    )
+      //- Nút Zalo
+      #zalo-button(
+        onclick="toggleZaloChat()"
+        style="width:60px; height:60px; border-radius:12px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition:transform 0.2s; overflow:hidden; background:#fff;"
+        onmouseover="this.style.transform='scale(1.05)'"
+        onmouseout="this.style.transform='scale(1)'"
+      )
+        img(
+          src="/assets/images/Zalo.jpg"
+          alt="Chat Zalo"
+          style="width:100%; height:100%; object-fit:cover;"
+        )
+
+      //- Cửa sổ chat
+      #zalo-chat-window(
+        style="display:none; position:absolute; bottom:75px; right:0; width:300px; background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden;"
+      )
+        //- Header
+        .zalo-header(
+          style="background:linear-gradient(135deg, #0068ff 0%, #0051cc 100%); padding:16px; color:#fff; display:flex; align-items:center; gap:12px;"
+        )
+          img(
+            src="/assets/images/Zalo.jpg"
+            alt="Zalo"
+            style="width:40px; height:40px; border-radius:10px; object-fit:cover; border:2px solid rgba(255,255,255,0.3);"
+          )
+          div
+            div(style="font-weight:600; font-size:15px;") Vi Vu Việt Nam
+            div(style="font-size:12px; opacity:0.9;") Hỗ trợ 24/7
+          span(
+            onclick="toggleZaloChat()"
+            style="margin-left:auto; cursor:pointer; font-size:20px; opacity:0.8;"
+            onmouseover="this.style.opacity='1'"
+            onmouseout="this.style.opacity='0.8'"
+          ) &times;
+
+        //- Body
+        .zalo-body(style="padding:20px; text-align:center; background:#f8f9fa;")
+          p(style="color:#666; font-size:14px; margin:0 0 16px 0;")
+            | Xin chào! 👋
+            br
+            | Chúng tôi có thể giúp gì cho bạn?
+          a(
+            href="https://zalo.me/0345043213"
+            target="_blank"
+            style="display:block; background:#0068ff; color:#fff; text-decoration:none; padding:12px 20px; border-radius:20px; font-weight:500; transition:background 0.2s;"
+            onmouseover="this.style.background='#0051cc'"
+            onmouseout="this.style.background='#0068ff'"
+          )
+            | 💬 Chat ngay trên Zalo
+
     script(src="/assets/js/main.js")
     block scripts
+
+    script.
+      function toggleZaloChat() {
+        const chatWindow = document.getElementById('zalo-chat-window');
+        if (chatWindow.style.display === 'none') {
+          chatWindow.style.display = 'block';
+        } else {
+          chatWindow.style.display = 'none';
+        }
+      }
+
+      //- Đóng chat khi click ra ngoài
+      document.addEventListener('click', function(e) {
+        const widget = document.getElementById('zalo-widget');
+        const chatWindow = document.getElementById('zalo-chat-window');
+        if (chatWindow.style.display === 'block' && !widget.contains(e.target)) {
+          chatWindow.style.display = 'none';
+        }
+      });

@@ -27,7 +27,14 @@ block content
           span Trạng thái
           strong
             span.badge.badge--pending Chờ xác nhận
-
+        if booking.payment_method === 'cash'
+        .info-box(style="background:#d1ecf1; border-left:4px solid #17a2b8; padding:12px 16px; margin:16px 0; border-radius:4px;")
+          p(style="font-weight:bold; margin-bottom:8px; color:#0c5460;")
+            | ℹ️ Đơn đặt của bạn đang chờ xác nhận.
+          p(style="margin:0; color:#0c5460;")
+            | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
+            strong 24 giờ.
+            |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.    
       .success-actions
         a.btn.btn--primary(href="/my-bookings") Xem đơn của tôi
         a.btn.btn--outline(href="/tours") Khám phá thêm tour
