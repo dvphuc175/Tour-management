@@ -183,16 +183,20 @@ const ScheduleController = {
     try {
       const scheduleId = req.params.id;
 
-      const result = await query(
+      const schedule = await ScheduleModel.findById(scheduleId);
+      if (!schedule) {
+        req.flash('error', 'Không tìm thấy lịch trình');
+        return res.redirect('/admin/tours');
+      }
+ 
+      const rows = await query(
         `SELECT id FROM BOOKINGS WHERE schedule_id = ? LIMIT 1`,
         [scheduleId]
       );
 
-      const rows = Array.isArray(result[0]) ? result[0] : result;
-
-      if (rows && rows.length > 0) {
+      if (rows.length > 0) {
         req.flash('error', 'Không thể xóa lịch trình này vì đã có khách đặt. Bạn có thể chuyển trạng thái thành "Đã hủy".');
-        return res.redirect(`/admin/tours/${schedule.tour_id}/schedules`); 
+        return res.redirect(`/admin/tours/${schedule.tour_id}/schedules`);
       }
 
       await query('DELETE FROM TOUR_SCHEDULES WHERE id = ?', [scheduleId]);
