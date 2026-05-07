@@ -51,6 +51,15 @@ function csrf(req, res, next) {
     });
   }
 
+  // Strip _csrf khỏi body/query để Joi schema strict (không allowUnknown)
+  // không báo lỗi '"_csrf" is not allowed'.
+  if (req.body && Object.prototype.hasOwnProperty.call(req.body, '_csrf')) {
+    delete req.body._csrf;
+  }
+  if (req.query && Object.prototype.hasOwnProperty.call(req.query, '_csrf')) {
+    delete req.query._csrf;
+  }
+
   return next();
 }
 
