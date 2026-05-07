@@ -6,44 +6,152 @@
     display: flex; 
     min-height: 100vh; 
 } 
-.admin-sidebar { 
-    width: 240px; 
-    background: var(--color-text); 
-    color: #fff; flex-shrink: 0; 
-    padding: 0; 
-    position: sticky; 
-    top: 0; 
-    height: 100vh; 
-    overflow-y: auto; 
-} 
-.sidebar__logo { 
-    padding: 20px 20px 16px; 
-    border-bottom: 1px solid rgba(255,255,255,.1); 
-} 
-.sidebar__logo a { 
-    font-family: var(--font-heading); 
-    font-size: 17px; 
-    font-weight: 700; 
-    color: #fff; 
-} 
-.sidebar__nav { 
-    padding: 12px 0; 
-} 
-.sidebar__nav a { 
-    display: block; 
-    padding: 10px 20px; 
-    font-size: 14px; 
-    color: rgba(255,255,255,.7); 
-    transition: all .15s; 
-} 
-.sidebar__nav a:hover, .sidebar__nav a.active { 
-    background: rgba(255,255,255,.08); 
-    color: #fff; 
-} 
-.sidebar__nav hr { 
-    border-color: rgba(255,255,255,.1); 
+.admin-sidebar {
+    width: 240px;
+    background: var(--color-text);
+    color: #fff;
+    flex-shrink: 0;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar__logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.sidebar__logo a {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+}
+.sidebar__nav {
+    padding: 12px 0;
+    flex: 1 1 auto;
+}
+.sidebar__nav a {
+    display: block;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: rgba(255,255,255,.7);
+    transition: all .15s;
+}
+.sidebar__nav a:hover, .sidebar__nav a.active {
+    background: rgba(255,255,255,.08);
+    color: #fff;
+}
+.sidebar__nav hr {
+    border-color: rgba(255,255,255,.1);
     margin: 8px 16px;
 } 
+
+ 
+/* ── Sidebar footer (bottom of admin sidebar) ────────── */
+.sidebar__footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.sidebar__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+.sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+    color: rgba(255,255,255,.7);
+    transition: background .15s, color .15s;
+}
+.sidebar__link:hover {
+    background: rgba(255,255,255,.08);
+    color: #fff;
+}
+.sidebar__link--ghost {
+    color: rgba(255,255,255,.6);
+}
+.sidebar__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,.04);
+    border-radius: var(--radius-sm);
+}
+.sidebar__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sidebar__user-info {
+    min-width: 0;
+}
+.sidebar__user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sidebar__user-role {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.sidebar__logout {
+    margin: 0;
+}
+.sidebar__logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
+    background: rgba(220,38,38,.12);
+    border: 1px solid rgba(220,38,38,.35);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+.sidebar__logout-btn:hover {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+    color: #fff;
+}
+.sidebar__logout-btn:active {
+    transform: translateY(1px);
+}
+.sidebar__logout-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+ 
 .admin-main { 
     flex: 1; 
     display: flex; 
