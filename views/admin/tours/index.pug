@@ -52,6 +52,7 @@ block content
 								data-confirm=`Xóa tour "${tour.name}"? Hành động này không thể hoàn tác.`
 								style="display:inline"
 							)
+								input(type="hidden" name="_csrf" value=csrfToken)
 								button.btn.btn--danger.btn--sm(type="submit") Xóa
 	//- Phân trang
 	if totalPages > 1

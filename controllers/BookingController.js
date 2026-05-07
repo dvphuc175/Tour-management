@@ -68,7 +68,7 @@ const BookingController = {
       });
 
       if (payment_method === 'vnpay') {
-        return res.redirect(`my-bookings/${bookingId}`);
+        return res.redirect(`/payment/vnpay/${bookingId}`);
       } else {
         req.flash('success', 'Đặt tour thành công! Vui lòng chờ xác nhận.');
         return res.redirect(`/booking/success/${bookingId}`);

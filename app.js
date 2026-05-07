@@ -9,6 +9,7 @@ const methodOverride= require('method-override');
 const sanitizeHtml = require('sanitize-html');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
+const { csrf } = require('./middlewares/csrf');
 const app = express()
 
 //Thiết lập views
@@ -39,7 +40,12 @@ app.use(session({
     }
 }));
 
-app.use(flash()); 
+app.use(flash());
+
+// CSRF: chạy sau session/body-parser/method-override.
+// Với form multipart (multer chạy route-level), gắn _csrf vào URL query.
+app.use(csrf);
+
 app.use((req, res, next) => { 
     res.locals.success = req.flash('success'); 
     res.locals.error = req.flash('error'); 

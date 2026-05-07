@@ -9,6 +9,7 @@ block content
         h1.booking-title Thông tin đặt tour
 
         form#bookingForm(action="/booking" method="POST")
+          input(type="hidden" name="_csrf" value=csrfToken)
           input(type="hidden" name="schedule_id" value=schedule.id)
 
           h3.form-section-title Thông tin liên hệ

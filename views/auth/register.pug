@@ -8,6 +8,7 @@ block content
         p.auth-card__sub Tham gia để đặt tour dễ dàng hơn
 
       form.auth-form(action="/register" method="POST")
+        input(type="hidden" name="_csrf" value=csrfToken)
         .form-row
           .form-group.form-group--half
             label(for="fullname") 

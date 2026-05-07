@@ -15,6 +15,7 @@ block content
                 : `/admin/tours/${tour.id}/schedules`
 
         form(action=action method="POST")
+            input(type="hidden" name="_csrf" value=csrfToken)
             .form-group
                 label Điểm khởi hành
                 input.form-control(
