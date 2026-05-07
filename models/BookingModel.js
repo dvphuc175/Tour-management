@@ -111,9 +111,11 @@ const BookingModel = {
   },
 
   /**
-   * Lấy danh sách booking của user
+   * Lấy danh sách booking của user có phân trang
    */
-  async getByUserId(userId) {
+  async getByUserId(userId, page = 1, limit = 5) {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
     const sql = `
       SELECT 
         b.*,
@@ -131,9 +133,22 @@ const BookingModel = {
       LEFT JOIN PAYMENTS p ON p.booking_id = b.id
       WHERE b.user_id = ?
       ORDER BY b.created_at DESC
+      LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}
     `;
 
-    return query(sql, [userId]);
+    const countSql = `
+      SELECT COUNT(*) as total FROM BOOKINGS WHERE user_id = ?
+    `;
+
+    const [bookings, countResult] = await Promise.all([
+      query(sql, [userId]),
+      query(countSql, [userId])
+    ]);
+
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    return { bookings, total, totalPages };
   },
 
   // Chi tiết 1 booking

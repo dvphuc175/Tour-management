@@ -24,7 +24,7 @@ block content
                 .booking-item__meta
                   span 📅 #{formatDate(b.start_date)} → #{formatDate(b.end_date)}
                   span 📍 #{b.departure_location}
-                  span 👥 #{b.adult_count} NL / #{b.child_count} TE
+                  span 👥 #{b.adult_count} Người lớn / #{b.child_count} Trẻ em
                 .booking-item__price= formatPrice(b.total_price)
               .booking-item__status
                 span(class=`badge badge--${b.status}`)
@@ -38,3 +38,15 @@ block content
                   )
                     input(type="hidden" name="_csrf" value=csrfToken)
                     button.btn.btn--danger.btn--sm(type="submit") Hủy đơn
+
+        if totalPages > 1
+          .pagination
+            if currentPage > 1
+              a.pagination__item(href=`/my-bookings?page=${currentPage-1}`) ← Trước
+            each p in Array.from({length: totalPages}, (_, i) => i + 1)
+              a(
+                href=`/my-bookings?page=${p}`
+                class=`pagination__item${p === currentPage ? ' active' : ''}`
+              )= p
+            if currentPage < totalPages
+              a.pagination__item(href=`/my-bookings?page=${currentPage+1}`) Tiếp →

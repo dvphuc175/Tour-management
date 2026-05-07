@@ -106,10 +106,13 @@ const BookingController = {
   // GET /my-bookings
   async myBookings(req, res, next) {
     try {
-      const bookings = await BookingModel.getByUserId(req.session.user.id);
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+
+      const result = await BookingModel.getByUserId(req.session.user.id, page, limit);
 
       // parse images
-      const parsedBookings = bookings.map(b => {
+      const parsedBookings = result.bookings.map(b => {
         try {
           b.tour_images = JSON.parse(b.tour_images || '[]');
         } catch {
@@ -120,7 +123,10 @@ const BookingController = {
 
       return res.render('client/my-bookings', {
         title: 'Đơn đặt của tôi',
-        bookings: parsedBookings
+        bookings: parsedBookings,
+        currentPage: page,
+        totalPages: result.totalPages,
+        total: result.total
       });
 
     } catch (err) {

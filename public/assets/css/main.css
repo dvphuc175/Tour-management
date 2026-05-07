@@ -1706,7 +1706,7 @@ html {
   background: #f0f7ff;
 }
 .payment-method-card__logo {
-  font-size: 22px;
+  font-size: 14px;
   width: 40px;
   text-align: center;
   flex-shrink: 0;

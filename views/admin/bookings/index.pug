@@ -20,12 +20,13 @@ block content
           th Ngày đi
           th Tổng tiền
           th Đặt cọc
+          th Phương thức thanh toán
           th Trạng thái
           th
       tbody
         if bookings.length === 0
           tr
-            td(colspan="8" style="text-align:center;padding:32px;color:#9ca3af") Không có đơn nào
+            td(colspan="9" style="text-align:center;padding:32px;color:#9ca3af") Không có đơn nào
         each b in bookings
           tr
             td= b.id
@@ -37,7 +38,8 @@ block content
             td= formatPrice(b.total_price)
             td
               span(class=`badge badge--${b.payment_status}`)
-                = {pending:'Chưa TT',success:'Đã TT',failed:'Thất bại'}[b.payment_status]
+                = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[b.payment_status]
+            td= {vnpay:'VNPay',cash:'Tiền mặt'}[b.payment_method]
             td
               span(class=`badge badge--${b.status}`)
                 = {pending:'Chờ XN',confirmed:'Xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
