@@ -5,24 +5,21 @@ const BookingController = require('../controllers/BookingController');
 const { isAuth } = require('../middlewares/auth');
 
 
-router.use(isAuth);
+router.get('/booking/success/:id', isAuth, BookingController.success);
 
 
-router.get('/booking/success/:id', BookingController.success);
+router.get('/booking/:scheduleId', isAuth, BookingController.showForm);
 
 
-router.get('/booking/:scheduleId', BookingController.showForm);
+router.post('/booking', isAuth, BookingController.create);
 
 
-router.post('/booking', BookingController.create);
+router.get('/my-bookings', isAuth, BookingController.myBookings);
 
 
-router.get('/my-bookings', BookingController.myBookings);
+router.get('/my-bookings/:id', isAuth, BookingController.bookingDetail);
 
 
-router.get('/my-bookings/:id', BookingController.bookingDetail);
-
-
-router.put('/my-bookings/:id/cancel', BookingController.cancel);
+router.put('/my-bookings/:id/cancel', isAuth, BookingController.cancel);
 
 module.exports = router;
