@@ -117,6 +117,7 @@ block content
             method="POST"
             data-confirm="Bạn chắc chắn muốn hủy đơn này?"
           )
+            input(type="hidden" name="_csrf" value=csrfToken)
             button.btn.btn--danger(type="submit") Hủy đơn
 
   #cancelPolicyModal.modal(
