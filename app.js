@@ -99,6 +99,16 @@ app.use((req, res, next) => {
       year: 'numeric'
     });
 
+  // Helper render sao: #{renderStars(rating)}
+  res.locals.renderStars = (rating) => {
+    const full  = Math.floor(rating);
+    const half  = rating - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return '★'.repeat(full)
+         + (half ? '⯨' : '')
+         + '☆'.repeat(empty);
+  };
+
     next(); });
 
 app.get('/admin', (req, res) => {

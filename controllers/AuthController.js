@@ -38,13 +38,18 @@ const AuthController = {
       };
 
       req.flash('success', `Chào mừng trở lại, ${user.fullname}!`);
-      return user.role === 'admin'
-        ? req.session.save(() => {
+      const returnTo = req.session.returnTo;
+      delete req.session.returnTo;
+      
+      return req.session.save(() => {
+        if (user.role === 'admin') {
           res.redirect('/admin');
-          })
-        : req.session.save(() => {
+        } else if (returnTo) {
+          res.redirect(returnTo);
+        } else {
           res.redirect('/');
-          })
+        }
+      });
 
     } catch (err) {
       console.error(err);
