@@ -167,19 +167,25 @@ const BookingController = {
 
   // PUT /my-bookings/:id/cancel
   async cancel(req, res, next) {
+    const bookingId = req.params.id;
     try {
       await BookingModel.cancelByUser(
-        req.params.id,
+        bookingId,
         req.session.user.id
       );
 
-      req.flash('success', 'Đã hủy đơn đặt');
+      req.flash('success', 'Đã hủy đơn đặt thành công.');
 
     } catch (err) {
-      req.flash('error', err.message);
+      req.flash('error', err.message || 'Không thể hủy đơn. Vui lòng thử lại.');
     }
 
-    return res.redirect('/my-bookings');
+    const referer = req.get('Referer') || '';
+    const fromDetail = /\/my-bookings\/\d+(?:[/?#]|$)/.test(referer);
+ 
+    return req.session.save(() => {
+      res.redirect(fromDetail ? `/my-bookings/${bookingId}` : '/my-bookings');
+    });
   }
 };
 

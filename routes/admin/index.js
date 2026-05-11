@@ -14,4 +14,6 @@ router.use('/categories', require('./categories'));
 router.use('/tours', require('./tours'));
 router.use('/schedules', require('./schedules'));
 router.use('/bookings',   require('./bookings'));
+router.use('/users',    require('./users'));
+router.use('/reviews',  require('./reviews'));
 module.exports = router;

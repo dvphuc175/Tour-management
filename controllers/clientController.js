@@ -1,7 +1,7 @@
 const TourModel = require('../models/TourModel');
 const CategoryModel = require('../models/CategoryModel');
 const ScheduleModel = require('../models/ScheduleModel');
-
+const ReviewModel = require('../models/ReviewModel');
 const LIMIT = 8; 
 const HOME_LIMIT = 6; // 6 tours per page on homepage
 
@@ -89,9 +89,30 @@ const ClientController = {
         return res.redirect('/tours');
       }
 
-      // Lấy lịch trình còn active, chưa qua ngày hôm nay
-      const schedules = await ScheduleModel.getAvailableByTourId(tour.id);
+        // Lấy dữ liệu song song
+      const [schedules, reviews, ratingInfo] = await Promise.all([
+        ScheduleModel.getAvailableByTourId(tour.id),
+        ReviewModel.getByTourId(tour.id),
+        ReviewModel.getAvgRating(tour.id)
+      ]);
 
+      // Kiểm tra quyền review
+      let canReview = false;
+      let hasReviewed = false;
+
+      if (req.session.user) {
+        [canReview, hasReviewed] = await Promise.all([
+          ReviewModel.hasCompletedBooking(
+            req.session.user.id,
+            tour.id
+          ),
+          ReviewModel.hasReviewed(
+            req.session.user.id,
+            tour.id
+          )
+        ]);
+      }
+      
       // Parse description into sections
       const sections = parseTourDescription(tour.description);
 
@@ -99,6 +120,10 @@ const ClientController = {
         title: tour.name,
         tour,
         schedules,
+        reviews,
+        ratingInfo,
+        canReview,
+        hasReviewed,
         sections
       });
     } catch (err) {
