@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+  .table-wrap
+    table.data-table
+      thead
+        tr
+          th ID
+          th Họ tên
+          th Email
+          th SĐT
+          th Vai trò
+          th Trạng thái
+          th Ngày đăng ký
+          th Thao tác
+      tbody
+        if users.length === 0
+          tr
+            td(colspan="8" style="text-align:center;padding:32px;color:#9ca3af") Chưa có người dùng nào
+        each u in users
+          tr(class=u.status === 'locked' ? 'row--locked' : '')
+            td= u.id
+            td: strong= u.fullname
+            td= u.email
+            td= u.phone || '—'
+            td
+              span(class=`badge ${u.role === 'admin' ? 'badge--confirmed' : 'badge--active'}`)
+                = u.role === 'admin' ? 'Admin' : 'Khách hàng'
+            td
+              span(class=`badge badge--${u.status}`)
+                = u.status === 'active' ? 'Hoạt động' : 'Đã khóa'
+            td= formatDate(u.created_at)
+            td
+              if u.role !== 'admin'
+                form(
+                  action=`/admin/users/${u.id}/toggle-status?_method=PUT`
+                  method="POST"
+                  data-confirm=u.status==='active' ? `Khóa tài khoản ${u.fullname}?` : `Mở khóa tài khoản ${u.fullname}?`
+                )
+                  button(
+                    type="submit"
+                    class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--outline'}`
+                  )= u.status === 'active' ? 'Khóa' : 'Mở khóa'
+              else
+                span.text-muted —

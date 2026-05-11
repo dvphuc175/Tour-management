@@ -1749,3 +1749,84 @@ html {
 .result-sub    { color: var(--color-text-muted); margin-bottom: 8px; }
 .result-amount { font-size: 22px; font-weight: 700; color: var(--color-accent); margin: 12px 0 24px; }
 .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Reviews section ─────────────────────── */
+.reviews-section {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-border);
+}
+.reviews-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  margin-bottom: 24px;
+}
+.reviews-header h2 { font-size: 20px; }
+
+.rating-summary { display: flex; align-items: center; gap: 10px; }
+.rating-summary__score {
+  font-size: 36px; font-weight: 700;
+  color: var(--color-accent); line-height: 1;
+}
+.rating-summary__stars { font-size: 20px; color: #f59e0b; }
+.rating-summary__count { font-size: 13px; color: var(--color-text-muted); }
+
+/* ── Star picker (CSS only trick) ────────── */
+.review-form-wrap {
+  background: var(--color-bg-soft);
+  border-radius: var(--radius-md);
+  padding: 20px; margin-bottom: 28px;
+}
+.review-form-wrap h3 { font-size: 16px; margin-bottom: 16px; }
+.star-picker { margin-bottom: 16px; }
+.star-picker > label {
+  display: block; font-size: 13px;
+  font-weight: 500; margin-bottom: 8px;
+}
+.stars-input {
+  display: flex;
+  flex-direction: row-reverse;  /* đảo ngược để CSS selector ~ hoạt động */
+  justify-content: flex-end;
+  gap: 2px;
+}
+.stars-input input[type="radio"] { display: none; }
+.stars-input > label {
+  font-size: 36px; color: #d1d5db;
+  cursor: pointer; transition: color .1s; line-height: 1;
+}
+/* hover: tô màu sao đang hover và tất cả sao bên phải (~ selector) */
+.stars-input > label:hover,
+.stars-input > label:hover ~ label { color: #f59e0b; }
+/* checked: tô màu sao được chọn và tất cả sao bên phải */
+.stars-input input:checked ~ label { color: #f59e0b; }
+
+/* ── Review list ─────────────────────────── */
+.review-list { display: flex; flex-direction: column; gap: 14px; }
+.review-item {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.review-item__header {
+  display: flex; align-items: center;
+  flex-wrap: wrap; gap: 10px; margin-bottom: 8px;
+}
+.review-item__author { font-weight: 600; font-size: 14px; }
+.review-item__stars  { color: #f59e0b; font-size: 16px; letter-spacing: 2px; }
+.review-item__date   { font-size: 12px; color: var(--color-text-muted); margin-left: auto; }
+.review-item__comment { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.review-notice {
+  padding: 12px 16px;
+  background: var(--color-bg-soft);
+  border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--color-text-muted);
+  margin-bottom: 20px;
+}
+.review-notice--done {
+  background: #f0fdf4; color: var(--color-success);
+}
+.no-reviews {
+  font-size: 13px; color: var(--color-text-muted);
+  text-align: center; padding: 24px 0;
+}
