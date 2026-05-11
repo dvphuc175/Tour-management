@@ -98,6 +98,14 @@ app.use((req, res, next) => {
       month: '2-digit',
       year: 'numeric'
     });
+  res.locals.renderStars = (rating) => {
+    const full  = Math.floor(rating);
+    const half  = rating - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return '★'.repeat(full)
+        + (half ? '⯨' : '')
+        + '☆'.repeat(empty);
+  };
 
     next(); });
 
