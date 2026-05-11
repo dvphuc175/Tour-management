@@ -28,11 +28,14 @@ const UserModel = {
     return result.insertId;
   },
 
-  // Admin: lấy danh sách user (có phân trang)
   async getAll({ limit = 20, offset = 0 } = {}) {
+    const parsedLimit = Number(limit) || 20;
+    const parsedOffset = Number(offset) || 0;
     return query(
-      'SELECT id, fullname, email, phone, role, status, created_at FROM USERS ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [limit, offset]
+      `SELECT id, fullname, email, phone, role, status, created_at 
+       FROM USERS 
+       ORDER BY created_at DESC 
+       LIMIT ${parsedLimit} OFFSET ${parsedOffset}`
     );
   },
 

@@ -181,7 +181,7 @@ block content
                 h3 Viết đánh giá của bạn
                 form.review-form(action="/reviews" method="POST")
                   input(type="hidden" name="tour_id" value=tour.id)
-
+                  input(type="hidden" name="_csrf" value=csrfToken)
                   .star-picker
                     label Chọn số sao
                     .stars-input
