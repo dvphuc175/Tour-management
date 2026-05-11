@@ -1,8 +1,9 @@
 function isAuth(req, res, next) { 
     if (req.session.user) 
         return next(); 
-        req.flash('error', 'Vui lòng đăng nhập để tiếp tục'); 
-        res.redirect('/login'); 
+    req.session.returnTo = req.originalUrl;
+    req.flash('error', 'Vui lòng đăng nhập để tiếp tục'); 
+    res.redirect('/login'); 
 } 
 function isAdmin(req, res, next) { 
     if (req.session.user?.role === 'admin') 

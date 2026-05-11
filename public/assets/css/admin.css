@@ -413,3 +413,38 @@ code {
   color: var(--color-accent);
   font-size: 16px;
 }
+
+/* ── Admin reviews table ─────────────────── */
+.stars-display {
+  color: #f59e0b; font-size: 15px; letter-spacing: 1px;
+}
+.review-comment {
+  max-width: 240px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 13px; color: var(--color-text-muted);
+}
+/* ── Locked row ──────────────────────────── */
+.row--locked td { opacity: .55; }
+.text-muted { color: var(--color-text-muted); font-size: 12px; }
+
+/* ── Logout button ───────────────────────── */
+.sidebar__logout {
+  padding: 0 20px;
+  margin-top: 8px;
+}
+.sidebar__logout button {
+  width: 100%;
+  padding: 10px 16px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius-sm);
+  color: rgba(255,255,255,.7);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.sidebar__logout button:hover {
+  background: rgba(220,38,38,.2);
+  border-color: rgba(220,38,38,.4);
+  color: #fca5a5;
+}

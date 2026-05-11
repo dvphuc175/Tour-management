@@ -9,6 +9,7 @@ const ClientController = {
   // GET /
   async home(req, res, next) {
     try {
+      console.log('[DEBUG] Trang chủ - Session user:', req.session.user ? 'Có' : 'Không');
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const offset = (page - 1) * HOME_LIMIT;
 
