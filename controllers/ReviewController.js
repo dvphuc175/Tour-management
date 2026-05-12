@@ -1,6 +1,11 @@
 const ReviewModel = require('../models/ReviewModel');
 const TourModel = require('../models/TourModel');
 
+// Express 5 đã bỏ res.redirect('back'); helper này thay thế tương đương an toàn.
+function redirectBack(req, res, fallback = '/') {
+  return res.redirect(req.get('Referer') || fallback);
+}
+
 const ReviewController = {
   // POST /reviews
   async create(req, res, next) {
@@ -13,7 +18,7 @@ const ReviewController = {
       // Kiểm tra rating hợp lệ
       if (!r || r < 1 || r > 5) {
         req.flash('error', 'Vui lòng chọn số sao từ 1 đến 5');
-        return res.redirect('back');
+        return redirectBack(req, res);
       }
 
       // Chỉ cho review khi đã hoàn thành tour
@@ -24,7 +29,7 @@ const ReviewController = {
 
       if (!canReview) {
         req.flash('error', 'Bạn cần hoàn thành tour trước khi đánh giá');
-        return res.redirect('back');
+        return redirectBack(req, res);
       }
 
       // Mỗi user chỉ được review 1 lần cho mỗi tour
@@ -35,7 +40,7 @@ const ReviewController = {
 
       if (alreadyReviewed) {
         req.flash('error', 'Bạn đã đánh giá tour này rồi');
-        return res.redirect('back');
+        return redirectBack(req, res);
       }
 
       // Tạo review
@@ -64,7 +69,7 @@ const ReviewController = {
 
       req.flash('success', 'Đã xóa đánh giá');
 
-      return res.redirect('back');
+      return redirectBack(req, res, '/admin/reviews');
     } catch (err) {
       next(err);
     }

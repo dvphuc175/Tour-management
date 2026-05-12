@@ -1,9 +1,9 @@
 const express    = require('express');
 const router     = express.Router();
-const { isAdmin }= require('../../middlewares/auth');
+const { isAuth, isAdmin } = require('../../middlewares/auth');
 
-// Bảo vệ toàn bộ /admin bằng isAdmin
-router.use(isAdmin);
+// Bảo vệ toàn bộ /admin: yêu cầu đã đăng nhập trước, sau đó kiểm tra quyền admin
+router.use(isAuth, isAdmin);
 
 // Dashboard tạm
 router.get('/', (req, res) =>

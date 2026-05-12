@@ -159,28 +159,34 @@ async detail(req, res, next) {
   // PUT /admin/bookings/:id/confirm  — CHỈ dùng cho Cash
   async confirm(req, res, next) {
     const conn = await getConnection();
+    const bookingId = req.params.id;
     try {
       await conn.beginTransaction();
 
       const [rows] = await conn.execute(
-        `SELECT b.id FROM BOOKINGS b
+        `SELECT b.id, b.contact_email, b.contact_name FROM BOOKINGS b
          JOIN PAYMENTS p ON p.booking_id = b.id
          WHERE b.id = ? AND b.status = 'pending' AND p.method = 'cash'
-         LIMIT 1`, [req.params.id]
+         LIMIT 1`, [bookingId]
       );
       if (!rows[0]) {
         await conn.rollback();
         req.flash('error', 'Không thể xác nhận: đơn không hợp lệ hoặc không phải thanh toán tiền mặt');
-        return res.redirect(`/admin/bookings/${req.params.id}`);
+        return res.redirect(`/admin/bookings/${bookingId}`);
       }
 
-      await conn.execute("UPDATE BOOKINGS SET status='confirmed' WHERE id=?", [req.params.id]);
-      await conn.execute("UPDATE PAYMENTS SET status='success', paid_at=NOW() WHERE booking_id=?", [req.params.id]);
+      const bookingData = rows[0];
+
+      await conn.execute("UPDATE BOOKINGS SET status='confirmed' WHERE id=?", [bookingId]);
+      await conn.execute("UPDATE PAYMENTS SET status='success', paid_at=NOW() WHERE booking_id=?", [bookingId]);
 
       await conn.commit();
-      EmailService.sendSuccessEmail(bookingId, bookingData.contact_email, bookingData.contact_name).catch(console.error);
+
+      if (bookingData.contact_email) {
+        EmailService.sendSuccessEmail(bookingId, bookingData.contact_email, bookingData.contact_name).catch(console.error);
+      }
       req.flash('success', 'Đã xác nhận đơn và ghi nhận thanh toán tiền mặt');
-      res.redirect(`/admin/bookings/${req.params.id}`);
+      res.redirect(`/admin/bookings/${bookingId}`);
     } catch (err) {
       await conn.rollback(); next(err);
     } finally { conn.release(); }
