@@ -11,7 +11,9 @@ const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const { csrf } = require('./middlewares/csrf');
 const app = express()
-
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 //Thiết lập views
 app.set('views', path.join(__dirname,"views"))
 app.set('view engine', 'pug')
