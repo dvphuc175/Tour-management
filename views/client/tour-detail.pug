@@ -190,10 +190,11 @@ block content
                         label(for=`star${i}` title=`${i} sao`) ★
 
                   .form-group
-                    label Nhận xét (không bắt buộc)
+                    label Nhận xét
                     textarea.form-control(
                       name="comment" rows="3"
-                      placeholder="Chia sẻ trải nghiệm của bạn..."
+                      minlength="10" maxlength="1000" required
+                      placeholder="Chia sẻ trải nghiệm của bạn (tối thiểu 10 ký tự, tối đa 1000 ký tự)..."
                     )
                   button.btn.btn--primary(type="submit") Gửi đánh giá
 

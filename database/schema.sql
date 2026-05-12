@@ -91,5 +91,7 @@ CREATE TABLE REVIEWS (
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tour_id) REFERENCES TOURS(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+    -- Mỗi user chỉ được review 1 lần cho mỗi tour (chống race condition)
+    UNIQUE KEY uq_review_tour_user (tour_id, user_id)
 );
