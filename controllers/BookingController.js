@@ -12,14 +12,18 @@ const BookingController = {
       const { scheduleId } = req.params;
 
       const schedule = await ScheduleModel.findById(scheduleId);
-      const tour = await TourModel.findById(schedule.tour_id);
-      
-      if (!schedule || schedule.status !== 'active' || schedule.available_slots === 0) {
-        req.flash('error', 'Lịch trình không còn chỗ hoặc đã bị hủy');
-        return res.redirect(`/tours/${tour.slug}`);
+
+      if (!schedule) {
+        req.flash('error', 'Lịch trình không tồn tại');
+        return res.redirect('/tours');
       }
 
-      //const tour = await TourModel.findById(schedule.tour_id);
+      const tour = await TourModel.findById(schedule.tour_id);
+      
+      if (schedule.status !== 'active' || schedule.available_slots === 0) {
+        req.flash('error', 'Lịch trình không còn chỗ hoặc đã bị hủy');
+        return res.redirect(tour ? `/tours/${tour.slug}` : '/tours');
+      }
 
       return res.render('client/booking-form', {
         title: `Đặt tour: ${tour.name}`,
