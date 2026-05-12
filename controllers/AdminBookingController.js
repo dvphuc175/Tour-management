@@ -1,5 +1,6 @@
 const { query, getConnection } = require('../config/db');
 const EmailService = require('../services/emailService');
+const { logActivity } = require('../services/auditLog');
 const AdminBookingController = {
 
   async index(req, res, next) {
@@ -146,6 +147,12 @@ async detail(req, res, next) {
 
       await conn.commit();
 
+      await logActivity(req, {
+        action: 'booking.cancel',
+        targetType: 'booking',
+        targetId: Number(req.params.id)
+      });
+
       req.flash('success', 'Đã hủy đơn đặt');
       return res.redirect(`/admin/bookings/${req.params.id}`);
 
@@ -181,6 +188,14 @@ async detail(req, res, next) {
       await conn.execute("UPDATE PAYMENTS SET status='success', paid_at=NOW() WHERE booking_id=?", [bookingId]);
 
       await conn.commit();
+
+      await logActivity(req, {
+        action: 'booking.confirm',
+        targetType: 'booking',
+        targetId: Number(bookingId),
+        metadata: { payment_method: 'cash' }
+      });
+
       if (bookingData.contact_email) {
         EmailService.sendSuccessEmail(bookingId, bookingData.contact_email, bookingData.contact_name).catch(console.error);
       }
@@ -226,7 +241,13 @@ async detail(req, res, next) {
       }
 
       await query("UPDATE BOOKINGS SET status = 'completed' WHERE id = ?", [bookingId]);
-      
+
+      await logActivity(req, {
+        action: 'booking.complete',
+        targetType: 'booking',
+        targetId: Number(bookingId)
+      });
+
       req.flash('success', 'Đã đánh dấu hoàn thành đơn đặt tour!');
       res.redirect(`/admin/bookings/${req.params.id}`);
     } catch (err) {

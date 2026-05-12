@@ -8,7 +8,7 @@ CREATE TABLE USERS (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(15),
-    role ENUM('admin', 'customer') DEFAULT 'customer',
+    role ENUM('admin', 'staff', 'customer') DEFAULT 'customer',
     status ENUM('active', 'locked') DEFAULT 'active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -93,4 +93,20 @@ CREATE TABLE REVIEWS (
     FOREIGN KEY (tour_id) REFERENCES TOURS(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
     UNIQUE KEY uq_review_tour_user (tour_id, user_id)
+);
+
+-- 8. Bảng ACTIVITY_LOGS — nhật ký thao tác của admin/staff
+CREATE TABLE ACTIVITY_LOGS (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    actor_id INT NULL,
+    actor_role ENUM('admin','staff','customer') NULL,
+    action VARCHAR(50) NOT NULL,
+    target_type VARCHAR(30) NULL,
+    target_id INT NULL,
+    metadata JSON NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (actor_id) REFERENCES USERS(id) ON DELETE SET NULL,
+    INDEX idx_logs_created_at (created_at),
+    INDEX idx_logs_action (action),
+    INDEX idx_logs_actor (actor_id)
 );

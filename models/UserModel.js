@@ -47,6 +47,15 @@ const UserModel = {
        WHERE id = ? AND role != 'admin'`,
       [id]
     );
+  },
+
+  // Admin: đổi role của user. Trả về số dòng bị ảnh hưởng (0 = không update).
+  async setRole(id, role) {
+    const result = await query(
+      `UPDATE USERS SET role = ? WHERE id = ?`,
+      [role, id]
+    );
+    return result.affectedRows;
   }
 };
 

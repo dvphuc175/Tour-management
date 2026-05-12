@@ -4,5 +4,6 @@ const AdminUserController = require('../../controllers/AdminUserController');
 
 router.get('/',                   AdminUserController.index);
 router.put('/:id/toggle-status', AdminUserController.toggleStatus);
+router.put('/:id/role',          AdminUserController.setRole);
 
 module.exports = router;

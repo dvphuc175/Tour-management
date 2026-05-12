@@ -1,3 +1,4 @@
+- var isAdminRole = user && user.role === 'admin'
 aside.admin-sidebar
   .sidebar__logo
     a(href="/admin") &#9992; Tour Admin
@@ -5,18 +6,22 @@ aside.admin-sidebar
   nav.sidebar__nav
     a(href="/admin" class=currentPath === '/admin' ? 'active' : '')
       | Dashboard
-    a(href="/admin/tours" class=(currentPath && currentPath.startsWith('/admin/tours')) ? 'active' : '')
-      | Quản lý tour & lịch trình
-    a(href="/admin/categories" class=(currentPath && currentPath.startsWith('/admin/categories')) ? 'active' : '')
-      | Danh mục
+    if isAdminRole
+      a(href="/admin/tours" class=(currentPath && currentPath.startsWith('/admin/tours')) ? 'active' : '')
+        | Quản lý tour & lịch trình
+      a(href="/admin/categories" class=(currentPath && currentPath.startsWith('/admin/categories')) ? 'active' : '')
+        | Danh mục
     a(href="/admin/bookings" class=(currentPath && currentPath.startsWith('/admin/bookings')) ? 'active' : '')
       | Đơn đặt tour
-    a(href="/admin/users" class=(currentPath && currentPath.startsWith('/admin/users')) ? 'active' : '')
-      | Người dùng
-    a(href="/admin/reviews" class=(currentPath && currentPath.startsWith('/admin/reviews')) ? 'active' : '')
-      | Đánh giá
-    a(href="/admin/reports")
-      | Báo cáo
+    if isAdminRole
+      a(href="/admin/users" class=(currentPath && currentPath.startsWith('/admin/users')) ? 'active' : '')
+        | Người dùng
+      a(href="/admin/reviews" class=(currentPath && currentPath.startsWith('/admin/reviews')) ? 'active' : '')
+        | Đánh giá
+      a(href="/admin/logs" class=(currentPath && currentPath.startsWith('/admin/logs')) ? 'active' : '')
+        | Nhật ký thao tác
+      a(href="/admin/reports")
+        | Báo cáo
   .sidebar__footer
     a.sidebar__link.sidebar__link--ghost(href="/")
       svg.sidebar__icon(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
@@ -28,7 +33,7 @@ aside.admin-sidebar
         .sidebar__avatar(aria-hidden="true")= (user.fullname || 'A').trim().charAt(0).toUpperCase()
         .sidebar__user-info
           .sidebar__user-name= user.fullname
-          .sidebar__user-role Quản trị viên
+          .sidebar__user-role= user.role === 'admin' ? 'Quản trị viên' : (user.role === 'staff' ? 'Nhân viên' : 'Khách hàng')
     form.sidebar__logout(action="/logout?_method=DELETE" method="POST" data-confirm="Bạn chắc chắn muốn đăng xuất?")
       input(type="hidden" name="_csrf" value=csrfToken)
       button.sidebar__logout-btn(type="submit")

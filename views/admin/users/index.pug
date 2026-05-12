@@ -18,29 +18,46 @@ block content
           tr
             td(colspan="8" style="text-align:center;padding:32px;color:#9ca3af") Chưa có người dùng nào
         each u in users
+          - var isSelf = user && user.id === u.id
           tr(class=u.status === 'locked' ? 'row--locked' : '')
             td= u.id
             td: strong= u.fullname
             td= u.email
             td= u.phone || '—'
             td
-              span(class=`badge ${u.role === 'admin' ? 'badge--confirmed' : 'badge--active'}`)
-                = u.role === 'admin' ? 'Admin' : 'Khách hàng'
+              - var roleBadge = u.role === 'admin' ? 'badge--confirmed' : (u.role === 'staff' ? 'badge--pending' : 'badge--active')
+              - var roleLabel = u.role === 'admin' ? 'Admin' : (u.role === 'staff' ? 'Nhân viên' : 'Khách hàng')
+              span(class=`badge ${roleBadge}`)= roleLabel
             td
               span(class=`badge badge--${u.status}`)
                 = u.status === 'active' ? 'Hoạt động' : 'Đã khóa'
             td= formatDate(u.created_at)
             td
-              if u.role !== 'admin'
-                form(
-                  action=`/admin/users/${u.id}/toggle-status?_method=PUT`
-                  method="POST"
-                  data-confirm=u.status==='active' ? `Khóa tài khoản ${u.fullname}?` : `Mở khóa tài khoản ${u.fullname}?`
-                )
-                  input(type="hidden" name="_csrf" value=csrfToken)
-                  button(
-                    type="submit"
-                    class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--outline'}`
-                  )= u.status === 'active' ? 'Khóa' : 'Mở khóa'
-              else
-                span.text-muted —
+              .user-actions(style="display:flex;gap:8px;align-items:center;flex-wrap:wrap")
+                //- Đổi role: không cho phép đổi role của chính mình
+                if isSelf
+                  span.text-muted (tài khoản hiện tại)
+                else
+                  form(
+                    action=`/admin/users/${u.id}/role?_method=PUT`
+                    method="POST"
+                    style="display:flex;gap:4px;align-items:center"
+                    data-confirm=`Đổi vai trò của ${u.fullname}?`
+                  )
+                    input(type="hidden" name="_csrf" value=csrfToken)
+                    select(name="role" class="form-control form-control--sm" style="padding:4px 6px")
+                      option(value="customer" selected=(u.role==='customer')) Khách hàng
+                      option(value="staff" selected=(u.role==='staff')) Nhân viên
+                      option(value="admin" selected=(u.role==='admin')) Admin
+                    button(type="submit" class="btn btn--sm btn--outline") Đổi
+                  if u.role !== 'admin'
+                    form(
+                      action=`/admin/users/${u.id}/toggle-status?_method=PUT`
+                      method="POST"
+                      data-confirm=u.status==='active' ? `Khóa tài khoản ${u.fullname}?` : `Mở khóa tài khoản ${u.fullname}?`
+                    )
+                      input(type="hidden" name="_csrf" value=csrfToken)
+                      button(
+                        type="submit"
+                        class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--outline'}`
+                      )= u.status === 'active' ? 'Khóa' : 'Mở khóa'

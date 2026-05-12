@@ -1,5 +1,8 @@
 const UserModel   = require('../models/UserModel');
 const ReviewModel = require('../models/ReviewModel');
+const { logActivity } = require('../services/auditLog');
+
+const VALID_ROLES = ['admin', 'staff', 'customer'];
 
 const AdminUserController = {
   // GET /admin/users
@@ -20,8 +23,60 @@ const AdminUserController = {
         return res.redirect('/admin/users');
       }
       // Lưu ý: Đảm bảo trong UserModel của bạn có hàm toggleStatus nhé!
-      await UserModel.toggleStatus(req.params.id); 
+      await UserModel.toggleStatus(req.params.id);
+      const target = await UserModel.findById(req.params.id);
+      await logActivity(req, {
+        action: 'user.toggle_status',
+        targetType: 'user',
+        targetId: Number(req.params.id),
+        metadata: { new_status: target?.status }
+      });
       req.flash('success', 'Đã cập nhật trạng thái tài khoản');
+      res.redirect('/admin/users');
+    } catch (err) { next(err); }
+  },
+
+  // PUT /admin/users/:id/role
+  async setRole(req, res, next) {
+    try {
+      const targetId = parseInt(req.params.id);
+      const newRole = (req.body.role || '').trim();
+
+      if (!VALID_ROLES.includes(newRole)) {
+        req.flash('error', 'Vai trò không hợp lệ');
+        return res.redirect('/admin/users');
+      }
+
+      if (targetId === req.session.user.id) {
+        req.flash('error', 'Không thể tự đổi vai trò của chính mình');
+        return res.redirect('/admin/users');
+      }
+
+      const target = await UserModel.findById(targetId);
+      if (!target) {
+        req.flash('error', 'Không tìm thấy người dùng');
+        return res.redirect('/admin/users');
+      }
+
+      if (target.role === newRole) {
+        req.flash('info', 'Vai trò không thay đổi');
+        return res.redirect('/admin/users');
+      }
+
+      const oldRole = target.role;
+      await UserModel.setRole(targetId, newRole);
+
+      await logActivity(req, {
+        action: 'user.set_role',
+        targetType: 'user',
+        targetId,
+        metadata: { from: oldRole, to: newRole, target_email: target.email }
+      });
+
+      req.flash(
+        'success',
+        `Đã đổi vai trò "${target.fullname}" từ ${oldRole} sang ${newRole}. Người dùng cần tải lại trang để áp dụng.`
+      );
       res.redirect('/admin/users');
     } catch (err) { next(err); }
   },

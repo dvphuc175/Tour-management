@@ -1,0 +1,51 @@
+extends ../layout
+
+block content
+  .filter-bar(style="margin-bottom:16px")
+    form(method="GET" action="/admin/logs" style="display:flex;gap:8px;align-items:center")
+      label(for="filter-action" style="font-weight:500") Lọc theo hành động:
+      select(id="filter-action" name="action" class="form-control" onchange="this.form.submit()")
+        option(value="" selected=!currentAction) — Tất cả —
+        each row in actions
+          option(value=row.action selected=(currentAction === row.action))= row.action
+      if currentAction
+        a.btn.btn--sm.btn--outline(href="/admin/logs") Xoá lọc
+
+  .table-wrap
+    table.data-table
+      thead
+        tr
+          th(style="width:160px") Thời gian
+          th(style="width:180px") Người thao tác
+          th(style="width:140px") Vai trò
+          th(style="width:180px") Hành động
+          th(style="width:120px") Đối tượng
+          th Chi tiết
+      tbody
+        if !logs || logs.length === 0
+          tr
+            td(colspan="6" style="text-align:center;padding:32px;color:#9ca3af") Chưa có nhật ký nào
+        each log in logs
+          tr
+            td= formatDate(log.created_at)
+            td
+              if log.actor_name
+                strong= log.actor_name
+                br
+                small.text-muted= log.actor_email
+              else
+                span.text-muted (đã xoá)
+            td
+              span(class=`badge ${log.actor_role === 'admin' ? 'badge--confirmed' : 'badge--pending'}`)= log.actor_role || '—'
+            td
+              code= log.action
+            td
+              if log.target_type
+                = `${log.target_type} #${log.target_id || '?'}`
+              else
+                span.text-muted —
+            td
+              if log.metadata
+                pre(style="margin:0;font-size:12px;white-space:pre-wrap;word-break:break-word;max-width:480px")= typeof log.metadata === 'string' ? log.metadata : JSON.stringify(log.metadata)
+              else
+                span.text-muted —
