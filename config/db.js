@@ -13,6 +13,13 @@ const pool = mysql.createPool({
     dateStrings: true
 });
 
+// Ép mọi connection của pool dùng timezone Việt Nam.
+// Cần thiết vì server MySQL trên Railway/cloud thường chạy UTC,
+// khiến NOW()/CURDATE() trả về giờ UTC, lệch 7 tiếng so với giờ VN.
+pool.on('connection', (connection) => {
+    connection.query("SET time_zone = '+07:00'");
+});
+
 async function query(sql, params = []) { 
     const [rows] = await pool.execute(sql, params); 
     return rows; }

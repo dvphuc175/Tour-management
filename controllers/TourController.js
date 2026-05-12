@@ -55,6 +55,7 @@ const TourController = {
   // POST /admin/tours
   async create(req, res, next) {
     try {
+      delete req.body._csrf;
       const { error, value } = tourSchema.validate(req.body);
         if (error) {
             req.flash('error', error.details[0].message);
@@ -126,6 +127,7 @@ const TourController = {
   async update(req, res, next) {
     try {
       const { id } = req.params;
+      delete req.body._csrf;
       const { error, value } = tourSchema.validate(req.body);
         if (error) {
             req.flash('error', error.details[0].message);

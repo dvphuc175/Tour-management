@@ -1,12 +1,40 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
+console.log('[MAIL_CONFIG]', {
+  user: EMAIL_USER || '(MISSING)',
+  hasPass: !!EMAIL_PASS
 });
+
+// Chỉ khởi tạo transporter khi có credentials, tránh lỗi runtime
+// (Lưu ý: trên Railway free tier, SMTP outbound bị block → mail sẽ fail
+// với ETIMEDOUT. Local Gmail SMTP vẫn hoạt động bình thường.)
+const transporter = (EMAIL_USER && EMAIL_PASS)
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: EMAIL_USER, pass: EMAIL_PASS }
+    })
+  : null;
+
+async function send({ to, subject, html, tag }) {
+  if (!transporter) {
+    console.warn(`[MAIL_SKIP] ${tag}: EMAIL_USER/EMAIL_PASS chưa set, bỏ qua gửi mail`);
+    return;
+  }
+  try {
+    await transporter.sendMail({
+      from: `"Vi Vu Việt Nam" <${EMAIL_USER}>`,
+      to,
+      subject,
+      html
+    });
+    console.log(`[MAIL] ${tag} sent to ${to}`);
+  } catch (err) {
+    console.error(`[MAIL_ERROR] ${tag}:`, err.code || '', err.message);
+  }
+}
 
 const EmailService = {
   // Gửi email 1: Xác nhận giữ chỗ (Pending)
@@ -29,13 +57,12 @@ const EmailService = {
         </div>
       `;
 
-      await transporter.sendMail({
-        from: '"Vi Vu Việt Nam" <' + process.env.EMAIL_USER + '>',
+      await send({
         to: contactEmail,
         subject: `[Vi Vu Việt Nam] Xác nhận giữ chỗ đơn hàng #${booking.id}`,
-        html: html
+        html,
+        tag: 'Pending'
       });
-      console.log(`[MAIL] Đã gửi email Pending cho ${contactEmail}`);
     } catch (error) {
       console.error(`[MAIL_ERROR] Lỗi gửi email Pending:`, error);
     }
@@ -55,13 +82,12 @@ const EmailService = {
         </div>
       `;
 
-      await transporter.sendMail({
-        from: '"Vi Vu Việt Nam" <' + process.env.EMAIL_USER + '>',
+      await send({
         to: contactEmail,
         subject: `[Vi Vu Việt Nam] Thanh toán thành công vé tour #${bookingId}`,
-        html: html
+        html,
+        tag: 'Success'
       });
-      console.log(`[MAIL] Đã gửi email Success cho ${contactEmail}`);
     } catch (error) {
       console.error(`[MAIL_ERROR] Lỗi gửi email Success:`, error);
     }
