@@ -119,12 +119,6 @@ app.use((req, res, next) => {
 
     next(); });
 
-app.get('/admin', (req, res) => {
-  res.render('admin/dashboard', {
-    title: 'Dashboard',
-  });
-});
-
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
 app.use('/', require('./routes/booking'));
