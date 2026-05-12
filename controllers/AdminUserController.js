@@ -23,12 +23,7 @@ const AdminUserController = {
 
       await UserModel.toggleStatus(req.params.id);
       const target = await UserModel.findById(req.params.id);
-      await logActivity(req, {
-        action: 'user.toggle_status',
-        targetType: 'user',
-        targetId: Number(req.params.id),
-        metadata: { new_status: target?.status }
-      }); 
+
       req.flash('success', 'Đã cập nhật trạng thái tài khoản');
       res.redirect('/admin/users');
     } catch (err) { next(err); }
