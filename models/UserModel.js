@@ -47,6 +47,14 @@ const UserModel = {
        WHERE id = ? AND role != 'admin'`,
       [id]
     );
+  },
+  
+  async setRole(id, role) {
+    const result = await query(
+      `UPDATE USERS SET role = ? WHERE id = ?`,
+      [role, id]
+    );
+    return result.affectedRows;
   }
 };
 

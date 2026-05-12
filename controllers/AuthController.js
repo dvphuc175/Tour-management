@@ -42,7 +42,7 @@ const AuthController = {
       delete req.session.returnTo;
       
       return req.session.save(() => {
-        if (user.role === 'admin') {
+        if (user.role === 'admin' || 'staff') {
           res.redirect('/admin');
         } else if (returnTo) {
           res.redirect(returnTo);
