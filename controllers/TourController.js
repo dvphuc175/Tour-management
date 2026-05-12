@@ -202,16 +202,14 @@ const TourController = {
     try {
       const tourId = req.params.id;
 
-      const result = await query(
+      const rows = await query(
         `SELECT b.id FROM BOOKINGS b 
          JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id 
          WHERE s.tour_id = ? LIMIT 1`, 
         [tourId]
       );
 
-      const rows = Array.isArray(result[0]) ? result[0] : result;
-
-      if (rows && rows.length > 0) {
+      if (rows.length > 0) {
         req.flash('error', 'Không thể xóa Tour này vì đang có khách đặt. Bạn chỉ có thể ẩn nó đi.');
         return res.redirect('/admin/tours');
       }

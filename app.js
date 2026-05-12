@@ -45,6 +45,7 @@ app.use(csrf);
 app.use((req, res, next) => { 
     res.locals.success = req.flash('success'); 
     res.locals.error = req.flash('error'); 
+    res.locals.info = req.flash('info');
     res.locals.user = req.session.user || null; 
     res.locals.currentPath = req.path;
 
@@ -106,17 +107,6 @@ app.use((req, res, next) => {
         + (half ? '⯨' : '')
         + '☆'.repeat(empty);
   };
-
-  // Helper render sao: #{renderStars(rating)}
-  res.locals.renderStars = (rating) => {
-    const full  = Math.floor(rating);
-    const half  = rating - full >= 0.5 ? 1 : 0;
-    const empty = 5 - full - half;
-    return '★'.repeat(full)
-         + (half ? '⯨' : '')
-         + '☆'.repeat(empty);
-  };
-
     next(); });
 
 app.use('/', require('./routes/auth'));

@@ -5,6 +5,7 @@ const AdminBookingController = {
   async index(req, res, next) {
     try {
       const status = req.query.status || null;
+      const payment = req.query.payment || null;
 
       let sql = `
         SELECT 
@@ -31,6 +32,11 @@ const AdminBookingController = {
         params.push(status);
       }
 
+      if (payment) {
+        sql += ' AND p.status = ?';
+        params.push(payment);
+      }
+
       sql += ' ORDER BY b.created_at DESC';
 
       const bookings = await query(sql, params);
@@ -39,6 +45,7 @@ const AdminBookingController = {
         title: 'Quản lý đơn đặt',
         bookings,
         currentStatus: status,
+        currentPayment: payment,
         currentPath: req.path
       });
 
@@ -121,8 +128,13 @@ async detail(req, res, next) {
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
-      if (b.status === 'confirmed') {
+      if (b.status === 'completed') {
+        await conn.commit();
+        req.flash('error', 'Không thể hủy đơn đã hoàn thành');
+        return res.redirect(`/admin/bookings/${req.params.id}`);
       }
+
+      const wasConfirmed = b.status === 'confirmed';
 
       await conn.execute(
         `UPDATE BOOKINGS SET status = 'cancelled' WHERE id = ?`,
@@ -137,16 +149,27 @@ async detail(req, res, next) {
         [b.adult_count + b.child_count, b.schedule_id]
       );
 
+      // Payment đã thanh toán thành công -> đánh dấu 'refunded' (cần xử lý hoàn tiền thủ công)
+      // Payment còn 'pending' -> 'failed'
       await conn.execute(
         `UPDATE PAYMENTS 
-         SET status = 'failed'
-         WHERE booking_id = ? AND status = 'pending'`,
+         SET status = CASE 
+                        WHEN status = 'success' THEN 'refunded'
+                        WHEN status = 'pending' THEN 'failed'
+                        ELSE status
+                      END
+         WHERE booking_id = ?`,
         [b.id]
       );
 
       await conn.commit();
 
-      req.flash('success', 'Đã hủy đơn đặt');
+      req.flash(
+        'success',
+        wasConfirmed
+          ? 'Đã hủy đơn. Trạng thái thanh toán chuyển sang "Đã hoàn tiền" — vui lòng xử lý hoàn tiền thủ công cho khách.'
+          : 'Đã hủy đơn đặt'
+      );
       return res.redirect(`/admin/bookings/${req.params.id}`);
 
     } catch (err) {
@@ -196,7 +219,7 @@ async detail(req, res, next) {
     try {
       const bookingId = req.params.id;
 
-      const result = await query(
+      const rows = await query(
         `SELECT b.status, s.start_date, s.end_date 
          FROM BOOKINGS b
          JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
@@ -204,8 +227,7 @@ async detail(req, res, next) {
         [bookingId]
       );
 
-      const rows = Array.isArray(result[0]) ? result[0] : result;
-      const bookingData = rows && rows.length > 0 ? rows[0] : null;
+      const bookingData = rows[0] || null;
 
       if (!bookingData) {
         req.flash('error', 'Không tìm thấy đơn hàng.');
