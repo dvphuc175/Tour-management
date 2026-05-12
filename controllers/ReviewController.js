@@ -1,5 +1,6 @@
 const ReviewModel = require('../models/ReviewModel');
 const TourModel = require('../models/TourModel');
+const { reviewSchema } = require('../validators/reviewSchema');
 
 function redirectBack(req, res, fallback = '/') {
   return res.redirect(req.get('Referer') || fallback);
@@ -9,53 +10,49 @@ const ReviewController = {
   // POST /reviews
   async create(req, res, next) {
     try {
-      const { tour_id, rating, comment } = req.body;
       const userId = req.session.user.id;
 
-      const r = parseInt(rating);
-
-      // Kiểm tra rating hợp lệ
-      if (!r || r < 1 || r > 5) {
-        req.flash('error', 'Vui lòng chọn số sao từ 1 đến 5');
+      // 1. Validate input bằng Joi
+      const { error, value } = reviewSchema.validate(req.body, { abortEarly: true });
+      if (error) {
+        req.flash('error', error.details[0].message);
         return redirectBack(req, res);
       }
 
-      // Chỉ cho review khi đã hoàn thành tour
-      const canReview = await ReviewModel.hasCompletedBooking(
-        userId,
-        tour_id
-      );
+      const { tour_id, rating, comment } = value;
+ 
+      // 2. Chỉ cho review khi đã hoàn thành tour
+      const canReview = await ReviewModel.hasCompletedBooking(userId, tour_id);
 
       if (!canReview) {
         req.flash('error', 'Bạn cần hoàn thành tour trước khi đánh giá');
         return redirectBack(req, res);
       }
 
-      // Mỗi user chỉ được review 1 lần cho mỗi tour
-      const alreadyReviewed = await ReviewModel.hasReviewed(
-        userId,
-        tour_id
-      );
+      // 3. Mỗi user chỉ được review 1 lần cho mỗi tour
+      const alreadyReviewed = await ReviewModel.hasReviewed(userId, tour_id);
 
       if (alreadyReviewed) {
         req.flash('error', 'Bạn đã đánh giá tour này rồi');
         return redirectBack(req, res);
       }
 
-      // Tạo review
-      await ReviewModel.create({
-        tour_id,
-        user_id: userId,
-        rating: r,
-        comment
-      });
+      // 4. Tạo review (UNIQUE(tour_id, user_id) ở DB là tuyến phòng cuối cho race condition)
+      try {
+        await ReviewModel.create({ tour_id, user_id: userId, rating, comment });
+      } catch (err) {
+        if (err && err.code === 'ER_DUP_ENTRY') {
+          req.flash('error', 'Bạn đã đánh giá tour này rồi');
+          return redirectBack(req, res);
+        }
+        throw err;
+      }
 
-      // Lấy thông tin tour để redirect
       const tour = await TourModel.findById(tour_id);
 
       req.flash('success', 'Cảm ơn bạn đã đánh giá!');
 
-      return res.redirect(`/tours/${tour.slug}#reviews`);
+      return res.redirect(tour ? `/tours/${tour.slug}#reviews` : '/tours');
     } catch (err) {
       next(err);
     }
