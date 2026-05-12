@@ -8,7 +8,7 @@ CREATE TABLE USERS (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(15),
-    role ENUM('admin', 'customer') DEFAULT 'customer',
+    role ENUM('admin', 'staff', 'customer') DEFAULT 'customer',
     status ENUM('active', 'locked') DEFAULT 'active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
