@@ -6,8 +6,32 @@ const AdminBookingController = {
     try {
       const status = req.query.status || null;
       const payment = req.query.payment || null;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = 10;
+      const offset = (page - 1) * limit;
 
-      let sql = `
+      let where = ' WHERE 1=1';
+      const params = [];
+
+      if (status) {
+        where += ' AND b.status = ?';
+        params.push(status);
+      }
+
+      if (payment) {
+        where += ' AND p.status = ?';
+        params.push(payment);
+      }
+
+      const baseFrom = `
+        FROM BOOKINGS b
+        JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
+        JOIN TOURS t ON s.tour_id = t.id
+        JOIN USERS u ON b.user_id = u.id
+        LEFT JOIN PAYMENTS p ON p.booking_id = b.id
+      `;
+
+      const sql = `
         SELECT 
           b.*, 
           t.name AS tour_name, 
@@ -17,35 +41,29 @@ const AdminBookingController = {
           u.email AS user_email,
           p.status AS payment_status, 
           p.method AS payment_method
-        FROM BOOKINGS b
-        JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
-        JOIN TOURS t ON s.tour_id = t.id
-        JOIN USERS u ON b.user_id = u.id
-        LEFT JOIN PAYMENTS p ON p.booking_id = b.id
-        WHERE 1=1
+        ${baseFrom}
+        ${where}
+        ORDER BY b.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
 
-      const params = [];
+      const countSql = `SELECT COUNT(*) AS total ${baseFrom} ${where}`;
 
-      if (status) {
-        sql += ' AND b.status = ?';
-        params.push(status);
-      }
+      const [bookings, countRows] = await Promise.all([
+        query(sql, params),
+        query(countSql, params)
+      ]);
 
-      if (payment) {
-        sql += ' AND p.status = ?';
-        params.push(payment);
-      }
-
-      sql += ' ORDER BY b.created_at DESC';
-
-      const bookings = await query(sql, params);
+      const total = countRows[0].total;
+      const totalPages = Math.ceil(total / limit) || 1;
 
       return res.render('admin/bookings/index', {
         title: 'Quản lý đơn đặt',
         bookings,
         currentStatus: status,
         currentPayment: payment,
+        currentPage: page,
+        totalPages,
         currentPath: req.path
       });
 

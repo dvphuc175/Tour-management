@@ -1,4 +1,5 @@
 extends ../../admin/layout
+include ../_pagination
 
 block content
   .toolbar
@@ -49,3 +50,6 @@ block content
                 = {pending:'Chờ XN',confirmed:'Xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
             td
               a.btn.btn--outline.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
+
+  - var baseUrl = '/admin/bookings?' + (currentStatus ? `status=${currentStatus}` : (currentPayment ? `payment=${currentPayment}` : ''))
+  +pagination(currentPage, totalPages, baseUrl)

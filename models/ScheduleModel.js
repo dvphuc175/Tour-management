@@ -2,14 +2,23 @@ const { query } = require('../config/db');
 
 const ScheduleModel = {
   // Lấy tất cả lịch trình của 1 tour
-  async getByTourId(tourId) {
-    return query(
-      `SELECT *
+  async getByTourId(tourId, { limit = null, offset = 0 } = {}) {
+    let sql = `SELECT *
        FROM TOUR_SCHEDULES
        WHERE tour_id = ?
-       ORDER BY start_date DESC`,
+       ORDER BY start_date DESC`;
+    if (limit !== null) {
+      sql += ` LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
+    }
+    return query(sql, [tourId]);
+  },
+
+  async countByTourId(tourId) {
+    const rows = await query(
+      `SELECT COUNT(*) AS total FROM TOUR_SCHEDULES WHERE tour_id = ?`,
       [tourId]
     );
+    return rows[0].total;
   },
 
   async findById(id) {

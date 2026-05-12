@@ -6,9 +6,21 @@ const AdminUserController = {
   // GET /admin/users
   async index(req, res, next) {
     try {
-      const users = await UserModel.getAll();
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
+      const [users, total] = await Promise.all([
+        UserModel.getAll({ limit, offset }),
+        UserModel.countAll()
+      ]);
+
       res.render('admin/users/index', {
-        title: 'Quản lý người dùng', users, currentPath: req.path
+        title: 'Quản lý người dùng',
+        users,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit) || 1,
+        currentPath: req.path
       });
     } catch (err) { next(err); }
   },
@@ -70,9 +82,21 @@ const AdminUserController = {
   // GET /admin/reviews
   async reviewIndex(req, res, next) {
     try {
-      const reviews = await ReviewModel.getAll();
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = 10;
+      const offset = (page - 1) * limit;
+
+      const [reviews, total] = await Promise.all([
+        ReviewModel.getAll({ limit, offset }),
+        ReviewModel.countAll()
+      ]);
+
       res.render('admin/reviews/index', {
-        title: 'Quản lý đánh giá', reviews, currentPath: req.path
+        title: 'Quản lý đánh giá',
+        reviews,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit) || 1,
+        currentPath: req.path
       });
     } catch (err) { next(err); }
   }

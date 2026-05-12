@@ -7,10 +7,14 @@ const ScheduleController = {
   async index(req, res, next) {
     try {
       const { tourId } = req.params;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = 10;
+      const offset = (page - 1) * limit;
 
-      const [tour, schedules] = await Promise.all([
+      const [tour, schedules, total] = await Promise.all([
         TourModel.findById(tourId),
-        ScheduleModel.getByTourId(tourId)
+        ScheduleModel.getByTourId(tourId, { limit, offset }),
+        ScheduleModel.countByTourId(tourId)
       ]);
 
       if (!tour) {
@@ -23,6 +27,8 @@ const ScheduleController = {
         tour,
         schedules,
         today: new Date(),
+        currentPage: page,
+        totalPages: Math.ceil(total / limit) || 1,
         currentPath: req.path
       });
     } catch (err) {

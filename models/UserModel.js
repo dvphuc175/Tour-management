@@ -39,6 +39,11 @@ const UserModel = {
     );
   },
 
+  async countAll() {
+    const rows = await query(`SELECT COUNT(*) AS total FROM USERS`);
+    return rows[0].total;
+  },
+
   // Admin: khóa / mở khóa tài khoản
   async toggleStatus(id) {
     return query(
