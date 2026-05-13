@@ -90,13 +90,13 @@ const ScheduleModel = {
       [id]
     );
   },
-  async getAvailableByTourId(tourId) 
-  { 
-    return query( 
-      `SELECT * 
+  async getAvailableByTourId(tourId)
+  {
+    return query(
+      `SELECT *
       FROM TOUR_SCHEDULES
-      WHERE tour_id = ? AND status = 'active' AND start_date >= CURDATE()
-      ORDER BY start_date ASC`, 
+      WHERE tour_id = ? AND status = 'active' AND start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+      ORDER BY start_date ASC`,
       [tourId] ); },
   async checkDuplicate(tour_id, departure_location, start_date, end_date, excludeId = null) {
     let sql = `

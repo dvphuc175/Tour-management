@@ -200,7 +200,7 @@ async function getPublic({
     LEFT JOIN TOUR_SCHEDULES s 
       ON s.tour_id = t.id
       AND s.status = 'active'
-      AND s.start_date >= CURDATE()
+      AND s.start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
     WHERE t.status = 'active'
   `;
 
@@ -294,7 +294,7 @@ async function getFeatured(limit = 6) {
     LEFT JOIN TOUR_SCHEDULES s
       ON s.tour_id = t.id
       AND s.status = 'active'
-      AND s.start_date >= CURDATE()
+      AND s.start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
     WHERE t.status = 'active'
     GROUP BY t.id
     ORDER BY t.created_at DESC
