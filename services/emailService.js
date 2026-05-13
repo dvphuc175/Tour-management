@@ -91,6 +91,64 @@ const EmailService = {
     } catch (error) {
       console.error(`[MAIL_ERROR] Lỗi gửi email Success:`, error);
     }
+  },
+
+  // Gửi email 3: Hủy đơn (Cancelled)
+  async sendCancelledEmail(bookingId, contactEmail, contactName, reason = '') {
+    try {
+      const reasonHtml = reason
+        ? `<p><strong>Lý do hủy:</strong> ${reason}</p>`
+        : '';
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #fff8f8;">
+          <h2 style="color: #dc3545; text-align: center;">Đơn đặt tour đã bị hủy</h2>
+          <p>Xin chào <strong>${contactName}</strong>,</p>
+          <p>Đơn đặt tour <strong>#${bookingId}</strong> của bạn đã bị <strong>hủy</strong>.</p>
+          ${reasonHtml}
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+          <p>Nếu bạn có thắc mắc hoặc cần hỗ trợ, vui lòng liên hệ Zalo hoặc Hotline: 0345.xxx.xxx.</p>
+          <p style="color: #888; font-size: 12px;">Vi Vu Việt Nam rất tiếc vì sự bất tiện này và hy vọng được phục vụ bạn trong tương lai.</p>
+        </div>
+      `;
+
+      await send({
+        to: contactEmail,
+        subject: `[Vi Vu Việt Nam] Đơn hàng #${bookingId} đã bị hủy`,
+        html,
+        tag: 'Cancelled'
+      });
+    } catch (error) {
+      console.error(`[MAIL_ERROR] Lỗi gửi email Cancelled:`, error);
+    }
+  },
+
+  // Gửi email 4: Hoàn thành đơn (Completed)
+  async sendCompletedEmail(bookingId, contactEmail, contactName) {
+    try {
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f0f8ff;">
+          <h2 style="color: #0068ff; text-align: center;">Chuyến đi của bạn đã hoàn thành!</h2>
+          <p>Xin chào <strong>${contactName}</strong>,</p>
+          <p>Đơn đặt tour <strong>#${bookingId}</strong> đã được đánh dấu <strong>Hoàn thành</strong>.</p>
+          <p>Cảm ơn bạn đã đồng hành cùng Vi Vu Việt Nam. Chúng tôi rất mong nhận được đánh giá và phản hồi từ bạn để ngày càng hoàn thiện hơn.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+          <p style="text-align: center;">
+            <a href="#" style="display: inline-block; padding: 10px 20px; background-color: #0068ff; color: #fff; text-decoration: none; border-radius: 5px;">Đánh giá chuyến đi</a>
+          </p>
+          <p style="color: #888; font-size: 12px; text-align: center;">Nếu nút không hoạt động, bạn có thể phản hồi trực tiếp qua Zalo hoặc Hotline.</p>
+        </div>
+      `;
+
+      await send({
+        to: contactEmail,
+        subject: `[Vi Vu Việt Nam] Đơn hàng #${bookingId} đã hoàn thành`,
+        html,
+        tag: 'Completed'
+      });
+    } catch (error) {
+      console.error(`[MAIL_ERROR] Lỗi gửi email Completed:`, error);
+    }
   }
 };
 

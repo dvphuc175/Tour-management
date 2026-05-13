@@ -182,6 +182,12 @@ async detail(req, res, next) {
 
       await conn.commit();
 
+      if (b.contact_email) {
+        EmailService.sendCancelledEmail(
+          b.id, b.contact_email, b.contact_name, 'Admin hủy đơn'
+        ).catch(console.error);
+      }
+
       req.flash(
         'success',
         wasConfirmed
@@ -238,7 +244,7 @@ async detail(req, res, next) {
       const bookingId = req.params.id;
 
       const rows = await query(
-        `SELECT b.status, s.start_date, s.end_date 
+        `SELECT b.status, b.contact_email, b.contact_name, s.start_date, s.end_date
          FROM BOOKINGS b
          JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
          WHERE b.id = ?`,
@@ -266,7 +272,13 @@ async detail(req, res, next) {
       }
 
       await query("UPDATE BOOKINGS SET status = 'completed' WHERE id = ?", [bookingId]);
-      
+
+      if (rows[0].contact_email) {
+        EmailService.sendCompletedEmail(
+          bookingId, rows[0].contact_email, rows[0].contact_name
+        ).catch(console.error);
+      }
+
       req.flash('success', 'Đã đánh dấu hoàn thành đơn đặt tour!');
       res.redirect(`/admin/bookings/${req.params.id}`);
     } catch (err) {
