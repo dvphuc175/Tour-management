@@ -1,1 +1,1 @@
-WEB DEMO: adaptable-joy-production-bcfb.up.railway.app
+WEB DEMO: https://adaptable-joy-production-bcfb.up.railway.app/
