@@ -1,14 +1,19 @@
 extends ../../admin/layout
+include ../_pagination
 
 block content
   .toolbar
     .filter-tabs
-      a(href="/admin/bookings" class=!currentStatus?'filter-tab active':'filter-tab') Tất cả
+      a(href="/admin/bookings" class=(!currentStatus && !currentPayment)?'filter-tab active':'filter-tab') Tất cả
       each s in ['pending','confirmed','cancelled','completed']
         a(
           href=`/admin/bookings?status=${s}`
-          class=currentStatus===s?'filter-tab active':'filter-tab'
+          class=(currentStatus===s && !currentPayment)?'filter-tab active':'filter-tab'
         )= {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[s]
+      a(
+        href="/admin/bookings?payment=refunded"
+        class=currentPayment==='refunded'?'filter-tab active':'filter-tab'
+      ) Đã hoàn tiền
 
   .table-wrap
     table.data-table
@@ -38,10 +43,13 @@ block content
             td= formatPrice(b.total_price)
             td
               span(class=`badge badge--${b.payment_status}`)
-                = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[b.payment_status]
+                = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[b.payment_status]
             td= {vnpay:'VNPay',cash:'Tiền mặt'}[b.payment_method]
             td
               span(class=`badge badge--${b.status}`)
                 = {pending:'Chờ XN',confirmed:'Xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
             td
               a.btn.btn--outline.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
+
+  - var baseUrl = '/admin/bookings?' + (currentStatus ? `status=${currentStatus}` : (currentPayment ? `payment=${currentPayment}` : ''))
+  +pagination(currentPage, totalPages, baseUrl)

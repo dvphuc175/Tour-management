@@ -1,4 +1,5 @@
 extends ../../admin/layout
+include ../_pagination
 
 block content
     .breadcrumb
@@ -55,3 +56,5 @@ block content
                                     )
                                         input(type="hidden" name="_csrf" value=csrfToken)
                                         button.btn.btn--danger.btn--sm(type="submit") Xóa
+
+    +pagination(currentPage, totalPages, `/admin/tours/${tour.id}/schedules`)

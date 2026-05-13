@@ -64,7 +64,7 @@ block content
           .summary-row
             span Trạng thái thanh toán
             span(class=`badge badge--${booking.payment_status}`)
-              = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại'}[booking.payment_status]
+              = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[booking.payment_status]
 
           .payment-actions(style="margin-top:16px")
             

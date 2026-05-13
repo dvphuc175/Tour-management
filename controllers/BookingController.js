@@ -61,7 +61,17 @@ const BookingController = {
         req.flash('error', 'Lịch trình không tồn tại');
         return res.redirect('/tours');
       }
-      
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const startDate = new Date(schedule.start_date);
+      const diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 3) {
+        req.flash('error', 'Lịch trình này quá gần ngày khởi hành. Vui lòng chọn lịch trình khác cách ít nhất 3 ngày.');
+        return res.redirect(`/tours/${schedule.tour_slug || 'tours'}`);
+      }
+
       const tour = await TourModel.findById(schedule.tour_id);
       const total_price = adults * tour.price_adult + children * tour.price_child;
 
@@ -173,20 +183,35 @@ const BookingController = {
   async cancel(req, res, next) {
     const bookingId = req.params.id;
     try {
-      await BookingModel.cancelByUser(
+      const booking = await BookingModel.findByIdAndUser(
         bookingId,
         req.session.user.id
       );
 
-      req.flash('success', 'Đã hủy đơn đặt thành công.');
+      if (!booking) {
+        req.flash('error', 'Không tìm thấy đơn đặt');
+      } else {
+        await BookingModel.cancelByUser(bookingId, req.session.user.id);
+
+        if (booking.contact_email) {
+          EmailService.sendCancelledEmail(
+            bookingId,
+            booking.contact_email,
+            booking.contact_name,
+            'Khách hàng yêu cầu hủy'
+          ).catch(console.error);
+        }
+
+        req.flash('success', 'Đã hủy đơn đặt thành công.');
+      }
 
     } catch (err) {
       req.flash('error', err.message || 'Không thể hủy đơn. Vui lòng thử lại.');
     }
 
     const referer = req.get('Referer') || '';
-    const fromDetail = /\/my-bookings\/\d+(?:[/?#]|$)/.test(referer);
- 
+    const fromDetail = /\/my-bookings\/\d+(?:[\/?#]|$)/.test(referer);
+
     return req.session.save(() => {
       res.redirect(fromDetail ? `/my-bookings/${bookingId}` : '/my-bookings');
     });

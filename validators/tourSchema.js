@@ -24,10 +24,10 @@ const tourSchema = Joi.object({
         'number.base': 'Giá trẻ em phải là một số.',
         'any.required': 'Vui lòng nhập giá trẻ em.'
     }),
-    description: Joi.string().trim().max(5000).required().messages({
+    description: Joi.string().trim().max(10000).required().messages({
         'any.required': 'Vui lòng nhập mô tả.',
         'string.empty': 'Mô tả không được để trống.',
-        'string.max': 'Mô tả không được vượt quá 5000 ký tự.'
+        'string.max': 'Mô tả không được vượt quá 10000 ký tự.'
     }),
     status: Joi.string().valid('active', 'hidden').default('active'),
 

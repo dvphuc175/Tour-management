@@ -29,14 +29,14 @@ block content
                     label Ngày khởi hành
                     input.form-control(
                         type="date" name="start_date"
-                        value=schedule ? schedule.start_date.toISOString().split('T')[0] : ''
+                        value=schedule ? String(schedule.start_date).slice(0, 10) : ''
                         required
                     )
                 .form-group
                     label Ngày về
                     input.form-control(
                         type="date" name="end_date"
-                        value=schedule ? schedule.end_date.toISOString().split('T')[0] : ''
+                        value=schedule ? String(schedule.end_date).slice(0, 10) : ''
                         required
                     )
             .form-row

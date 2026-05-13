@@ -5,8 +5,33 @@ const AdminBookingController = {
   async index(req, res, next) {
     try {
       const status = req.query.status || null;
+      const payment = req.query.payment || null;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = 10;
+      const offset = (page - 1) * limit;
 
-      let sql = `
+      let where = ' WHERE 1=1';
+      const params = [];
+
+      if (status) {
+        where += ' AND b.status = ?';
+        params.push(status);
+      }
+
+      if (payment) {
+        where += ' AND p.status = ?';
+        params.push(payment);
+      }
+
+      const baseFrom = `
+        FROM BOOKINGS b
+        JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
+        JOIN TOURS t ON s.tour_id = t.id
+        JOIN USERS u ON b.user_id = u.id
+        LEFT JOIN PAYMENTS p ON p.booking_id = b.id
+      `;
+
+      const sql = `
         SELECT 
           b.*, 
           t.name AS tour_name, 
@@ -16,29 +41,29 @@ const AdminBookingController = {
           u.email AS user_email,
           p.status AS payment_status, 
           p.method AS payment_method
-        FROM BOOKINGS b
-        JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
-        JOIN TOURS t ON s.tour_id = t.id
-        JOIN USERS u ON b.user_id = u.id
-        LEFT JOIN PAYMENTS p ON p.booking_id = b.id
-        WHERE 1=1
+        ${baseFrom}
+        ${where}
+        ORDER BY b.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
 
-      const params = [];
+      const countSql = `SELECT COUNT(*) AS total ${baseFrom} ${where}`;
 
-      if (status) {
-        sql += ' AND b.status = ?';
-        params.push(status);
-      }
+      const [bookings, countRows] = await Promise.all([
+        query(sql, params),
+        query(countSql, params)
+      ]);
 
-      sql += ' ORDER BY b.created_at DESC';
-
-      const bookings = await query(sql, params);
+      const total = countRows[0].total;
+      const totalPages = Math.ceil(total / limit) || 1;
 
       return res.render('admin/bookings/index', {
         title: 'Quản lý đơn đặt',
         bookings,
         currentStatus: status,
+        currentPayment: payment,
+        currentPage: page,
+        totalPages,
         currentPath: req.path
       });
 
@@ -121,8 +146,13 @@ async detail(req, res, next) {
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
-      if (b.status === 'confirmed') {
+      if (b.status === 'completed') {
+        await conn.commit();
+        req.flash('error', 'Không thể hủy đơn đã hoàn thành');
+        return res.redirect(`/admin/bookings/${req.params.id}`);
       }
+
+      const wasConfirmed = b.status === 'confirmed';
 
       await conn.execute(
         `UPDATE BOOKINGS SET status = 'cancelled' WHERE id = ?`,
@@ -137,16 +167,33 @@ async detail(req, res, next) {
         [b.adult_count + b.child_count, b.schedule_id]
       );
 
+      // Payment đã thanh toán thành công -> đánh dấu 'refunded' (cần xử lý hoàn tiền thủ công)
+      // Payment còn 'pending' -> 'failed'
       await conn.execute(
         `UPDATE PAYMENTS 
-         SET status = 'failed'
-         WHERE booking_id = ? AND status = 'pending'`,
+         SET status = CASE 
+                        WHEN status = 'success' THEN 'refunded'
+                        WHEN status = 'pending' THEN 'failed'
+                        ELSE status
+                      END
+         WHERE booking_id = ?`,
         [b.id]
       );
 
       await conn.commit();
 
-      req.flash('success', 'Đã hủy đơn đặt');
+      if (b.contact_email) {
+        EmailService.sendCancelledEmail(
+          b.id, b.contact_email, b.contact_name, 'Admin hủy đơn'
+        ).catch(console.error);
+      }
+
+      req.flash(
+        'success',
+        wasConfirmed
+          ? 'Đã hủy đơn. Trạng thái thanh toán chuyển sang "Đã hoàn tiền" — vui lòng xử lý hoàn tiền thủ công cho khách.'
+          : 'Đã hủy đơn đặt'
+      );
       return res.redirect(`/admin/bookings/${req.params.id}`);
 
     } catch (err) {
@@ -196,16 +243,15 @@ async detail(req, res, next) {
     try {
       const bookingId = req.params.id;
 
-      const result = await query(
-        `SELECT b.status, s.start_date, s.end_date 
+      const rows = await query(
+        `SELECT b.status, b.contact_email, b.contact_name, s.start_date, s.end_date
          FROM BOOKINGS b
          JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
          WHERE b.id = ?`,
         [bookingId]
       );
 
-      const rows = Array.isArray(result[0]) ? result[0] : result;
-      const bookingData = rows && rows.length > 0 ? rows[0] : null;
+      const bookingData = rows[0] || null;
 
       if (!bookingData) {
         req.flash('error', 'Không tìm thấy đơn hàng.');
@@ -226,7 +272,13 @@ async detail(req, res, next) {
       }
 
       await query("UPDATE BOOKINGS SET status = 'completed' WHERE id = ?", [bookingId]);
-      
+
+      if (rows[0].contact_email) {
+        EmailService.sendCompletedEmail(
+          bookingId, rows[0].contact_email, rows[0].contact_name
+        ).catch(console.error);
+      }
+
       req.flash('success', 'Đã đánh dấu hoàn thành đơn đặt tour!');
       res.redirect(`/admin/bookings/${req.params.id}`);
     } catch (err) {

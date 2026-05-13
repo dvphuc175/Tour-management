@@ -9,7 +9,6 @@ block content
               : `/admin/tours?_csrf=${csrfToken}`
 
         form(action=action method="POST" enctype="multipart/form-data")
-            input(type="hidden" name="_csrf" value=csrfToken)
 
             .form-row
                 .form-group.form-group--grow

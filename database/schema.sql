@@ -75,7 +75,7 @@ CREATE TABLE PAYMENTS (
     booking_id INT NOT NULL,
     amount DECIMAL(12,0) NOT NULL,
     method ENUM('vnpay', 'cash') NOT NULL,
-    status ENUM('pending', 'success', 'failed') DEFAULT 'pending',
+    status ENUM('pending', 'success', 'failed', 'refunded') DEFAULT 'pending',
     transaction_id VARCHAR(100),
     paid_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

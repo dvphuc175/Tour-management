@@ -81,9 +81,8 @@ const ReviewModel = {
   },
 
   // Lấy tất cả review
-  async getAll() {
-    return query(
-      `
+  async getAll({ limit = null, offset = 0 } = {}) {
+    let sql = `
       SELECT 
         r.*,
         u.fullname AS user_name,
@@ -94,8 +93,16 @@ const ReviewModel = {
       JOIN TOURS t 
         ON r.tour_id = t.id
       ORDER BY r.created_at DESC
-      `
-    );
+    `;
+    if (limit !== null) {
+      sql += ` LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
+    }
+    return query(sql);
+  },
+
+  async countAll() {
+    const rows = await query(`SELECT COUNT(*) AS total FROM REVIEWS`);
+    return rows[0].total;
   },
 
   // Xóa review
