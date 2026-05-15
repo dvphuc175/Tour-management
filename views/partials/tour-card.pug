@@ -8,6 +8,11 @@ a.tour-card(href=`/tours/${tour.slug}`)
 		if tour.category_name
 			span.tour-card__cat= tour.category_name
 		h3.tour-card__name= tour.name
+		if tour.avg_rating && tour.review_count > 0
+			.tour-card__rating
+				span.tour-card__rating-stars= renderStars(tour.avg_rating)
+				span.tour-card__rating-score= tour.avg_rating
+				span.tour-card__rating-count (#{tour.review_count} đánh giá)
 		.tour-card__meta
 			if tour.next_departure
 				span 📅 #{formatDate(tour.next_departure)}

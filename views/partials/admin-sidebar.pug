@@ -18,7 +18,7 @@ aside.admin-sidebar
         | Người dùng
       a(href="/admin/reviews" class=(currentPath && currentPath.startsWith('/admin/reviews')) ? 'active' : '')
         | Đánh giá
-      a(href="/admin/reports")
+      a(href="/admin/reports" class=currentPath === '/admin/reports' ? 'active' : '')
         | Báo cáo
   .sidebar__footer
     a.sidebar__link.sidebar__link--ghost(href="/")
