@@ -222,6 +222,19 @@ block content
                   if rv.comment
                     p.review-item__comment= rv.comment
 
+            if reviewTotalPages > 1
+              .pagination.reviews-pagination
+                - const reviewBase = `/tours/${tour.slug}?review_page=`
+                if reviewPage > 1
+                  a.pagination__item(href=`${reviewBase}${reviewPage - 1}#reviews`) ← Trước
+                each p in Array.from({length: reviewTotalPages}, (_, i) => i + 1)
+                  a(
+                    href=`${reviewBase}${p}#reviews`
+                    class=`pagination__item${p === reviewPage ? ' active' : ''}`
+                  )= p
+                if reviewPage < reviewTotalPages
+                  a.pagination__item(href=`${reviewBase}${reviewPage + 1}#reviews`) Tiếp →
+
       aside.tour-booking-box
         if schedules.length === 0
           h3.booking-box__title Lịch trình khởi hành

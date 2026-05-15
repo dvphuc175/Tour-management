@@ -193,7 +193,9 @@ async function getPublic({
       t.images,
       c.name AS category_name,
       MIN(s.start_date) AS next_departure,
-      SUM(s.available_slots) AS total_available
+      SUM(s.available_slots) AS total_available,
+      rv_stats.avg_rating,
+      COALESCE(rv_stats.review_count, 0) AS review_count
     FROM TOURS t
     LEFT JOIN CATEGORIES c 
       ON t.category_id = c.id
@@ -201,6 +203,13 @@ async function getPublic({
       ON s.tour_id = t.id
       AND s.status = 'active'
       AND s.start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+    LEFT JOIN (
+      SELECT tour_id,
+             ROUND(AVG(rating), 1) AS avg_rating,
+             COUNT(*) AS review_count
+      FROM REVIEWS
+      GROUP BY tour_id
+    ) rv_stats ON rv_stats.tour_id = t.id
     WHERE t.status = 'active'
   `;
 
@@ -287,7 +296,9 @@ async function getFeatured(limit = 6) {
       t.images,
       c.name AS category_name,
       MIN(s.start_date) AS next_departure,
-      SUM(s.available_slots) AS total_available
+      SUM(s.available_slots) AS total_available,
+      rv_stats.avg_rating,
+      COALESCE(rv_stats.review_count, 0) AS review_count
     FROM TOURS t
     LEFT JOIN CATEGORIES c
       ON t.category_id = c.id
@@ -295,6 +306,13 @@ async function getFeatured(limit = 6) {
       ON s.tour_id = t.id
       AND s.status = 'active'
       AND s.start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+    LEFT JOIN (
+      SELECT tour_id,
+             ROUND(AVG(rating), 1) AS avg_rating,
+             COUNT(*) AS review_count
+      FROM REVIEWS
+      GROUP BY tour_id
+    ) rv_stats ON rv_stats.tour_id = t.id
     WHERE t.status = 'active'
     GROUP BY t.id
     ORDER BY t.created_at DESC

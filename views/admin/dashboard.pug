@@ -1,5 +1,85 @@
 extends layout
 
 block content
-  h2 Dashboard
-  p Admin layout đang hoạt động ✓
+  .stat-cards
+    .stat-card
+      .stat-card__icon.stat-card__icon--blue 🧾
+      .stat-card__body
+        .stat-card__label Tổng đơn đặt
+        .stat-card__num= summary.bookings.total || 0
+        .stat-card__sub #{summary.bookings.confirmed || 0} xác nhận · #{summary.bookings.pending || 0} chờ
+    .stat-card
+      .stat-card__icon.stat-card__icon--green 💰
+      .stat-card__body
+        .stat-card__label Doanh thu
+        - const revenueValue = Number(summary.revenue || 0)
+        .stat-card__num= revenueValue.toLocaleString('vi-VN') + ' ₫'
+        .stat-card__sub Doanh thu thành công
+    .stat-card
+      .stat-card__icon.stat-card__icon--orange 👥
+      .stat-card__body
+        .stat-card__label Khách hàng
+        .stat-card__num= summary.users.total || 0
+        .stat-card__sub #{summary.users.active || 0} hoạt động
+    .stat-card
+      .stat-card__icon.stat-card__icon--teal 🗺️
+      .stat-card__body
+        .stat-card__label Tour
+        .stat-card__num= summary.tours.total || 0
+        .stat-card__sub #{summary.tours.active || 0} đang hoạt động
+
+  .dashboard-grid
+    .chart-card
+      .chart-card__header
+        h2.chart-card__title Doanh thu theo tháng #{currentYear}
+      canvas#revenueChart(width="400" height="220")
+    .top-tours-card
+      .chart-card__header
+        h2.chart-card__title Top tour đặt nhiều nhất
+        span.top-tours-card__meta Top #{topTours.length}
+      .top-list
+        each tour, idx in topTours
+          .top-item
+            .top-item__rank #{idx + 1}
+            .top-item__info
+              .top-item__name= tour.name
+              .top-item__meta #{tour.total_bookings || 0} lượt đặt
+            .top-item__rev= Number(tour.total_revenue || 0).toLocaleString('vi-VN') + ' ₫'
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js")
+  script.
+    const dashboardData = !{chartData};
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+      new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+          labels: dashboardData.labels,
+          datasets: [{
+            label: 'Doanh thu',
+            data: dashboardData.revenue,
+            borderColor: '#0b74de',
+            backgroundColor: 'rgba(11, 116, 222, 0.18)',
+            pointRadius: 4,
+            fill: true,
+            tension: 0.35
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: {
+              ticks: {
+                callback: value => new Intl.NumberFormat('vi-VN').format(value)
+              }
+            }
+          }
+        }
+      });
+    }
