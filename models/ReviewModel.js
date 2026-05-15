@@ -1,10 +1,9 @@
 const { query } = require('../config/db');
 
 const ReviewModel = {
-  // Lấy danh sách review theo tour
-  async getByTourId(tourId) {
-    return query(
-      `
+  // Lấy danh sách review theo tour (có phân trang)
+  async getByTourId(tourId, { limit = null, offset = 0 } = {}) {
+    let sql = `
       SELECT 
         r.*, 
         u.fullname AS user_name
@@ -12,9 +11,22 @@ const ReviewModel = {
       JOIN USERS u ON r.user_id = u.id
       WHERE r.tour_id = ?
       ORDER BY r.created_at DESC
-      `,
+    `;
+    const params = [tourId];
+
+    if (limit !== null) {
+      sql += ` LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
+    }
+
+    return query(sql, params);
+  },
+
+  async countByTourId(tourId) {
+    const rows = await query(
+      `SELECT COUNT(*) AS total FROM REVIEWS WHERE tour_id = ?`,
       [tourId]
     );
+    return rows[0].total;
   },
 
   // Lấy điểm đánh giá trung bình

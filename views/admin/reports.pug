@@ -1,0 +1,96 @@
+extends layout
+
+block content
+  .report-filter
+    form.report-filter__form(method="GET" action="/admin/reports")
+      .form-group
+        label(for="from") Từ ngày
+        input#from(type="date" name="from" value=from)
+      .form-group
+        label(for="to") Đến ngày
+        input#to(type="date" name="to" value=to)
+      .form-group
+        button.btn.btn--primary(type="submit") Lọc
+
+  .report-summary
+    .report-summary__card
+      .report-summary__label Tổng doanh thu
+      .report-summary__value= Number(totals.revenue || 0).toLocaleString('vi-VN') + ' ₫'
+    .report-summary__card
+      .report-summary__label Tổng đơn đặt
+      .report-summary__value= totals.bookings || 0
+    .report-summary__card
+      .report-summary__label Tổng hành khách
+      .report-summary__value= totals.passengers || 0
+
+  if rows.length > 0
+    .chart-card
+      .chart-card__header
+        h2.chart-card__title Doanh thu theo ngày
+      canvas#reportChart(width="400" height="280")
+
+    .table-wrap
+      table.data-table
+        thead
+          tr
+            th Ngày
+            th Doanh thu
+            th Đơn đặt
+            th Hành khách
+        tbody
+          each row in rows
+            tr
+              td= row.date
+              td= Number(row.revenue || 0).toLocaleString('vi-VN') + ' ₫'
+              td= row.bookings || 0
+              td= row.passengers || 0
+  else
+    .flash.flash--info
+      p Không có dữ liệu trong khoảng thời gian đã chọn.
+
+block scripts
+  script(src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js")
+  if rows.length > 0
+    script.
+      const reportData = !{chartData};
+      const reportCtx = document.getElementById('reportChart');
+      if (reportCtx) {
+        new Chart(reportCtx, {
+          type: 'line',
+          data: {
+            labels: reportData.labels,
+            datasets: [
+              {
+                label: 'Doanh thu',
+                data: reportData.revenue,
+                borderColor: '#0b74de',
+                backgroundColor: 'rgba(11, 116, 222, 0.18)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 3
+              },
+              {
+                label: 'Đơn đặt',
+                data: reportData.bookings,
+                borderColor: '#ff8a00',
+                backgroundColor: 'rgba(255, 138, 0, 0.14)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: {
+                ticks: {
+                  callback: value => new Intl.NumberFormat('vi-VN').format(value)
+                }
+              }
+            }
+          }
+        });
+      }

@@ -4,6 +4,7 @@ const ScheduleModel = require('../models/ScheduleModel');
 const ReviewModel = require('../models/ReviewModel');
 const LIMIT = 8; 
 const HOME_LIMIT = 6; // 6 tours per page on homepage
+const REVIEW_LIMIT = 5;
 
 const ClientController = {
   // GET /
@@ -89,12 +90,20 @@ const ClientController = {
         return res.redirect('/tours');
       }
 
-        // Lấy dữ liệu song song
-      const [schedules, reviews, ratingInfo] = await Promise.all([
+      const reviewPage = Math.max(1, parseInt(req.query.review_page) || 1);
+      const reviewOffset = (reviewPage - 1) * REVIEW_LIMIT;
+
+      const [schedules, reviews, ratingInfo, reviewTotal] = await Promise.all([
         ScheduleModel.getAvailableByTourId(tour.id),
-        ReviewModel.getByTourId(tour.id),
-        ReviewModel.getAvgRating(tour.id)
+        ReviewModel.getByTourId(tour.id, {
+          limit: REVIEW_LIMIT,
+          offset: reviewOffset
+        }),
+        ReviewModel.getAvgRating(tour.id),
+        ReviewModel.countByTourId(tour.id)
       ]);
+
+      const reviewTotalPages = Math.ceil(reviewTotal / REVIEW_LIMIT) || 1;
 
       // Kiểm tra quyền review
       let canReview = false;
@@ -122,6 +131,9 @@ const ClientController = {
         schedules,
         reviews,
         ratingInfo,
+        reviewPage,
+        reviewTotalPages,
+        reviewTotal,
         canReview,
         hasReviewed,
         sections
