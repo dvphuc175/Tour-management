@@ -206,6 +206,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Keyboard navigation for gallery
 	document.addEventListener('keydown', function(e) {
+		// Ignore if inside input/textarea or any modifier key is held
+		const tag = e.target.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+		if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+
 		if (e.key === 'ArrowLeft') {
 			e.preventDefault();
 			prevImage();
