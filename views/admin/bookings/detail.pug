@@ -76,41 +76,44 @@ block content
             strong= formatDate(booking.paid_at)
 
     .booking-detail-actions
-      a.btn.btn--outline(href="/admin/bookings") ← Quay lại
+      a.btn.btn--outline(href="/admin/bookings")
+        +fa('arrow-left')
+        |  Quay lại
 
       //- Chỉ hiện "Xác nhận đơn" với đơn CASH đang pending
       if booking.status === 'pending' && booking.payment_method === 'cash'
-        form(
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/confirm?_method=PUT`
           method="POST"
           data-confirm="Xác nhận đã nhận tiền mặt và duyệt đơn này?"
-          style="display:inline"
         )
           input(type="hidden" name="_csrf" value=csrfToken)
-          button.btn.btn--primary(type="submit") ✓ Xác nhận & Nhận tiền mặt
+          button.btn.btn--primary(type="submit")
+            +fa('check')
+            |  Xác nhận & Nhận tiền mặt
 
       //- VNPay pending: chỉ hiển thị trạng thái, không có nút duyệt
       if booking.status === 'pending' && booking.payment_method === 'vnpay'
-        span.badge.badge--pending(style="padding:8px 14px") Chờ khách thanh toán VNPay
+        span.badge.badge--pending.badge--lg-pad Chờ khách thanh toán VNPay
 
       //- Nút "Hoàn thành tour" — cả 2 luồng, khi đã confirmed
       if booking.status === 'confirmed'
-        form(
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/complete?_method=PUT`
           method="POST"
           data-confirm="Đánh dấu tour này đã hoàn thành?"
-          style="display:inline"
         )
           input(type="hidden" name="_csrf" value=csrfToken)
-          button.btn.btn--primary(type="submit") ✓ Hoàn thành tour
+          button.btn.btn--primary(type="submit")
+            +fa('check')
+            |  Hoàn thành tour
 
       //- Hủy đơn — không hủy khi đã completed
       if booking.status !== 'cancelled' && booking.status !== 'completed'
-        form(
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/cancel?_method=PUT`
           method="POST"
           data-confirm="Hủy đơn này và hoàn lại chỗ cho lịch trình?"
-          style="display:inline"
         )
           input(type="hidden" name="_csrf" value=csrfToken)
           button.btn.btn--danger(type="submit") Hủy đơn

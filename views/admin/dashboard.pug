@@ -3,26 +3,30 @@ extends layout
 block content
   .stat-cards
     .stat-card
-      .stat-card__icon.stat-card__icon--blue 🧾
+      .stat-card__icon.stat-card__icon--blue
+        +fa('receipt')
       .stat-card__body
         .stat-card__label Tổng đơn đặt
         .stat-card__num= summary.bookings.total || 0
         .stat-card__sub #{summary.bookings.confirmed || 0} xác nhận · #{summary.bookings.pending || 0} chờ
     .stat-card
-      .stat-card__icon.stat-card__icon--green 💰
+      .stat-card__icon.stat-card__icon--green
+        +fa('money')
       .stat-card__body
         .stat-card__label Doanh thu
         - const revenueValue = Number(summary.revenue || 0)
         .stat-card__num= revenueValue.toLocaleString('vi-VN') + ' ₫'
         .stat-card__sub Doanh thu thành công
     .stat-card
-      .stat-card__icon.stat-card__icon--orange 👥
+      .stat-card__icon.stat-card__icon--orange
+        +fa('users')
       .stat-card__body
         .stat-card__label Khách hàng
         .stat-card__num= summary.users.total || 0
         .stat-card__sub #{summary.users.active || 0} hoạt động
     .stat-card
-      .stat-card__icon.stat-card__icon--teal 🗺️
+      .stat-card__icon.stat-card__icon--teal
+        +fa('map')
       .stat-card__body
         .stat-card__label Tour
         .stat-card__num= summary.tours.total || 0

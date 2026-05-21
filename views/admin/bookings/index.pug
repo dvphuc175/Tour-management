@@ -31,7 +31,7 @@ block content
       tbody
         if bookings.length === 0
           tr
-            td(colspan="9" style="text-align:center;padding:32px;color:#9ca3af") Không có đơn nào
+            td.table-empty(colspan="9") Không có đơn nào
         each b in bookings
           tr
             td= b.id
