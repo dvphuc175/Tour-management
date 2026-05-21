@@ -44,10 +44,10 @@ block content
                                         = {active:'Mở',full:'Hết chỗ',cancelled:'Đã hủy'}[s.status]
                             td.action-btns
                                 if isExpired
-                                    button.btn.btn--outline.btn--sm(disabled) Sửa
+                                    button.btn.btn--edit.btn--sm(disabled) Sửa
                                     button.btn.btn--danger.btn--sm(disabled) Xóa
                                 else
-                                    a.btn.btn--outline.btn--sm(href=`/admin/schedules/${s.id}/edit`) Sửa
+                                    a.btn.btn--edit.btn--sm(href=`/admin/schedules/${s.id}/edit`) Sửa
                                     form.form--inline(
                                         action=`/admin/schedules/${s.id}?_method=DELETE`
                                         method="POST"

@@ -28,7 +28,7 @@ block content
               span(class=`badge badge--${cat.status}`)
                 = cat.status === 'active' ? 'Hiển thị' : 'Ẩn'
             td.action-btns
-              a.btn.btn--outline.btn--sm(href=`/admin/categories/${cat.id}/edit`) Sửa
+              a.btn.btn--edit.btn--sm(href=`/admin/categories/${cat.id}/edit`) Sửa
               form.form--inline(
                 action=`/admin/categories/${cat.id}?_method=DELETE`
                 method="POST"

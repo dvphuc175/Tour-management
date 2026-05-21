@@ -35,7 +35,7 @@ block content
               .booking-item__status
                 span(class=`badge badge--${b.status}`)
                   = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
-                a.btn.btn--outline.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
+                a.btn.btn--view.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
                 if b.status === 'pending'
                   form(
                     action=`/my-bookings/${b.id}/cancel?_method=PUT`

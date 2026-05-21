@@ -3,7 +3,7 @@ const CategoryModel = require('../models/CategoryModel');
 const ScheduleModel = require('../models/ScheduleModel');
 const ReviewModel = require('../models/ReviewModel');
 const LIMIT = 9; 
-const HOME_LIMIT = 6; // 6 tours per page on homepage
+const HOME_LIMIT = 8; // 6 tours per page on homepage
 const REVIEW_LIMIT = 5;
 
 const ClientController = {
