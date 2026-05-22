@@ -1,0 +1,66 @@
+extends ../layout
+
+block content
+  //- ── Hero About ─────────────────────────────
+  section.hero.hero--about
+    .hero__content.container
+      h1.hero__title Về Chúng Tôi
+      p.hero__sub Khám phá hành trình và sứ mệnh của Vi Vu Việt Nam
+
+  //- ── About Content ──────────────────────────
+  section.section
+    .container
+      .about-grid
+        .about-content
+          h2.section__title Chúng Tôi Là Ai?
+          p.
+            Vi Vu Việt Nam được thành lập với niềm đam mê khám phá và mong muốn mang đến những trải nghiệm du lịch độc đáo, đáng nhớ cho mọi người. 
+            Với nhiều năm kinh nghiệm trong ngành du lịch, chúng tôi tự hào là đối tác tin cậy của hàng ngàn khách hàng.
+          
+          h2.section__title Sứ Mệnh Của Chúng Tôi
+          p.
+            Chúng tôi cam kết cung cấp các tour du lịch chất lượng cao, dịch vụ chuyên nghiệp và giá cả hợp lý. 
+            Mục tiêu của chúng tôi là giúp mỗi khách hàng có được một chuyến đi hoàn hảo, an toàn và tràn đầy niềm vui.
+          
+          h2.section__title Tại Sao Chọn Chúng Tôi?
+          .features-list
+            .feature-item
+              +fa('map-location-dot')
+              .feature-item__content
+                h4 Hành trình đa dạng
+                p Hơn 100 tour du lịch khắp các tỉnh thành Việt Nam
+            .feature-item
+              +fa('award')
+              .feature-item__content
+                h4 Chất lượng đảm bảo
+                p Đội ngũ hướng dẫn viên chuyên nghiệp, kinh nghiệm
+            .feature-item
+              +fa('headset')
+              .feature-item__content
+                h4 Hỗ trợ 24/7
+                p Đội ngũ CSKH luôn sẵn sàng hỗ trợ bạn mọi lúc
+            .feature-item
+              +fa('money-bill-wave')
+              .feature-item__content
+                h4 Giá tốt nhất
+                p Cam kết giá cạnh tranh nhất thị trường
+
+        .about-image
+          img(src="/assets/images/slide3.jpg" alt="Về chúng tôi")
+
+  //- ── Stats ─────────────────────────────────
+  section.section.section--gray
+    .container
+      .stats-grid
+        .stat-card
+          .stat-card__number 100+
+          .stat-card__label Tour đa dạng
+        .stat-card
+          .stat-card__number 10,000+
+          .stat-card__label Khách hàng hài lòng
+        .stat-card
+          .stat-card__number 50+
+          .stat-card__label Tỉnh thành
+        .stat-card
+          .stat-card__number 5+
+          .stat-card__label Năm kinh nghiệm

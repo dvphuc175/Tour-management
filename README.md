@@ -242,7 +242,7 @@ Lệnh trên sẽ chạy `nodemon --inspect app.js` (auto-reload khi sửa code)
 Dự án được phát triển bởi nhóm sinh viên chuyên đề.
  
 - **Đỗ Văn Phúc** - (2221050687)
-- **Cao Văn Quyết** -(2221050271)
+- **Cao Văn Quyết**
  
 **Giảng viên hướng dẫn:** ThS. Nguyễn Thị Thanh
 *Trường Đại học Mỏ - Địa chất Hà Nội | Hà Nội, Năm 2026*

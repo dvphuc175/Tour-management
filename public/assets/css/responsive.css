@@ -1,0 +1,193 @@
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE.CSS
+   Media queries for responsive design
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Navbar responsive ──────────────────── */
+@media (max-width: 991px) {
+	.navbar__menu {
+		display: none;
+	}
+	.navbar__auth {
+		display: none;
+	}
+	.navbar__toggle {
+		display: flex;
+	}
+	.navbar__backdrop {
+		display: block;
+	}
+	.navbar.is-open .navbar__panel {
+		display: flex;
+		flex-direction: column;
+		position: fixed;
+		top: var(--header-h);
+		left: 0;
+		right: 0;
+		background: var(--color-bg);
+		border-bottom: 1px solid var(--color-border);
+		padding: 16px;
+		gap: 16px;
+	}
+	.navbar.is-open .navbar__menu {
+		display: flex;
+		flex-direction: column;
+		position: static;
+		background: transparent;
+		border-bottom: none;
+		padding: 0;
+		gap: 8px;
+		margin: 0;
+	}
+	.navbar.is-open .navbar__auth {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+		margin-left: 0;
+		padding-top: 12px;
+		border-top: 1px solid var(--color-border);
+	}
+}
+
+@media (max-width: 768px) {
+	.hero {
+		min-height: 480px;
+		padding: clamp(50px, 10vw, 120px) 0;
+	}
+}
+
+@media (max-width: 576px) {
+	.hero {
+		min-height: 400px;
+		padding: clamp(40px, 8vw, 100px) 0;
+	}
+	.hero::before {
+		background-size: cover;
+	}
+	.hero__search {
+		padding: 6px 6px 6px 14px;
+		gap: 6px;
+	}
+	.hero__search .form-control {
+		font-size: 14px;
+		padding: 10px 0;
+	}
+	.btn--accent {
+		padding: 10px 16px;
+		font-size: 14px;
+	}
+}
+
+@media (max-width: 400px) {
+	.hero {
+		min-height: 350px;
+		padding: clamp(30px, 7vw, 90px) 0;
+	}
+}
+
+/* ── Grid responsive ─────────────────────── */
+@media (max-width: 1200px) {
+  .highlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .intro-grid,
+  .experience-grid {
+    grid-template-columns: 1fr;
+  }
+  .experience-right {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .intro-stats {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 991px) {
+  .hero {
+    min-height: 580px;
+    padding: clamp(60px, 12vw, 140px) 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .intro__title {
+    font-size: 1.75rem;
+  }
+  .experience-feature {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .experience-feature__img {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  .experience-feature__avatars {
+    justify-content: center;
+  }
+  .experience-right {
+    grid-template-columns: 1fr;
+  }
+  .highlight-grid {
+    grid-template-columns: 1fr;
+  }
+  .destination-grid {
+    grid-template-columns: 1fr;
+  }
+  .intro-stats {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .intro-stat__number {
+    font-size: 2rem;
+  }
+  .tour-nav-link {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+  .tour-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tour-section__title {
+    font-size: 14px;
+  }
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+  .tour-booking-box {
+    position: static;
+    margin-top: 24px;
+  }
+  .footer__content {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* ── Pricing table responsive ────────────── */
+@media (max-width: 768px) {
+  .price-detail-table {
+    font-size: 11px;
+    display: block;
+    overflow-x: auto;
+  }
+  .price-detail-table th,
+  .price-detail-table td {
+    padding: 6px 8px;
+  }
+  .price-detail-table th {
+    font-size: 10px;
+  }
+  .schedule-price-detail {
+    padding: 12px;
+  }
+  .schedule-table {
+    display: block;
+    overflow-x: auto;
+  }
+  .schedule-table th,
+  .schedule-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}

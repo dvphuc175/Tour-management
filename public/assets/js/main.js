@@ -1,4 +1,4 @@
-// Navbar mobile menu
+// Navbar mobile menu + scroll state
 (function initNavbar() {
   const navbar = document.querySelector('.navbar');
   const toggle = document.querySelector('.navbar__toggle');
@@ -39,6 +39,17 @@
   window.addEventListener('resize', () => {
     if (window.innerWidth > 991) closeMenu();
   });
+
+  // Navbar scroll state
+  const updateNavbarScrollState = () => {
+    if (window.scrollY > 10) {
+      navbar.classList.add('is-scrolled');
+    } else {
+      navbar.classList.remove('is-scrolled');
+    }
+  };
+  updateNavbarScrollState();
+  window.addEventListener('scroll', updateNavbarScrollState);
 })();
 
 // Tour filter drawer
@@ -179,19 +190,12 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     if (!input) return;
     
     // Toggle input type between password and text
-    const icon = toggle.querySelector('i');
     if (input.type === 'password') {
       input.type = 'text';
-      if (icon) {
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      }
+      toggle.classList.add('active');
     } else {
       input.type = 'password';
-      if (icon) {
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
+      toggle.classList.remove('active');
     }
   });
 });
@@ -911,5 +915,25 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
   const reviewsSection = document.getElementById('reviews');
   if (reviewsSection) {
     reviewsSection.addEventListener('click', handleReviewsPaginationClick);
+  }
+})();
+
+// Contact page: Toggle admin info
+(function initContactToggle() {
+  const toggleBtn = document.getElementById('toggleAdminInfo');
+  const adminInfo = document.getElementById('adminContactInfo');
+  
+  if (toggleBtn && adminInfo) {
+    toggleBtn.addEventListener('click', () => {
+      adminInfo.classList.toggle('show');
+      
+      // Update button text and icon
+      const icon = toggleBtn.querySelector('i');
+      if (adminInfo.classList.contains('show')) {
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ẩn thông tin quản trị viên & Hotline';
+      } else {
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Hiển thị thông tin quản trị viên & Hotline';
+      }
+    });
   }
 })();

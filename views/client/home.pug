@@ -1,10 +1,37 @@
 extends ../layout
 
 block content
+	-
+		const catIcons = {
+			'tour-mien-bac': 'map',
+			'mien-bac': 'map',
+			'tour-mien-trung': 'umbrella-beach',
+			'mien-trung': 'umbrella-beach',
+			'tour-mien-nam': 'ship',
+			'mien-nam': 'ship',
+			'tour-bien-dao': 'sun',
+			'bien-dao': 'sun',
+			'tour-nui-rung': 'mountain',
+			'nui-rung': 'mountain',
+			'tour-van-hoa': 'landmark',
+			'van-hoa': 'landmark',
+			'tour-am-thuc': 'bowl-food',
+			'am-thuc': 'bowl-food',
+			'tour-nghi-duong': 'spa',
+			'nghi-duong': 'spa',
+			'tour-mao-hiem': 'person-hiking',
+			'mao-hiem': 'person-hiking',
+			'tour-gia-dinh': 'users',
+			'gia-dinh': 'users',
+			'tour-trang-mat': 'heart',
+			'trung-mat': 'heart',
+			'tour-trung-mat': 'heart',
+			'team-building': 'people-group'
+		}
 
 	//- ── Hero ─────────────────────────────────
-	section.hero.hero--home
-		.hero__content.container
+	section.hero
+		.hero__content
 			h1.hero__title Khám phá Việt Nam theo cách của bạn
 			p.hero__sub Hàng trăm tour chất lượng — đặt dễ, đi vui
 			form.hero__search(action="/tours" method="GET")
@@ -12,41 +39,64 @@ block content
 					type="text" name="search"
 					placeholder="Tìm tour, điểm đến..."
 				)
-				button.btn.btn--accent(type="submit")
-					+fa('search')
-					|  Tìm kiếm
-
+				button.btn.btn--accent(type="submit") Tìm kiếm
 
 	//- ── Danh mục ─────────────────────────────
-	section.section.section--gray
+	section.section
 		.container
-			.section-header.section-header--centered
-				h2.section__title Danh mục tour
-				p.section__subtitle Khám phá theo sở thích của bạn
+			h2.section__title Danh mục tour
 			.category-grid
 				each cat in categories
-					a.category-card(href=`/tours?category=${cat.id}`)
+					a.category-card(href=`/tours?category=${cat.id}` class=`category-card--${cat.slug}`)
+						span.category-card__icon
+							+fa(catIcons[cat.slug] || 'compass')
 						span.category-card__name= cat.name
 
+	//- ── Giới thiệu ngắn ─────────────────────
+	section.section
+		.container
+			.intro-grid
+				.intro-content
+					h2.intro__title Du Lịch Với Sự Tự Tin Lý Do Hàng Đầu Để Chọn Công Ty Chúng Tôi
+					p.intro__desc Chúng tôi tự hào là một trong những đơn vị cung cấp các dịch vụ tour hàng đầu với chất lượng, an toàn, và có nhiều trải nghiệm đáng nhớ
+					.intro-buttons
+						a.btn.btn--primary(href="/about")
+							| Chủng tộc cổ
+							+fa('arrow-right')
+						span.intro-badge
+							+fa('star')
+							|  5 Sao - Niềm kinh nghiệm
+					.intro-stats
+						.intro-stat
+							.intro-stat__number 1k+
+							.intro-stat__label Điểm đến phát triển
+						.intro-stat
+							.intro-stat__number 8m+
+							.intro-stat__label Khách hàng hài lòng
+					.intro-cta
+						a.btn.btn--success(href="/tours")
+							| Khám Phá Điểm Đến
+							+fa('arrow-right')
+				.intro-image
+					img(src="/assets/images/slide4.jpg" alt="Du lịch Việt Nam")
+
+	
+
 	//- ── Tour nổi bật ─────────────────────────
-	section.section#homeTourSection
+	section.section.section--gray
 		.container
 			.section-header
 				h2.section__title Tour nổi bật
-				a.section__link(href="/tours")
-					| Xem tất cả 
-					+fa('chevron-right')
-			.tour-grid#homeTourGrid
+				a.section__link(href="/tours") Xem tất cả →
+			.tour-grid
 				each tour in tours
 					include ../partials/tour-card
 
 			//- Phân trang
 			if totalPages > 1
-				.pagination#homePagination
+				.pagination
 					if currentPage > 1
-						a.pagination__item(href=`/?page=${currentPage-1}`)
-							+fa('chevron-left')
-							|  Trước
+						a.pagination__item(href=`/?page=${currentPage-1}`) ← Trước
 					each p in Array.from({length: totalPages}, (_, i) => i + 1)
 						a(
 							href=`/?page=${p}`
@@ -56,3 +106,101 @@ block content
 						a.pagination__item(href=`/?page=${currentPage+1}`)
 							| Tiếp 
 							+fa('chevron-right')
+
+	//- ── Tại sao chọn chúng tôi (Static Features) ──
+	section.section
+		.container
+			.section-header.section-header--centered
+				h2.section__title Tại sao chọn Vi Vu Việt Nam?
+				p.section__subtitle Trải nghiệm đặt tour trực tuyến nhanh chóng, an toàn và chuyên nghiệp nhất
+			.features-grid
+				.feature-card
+					.feature-card__icon
+						+fa('map-location-dot')
+					h3.feature-card__title Hành trình đa dạng
+					p.feature-card__desc Hàng trăm tour du lịch được thiết kế phong phú, phù hợp với mọi nhu cầu.
+				.feature-card
+					.feature-card__icon
+						+fa('money-bill-wave')
+					h3.feature-card__title Giá cả tốt nhất
+					p.feature-card__desc Cam kết mức giá cạnh tranh nhất thị trường cùng nhiều ưu đãi hấp dẫn.
+				.feature-card
+					.feature-card__icon
+						+fa('headset')
+					h3.feature-card__title Hỗ trợ 24/7
+					p.feature-card__desc Đội ngũ CSKH chuyên nghiệp luôn sẵn sàng đồng hành cùng quý khách.
+				.feature-card
+					.feature-card__icon
+						+fa('award')
+					h3.feature-card__title Chất lượng hàng đầu
+					p.feature-card__desc Hợp tác với các đối tác khách sạn, vận chuyển uy tín mang lại sự thoải mái.
+
+	//- ── Trải nghiệm tuyệt đỉnh ───────────────
+	section.section
+		.container
+			.experience-grid
+				.experience-left
+					h2.experience__title Trải Nghiệm Du Lịch Tuyệt Đỉnh Mang Đến Sự Khác Biệt Cho Công Ty Chúng Tôi
+					.experience-feature
+						.experience-feature__img
+							img(src="/assets/images/slide1.jpg" alt="Trải nghiệm")
+						.experience-feature__content
+							.experience-feature__avatars
+								img(src="/assets/images/slide2.jpg" alt="User 1")
+								img(src="/assets/images/slide3.jpg" alt="User 2")
+								img(src="/assets/images/slide4.jpg" alt="User 3")
+								span.experience-feature__count 84k+
+							.experience-feature__badge
+								+fa('star')
+								|  5 Sao
+							.experience-feature__text Chúng tôi tự hào cung cấp các hành trình được cá nhân hóa
+				.experience-right
+					.experience-card
+						.experience-card__icon
+							+fa('mountain-sun')
+						h3.experience-card__title Chinh Phục Cảnh Quan Việt Nam
+						p.experience-card__desc Khám phá những cảnh đẹp tuyệt vời của đất nước Việt Nam.
+					.experience-card
+						.experience-card__icon
+							+fa('landmark-dome')
+						h3.experience-card__title Khám Phá Di Sản Việt Nam
+						p.experience-card__desc Khám phá các di tích lịch sử gắn liền với các thế hệ nhân văn.
+					.experience-card
+						.experience-card__icon
+							+fa('palette')
+						h3.experience-card__title Trải Nghiệm Đặc Sắc Việt Nam
+						p.experience-card__desc Trải nghiệm những hoạt động văn hóa và ẩm thực đặc trưng của Việt Nam.
+					.experience-card
+						.experience-card__icon
+							+fa('tree')
+						h3.experience-card__title Vẻ Đẹp Thiên Nhiên Việt Nam
+						p.experience-card__desc Chiêm ngược vẻ đẹp của thiên nhiên hoang sơ và kỳ vĩ của Việt Nam.
+
+	//- ── Điểm đến nổi bật ─────────────────────
+	section.section.section--gray
+		.container
+			.highlight-grid
+				.highlight-card
+					.highlight-card__img
+						img(src="/assets/images/slide1.jpg" alt="Camping")
+					.highlight-card__content
+						h3.highlight-card__title Tìm hiểu những giá trị văn hóa độc đáo của các vùng miền Việt Nam.
+						a.btn.btn--accent(href="/tours")
+							| Khám Phá
+							+fa('arrow-right')
+				.highlight-card
+					.highlight-card__img
+						img(src="/assets/images/slide2.jpg" alt="Bãi biển")
+					.highlight-card__content
+						h3.highlight-card__title Bãi biển xanh trong đảo ở Việt Nam
+						a.btn.btn--accent(href="/tours")
+							| Khám Phá
+							+fa('arrow-right')
+				.highlight-card
+					.highlight-card__img
+						img(src="/assets/images/slide3.jpg" alt="Thác nước")
+					.highlight-card__content
+						h3.highlight-card__title Thác nước lớn nhất Việt Nam
+						a.btn.btn--accent(href="/tours")
+							| Khám Phá
+							+fa('arrow-right')

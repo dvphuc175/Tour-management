@@ -3,30 +3,26 @@ extends layout
 block content
   .stat-cards
     .stat-card
-      .stat-card__icon.stat-card__icon--blue
-        +fa('receipt')
+      .stat-card__icon.stat-card__icon--blue 🧾
       .stat-card__body
         .stat-card__label Tổng đơn đặt
         .stat-card__num= summary.bookings.total || 0
         .stat-card__sub #{summary.bookings.confirmed || 0} xác nhận · #{summary.bookings.pending || 0} chờ
     .stat-card
-      .stat-card__icon.stat-card__icon--green
-        +fa('money')
+      .stat-card__icon.stat-card__icon--green 💰
       .stat-card__body
         .stat-card__label Doanh thu
         - const revenueValue = Number(summary.revenue || 0)
         .stat-card__num= revenueValue.toLocaleString('vi-VN') + ' ₫'
         .stat-card__sub Doanh thu thành công
     .stat-card
-      .stat-card__icon.stat-card__icon--orange
-        +fa('users')
+      .stat-card__icon.stat-card__icon--orange 👥
       .stat-card__body
         .stat-card__label Khách hàng
         .stat-card__num= summary.users.total || 0
         .stat-card__sub #{summary.users.active || 0} hoạt động
     .stat-card
-      .stat-card__icon.stat-card__icon--teal
-        +fa('map')
+      .stat-card__icon.stat-card__icon--teal 🗺️
       .stat-card__body
         .stat-card__label Tour
         .stat-card__num= summary.tours.total || 0
@@ -56,10 +52,6 @@ block scripts
     const dashboardData = !{chartData};
     const revenueCtx = document.getElementById('revenueChart');
     if (revenueCtx) {
-      const gradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, 340);
-      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.45)');
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.03)');
-      
       new Chart(revenueCtx, {
         type: 'line',
         data: {
@@ -67,55 +59,23 @@ block scripts
           datasets: [{
             label: 'Doanh thu',
             data: dashboardData.revenue,
-            borderColor: '#3b82f6',
-            borderWidth: 3,
-            backgroundColor: gradient,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 3,
+            borderColor: '#0b74de',
+            backgroundColor: 'rgba(11, 116, 222, 0.18)',
+            pointRadius: 4,
             fill: true,
-            tension: 0.4
+            tension: 0.35
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: {
-            duration: 1500,
-            easing: 'easeOutQuart'
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          },
           plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#1f2937',
-              padding: 12,
-              titleFont: { size: 14, weight: 700 },
-              bodyFont: { size: 13 },
-              cornerRadius: 10,
-              displayColors: false,
-              callbacks: {
-                label: function(context) {
-                  return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' ₫';
-                }
-              }
-            }
+            legend: { display: false }
           },
           scales: {
-            x: { 
-              grid: { display: false },
-              ticks: { font: { weight: 600 }, color: '#64748b' }
-            },
+            x: { grid: { display: false } },
             y: {
-              grid: { color: 'rgba(226, 232, 240, 0.5)' },
               ticks: {
-                font: { weight: 600 },
-                color: '#64748b',
                 callback: value => new Intl.NumberFormat('vi-VN').format(value)
               }
             }

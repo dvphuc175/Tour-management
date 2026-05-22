@@ -32,60 +32,64 @@ block content
             | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
             strong 24 giờ.
             |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
-            
+
+      if booking.payment_status === 'success'
+        .tip-box
+          p
+            +fa('check')
+            |  Đã thanh toán thành công
+          if booking.paid_at
+            p Thời gian: #{formatDate(booking.paid_at)}
+
+      
+
       .booking-detail-grid
 
-        .booking-detail-left
-          if booking.tour_images && booking.tour_images.length
-            .booking-tour-image
-              img(src=booking.tour_images[0] alt=booking.tour_name)
-          
-          .detail-card
-            h3.detail-card__title Thông tin tour
-            .summary-row
-              span Tour
-              strong: a(href=`/tours/${booking.tour_slug}`)= booking.tour_name
-            .summary-row
-              span Ngày khởi hành
-              strong= formatDate(booking.start_date)
-            .summary-row
-              span Ngày về
-              strong= formatDate(booking.end_date)
-            .summary-row
-              span Điểm khởi hành
-              strong= booking.departure_location
+        .detail-card
+          h3.detail-card__title Thông tin tour
+          .summary-row
+            span Tour
+            strong: a(href=`/tours/${booking.tour_slug}`)= booking.tour_name
+          .summary-row
+            span Ngày khởi hành
+            strong= formatDate(booking.start_date)
+          .summary-row
+            span Ngày về
+            strong= formatDate(booking.end_date)
+          .summary-row
+            span Điểm khởi hành
+            strong= booking.departure_location
 
-        .booking-detail-right
-          .detail-card
-            h3.detail-card__title Thông tin liên hệ
+        .detail-card
+          h3.detail-card__title Thông tin liên hệ
+          .summary-row
+            span Họ tên
+            strong= booking.contact_name
+          .summary-row
+            span Điện thoại
+            strong= booking.contact_phone
+          .summary-row
+            span Email
+            strong= booking.contact_email
+          if booking.special_request
             .summary-row
-              span Họ tên
-              strong= booking.contact_name
-            .summary-row
-              span Điện thoại
-              strong= booking.contact_phone
-            .summary-row
-              span Email
-              strong= booking.contact_email
-            if booking.special_request
-              .summary-row
-                span Yêu cầu
-                strong= booking.special_request
+              span Yêu cầu
+              strong= booking.special_request
 
-          .detail-card
-            h3.detail-card__title Thanh toán
+        .detail-card
+          h3.detail-card__title Thanh toán
 
-            .summary-row
-              span Người lớn
-              strong #{booking.adult_count} × #{formatPrice(booking.price_adult)}
+          .summary-row
+            span Người lớn
+            strong #{booking.adult_count} × #{formatPrice(booking.price_adult)}
 
-            .summary-row
-              span Trẻ em
-              strong #{booking.child_count} × #{formatPrice(booking.price_child)}
+          .summary-row
+            span Trẻ em
+            strong #{booking.child_count} × #{formatPrice(booking.price_child)}
 
-            .summary-row.summary-row--total
-              span Tổng tiền
-              strong.price= formatPrice(booking.total_price)
+          .summary-row.summary-row--total
+            span Tổng tiền
+            strong.price= formatPrice(booking.total_price)
 
             .summary-row
               span Phương thức
@@ -101,6 +105,14 @@ block content
                 p
                   +fa('info')
                   |  #{bookingStatus.clientBookingNotice(booking)}
+
+            if booking.status === 'confirmed'
+              button.btn.btn--outline-danger.btn--block.btn--support-cancel(
+                type="button"
+                onclick="openCancelPolicyModal()"
+              )
+                +fa('warning')
+                |  Hỗ trợ Hủy / Dời ngày đi  
 
             .payment-actions
               
@@ -143,52 +155,51 @@ block content
           +fa('xmark')
         h3 Quy định Hủy / Đổi ngày tour
 
-      .modal-body
-        p Do đặc thù dịch vụ du lịch, hệ thống không hỗ trợ tự động hủy đơn.
+      .modal-body(style="padding:24px;")
+        p(style="font-size:14px; color:#666; margin:0 0 20px 0; line-height:1.6;")
+          | Do đặc thù dịch vụ du lịch, hệ thống không hỗ trợ tự động hủy đơn.
 
-        .policy-list
-          .policy-item.policy-item--green
-            span.policy-item__icon
-              +fa('circle')
+        .policy-list(style="margin-bottom:24px;")
+          .policy-item(style="display:flex; align-items:center; padding:12px; background:#f8f9fa; border-radius:8px; margin-bottom:10px; border-left:4px solid #4caf50;")
+            span(style="font-size:20px; margin-right:12px;") 🟢
             div
-              .policy-item__title.policy-item__title--green Trước 5 ngày
-              .policy-item__desc Hoàn tiền 100%
-          .policy-item.policy-item--orange
-            span.policy-item__icon
-              +fa('circle')
+              div(style="font-weight:600; color:#2e7d32; font-size:14px;") Trước 5 ngày
+              div(style="font-size:13px; color:#666;") Hoàn tiền 100%
+          .policy-item(style="display:flex; align-items:center; padding:12px; background:#f8f9fa; border-radius:8px; margin-bottom:10px; border-left:4px solid #ff9800;")
+            span(style="font-size:20px; margin-right:12px;") 🟡
             div
-              .policy-item__title.policy-item__title--orange 2-5 ngày
-              .policy-item__desc Phí hủy 50%
-          .policy-item.policy-item--red
-            span.policy-item__icon
-              +fa('circle')
+              div(style="font-weight:600; color:#ef6c00; font-size:14px;") 2-5 ngày
+              div(style="font-size:13px; color:#666;") Phí hủy 50%
+          .policy-item(style="display:flex; align-items:center; padding:12px; background:#f8f9fa; border-radius:8px; border-left:4px solid #f44336;")
+            span(style="font-size:20px; margin-right:12px;") 🔴
             div
-              .policy-item__title.policy-item__title--red Dưới 48 giờ
-              .policy-item__desc Không hoàn tiền
+              div(style="font-weight:600; color:#c62828; font-size:14px;") Dưới 48 giờ
+              div(style="font-size:13px; color:#666;") Không hoàn tiền
 
-        .contact-section
-          h4 Liên hệ CSKH để được hỗ trợ
-          p
+        .contact-section(style="background:#f5f5f5; border-radius:10px; padding:16px; text-align:center;")
+          h4(style="margin:0 0 12px 0; font-size:15px; color:#333; font-weight:600;") Liên hệ CSKH để được hỗ trợ
+          p(style="margin:0 0 16px 0; font-size:13px; color:#666;")
             | Cung cấp mã đơn: 
-            strong.contact-section__booking-id ##{booking.id}
+            strong(style="color:#d32f2f; font-size:16px; background:#fff; padding:4px 12px; border-radius:4px; display:inline-block;") ##{booking.id}
 
-          .contact-actions
-            a.btn.btn--zalo-contact(href="https://zalo.me/0345043213" target="_blank")
-              +fa('comment')
+          .contact-actions(style="display:flex; gap:12px;")
+            a.btn.btn--primary(
+              href="https://zalo.me/0345043213"
+              target="_blank"
+              style="flex:1; text-align:center; background:#0068ff; border:none; padding:12px; border-radius:8px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; color:#fff;"
+            )
+              span 💬
               span Zalo
-            a.btn.btn--hotline-contact(href="tel:0345043213")
-              +fa('phone')
+
+            a.btn.btn--outline(
+              href="tel:0345043213"
+              style="flex:1; text-align:center; padding:12px; border-radius:8px; font-weight:600; border:2px solid #d32f2f; color:#d32f2f; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none;"
+            )
+              span 📞
               span Hotline
 
 block scripts
   script.
-    function openCancelPolicyModal() {
-      document.getElementById('cancelPolicyModal').classList.add('is-open');
-    }
-    function closeCancelPolicyModal() {
-      document.getElementById('cancelPolicyModal').classList.remove('is-open');
-    }
-
     document.addEventListener("DOMContentLoaded", function() {
       const timerBox = document.querySelector('.vnpay-timer-box');
       if (!timerBox) return;
@@ -208,7 +219,8 @@ block scripts
           clockEl.innerHTML = "Đã quá hạn thanh toán";
           
           if(btnVnpay) {
-            btnVnpay.classList.add('is-expired');
+            btnVnpay.style.backgroundColor = '#ccc';
+            btnVnpay.style.pointerEvents = 'none';
             btnVnpay.innerHTML = "Đơn hàng đã bị hủy do quá hạn";
             btnVnpay.removeAttribute('href'); 
           }

@@ -19,8 +19,7 @@ block content
                   type="button"
                   onclick="prevImage()"
                   aria-label="Previous image"
-                )
-                  +fa('chevron-left')
+                ) ←
                 .tour-gallery__thumbs(id="thumbsContainer")
                   each img, i in tour.images
                     img.tour-gallery__thumb(
@@ -33,8 +32,7 @@ block content
                   type="button"
                   onclick="nextImage()"
                   aria-label="Next image"
-                )
-                  +fa('chevron-right')
+                ) →
 
         .tour-detail-header
           if tour.category_name
@@ -101,15 +99,11 @@ block content
                       tr.schedule-row(data-schedule-id=s.id)
                         td
                           button.schedule-toggle(type="button" onclick=`toggleScheduleDetail('${s.id}')`)
-                            span.schedule-toggle__icon.schedule-toggle__icon--plus(id=`icon-plus-${s.id}`)
-                              +fa('plus')
-                            span.schedule-toggle__icon.schedule-toggle__icon--minus.hidden(id=`icon-minus-${s.id}`)
-                              +fa('minus')
+                            span.schedule-toggle__icon.schedule-toggle__icon--plus(id=`icon-plus-${s.id}`) +
+                            span.schedule-toggle__icon.schedule-toggle__icon--minus.hidden(id=`icon-minus-${s.id}`) −
                           span.schedule-number= index + 1
                         td
-                          strong.icon-text
-                            +fa('calendar')
-                            | #{formatDate(s.start_date)}
+                          strong 📅 #{formatDate(s.start_date)}
                         td
                           if s.available_slots > 0
                             span.text-success= s.available_slots
@@ -133,19 +127,27 @@ block content
                               thead
                                 tr
                                   th Loại giá/Độ tuổi
-                                  th Người lớn (>13 tuổi)
-                                  th Trẻ em (<13 tuổi)
+                                  th Người lớn (>11 tuổi)
+                                  th Trẻ em (5-11 tuổi)
+                                  th Trẻ nhỏ (2-5 tuổi)
+                                  th Sơ sinh (<2 tuổi)
                               tbody
                                 tr
                                   td Giá
                                   td= formatPrice(tour.price_adult)
-                                  td= formatPrice(tour.price_child)
+                                  td= formatPrice(Math.round(tour.price_adult * 0.9))
+                                  td= formatPrice(Math.round(tour.price_adult * 0.5))
+                                  td 0₫
                                 tr
                                   td Phụ thu
                                   td 0₫
                                   td 0₫
+                                  td 0₫
+                                  td 0₫
                                 tr
                                   td Giảm giá
+                                  td 0₫
+                                  td 0₫
                                   td 0₫
                                   td 0₫
 
@@ -169,7 +171,7 @@ block content
             if ratingInfo && ratingInfo.total > 0
               .rating-summary
                 span.rating-summary__score= ratingInfo.avg_rating
-                span.rating-summary__stars!= renderStars(ratingInfo.avg_rating)
+                span.rating-summary__stars= renderStars(ratingInfo.avg_rating)
                 span.rating-summary__count (#{ratingInfo.total} đánh giá)
 
           //- Form gửi đánh giá
@@ -185,8 +187,7 @@ block content
                     .stars-input
                       - for(let i = 5; i >= 1; i--)
                         input(type="radio" name="rating" id=`star${i}` value=`${i}` required)
-                        label(for=`star${i}` title=`${i} sao`)
-                          +fa('star')
+                        label(for=`star${i}` title=`${i} sao`) ★
 
                   .form-group
                     label Nhận xét
@@ -198,9 +199,7 @@ block content
                   button.btn.btn--primary(type="submit") Gửi đánh giá
 
             else if hasReviewed
-              .review-notice.review-notice--done
-                +fa('check')
-                |  Bạn đã đánh giá tour này rồi
+              .review-notice.review-notice--done ✓ Bạn đã đánh giá tour này rồi
 
             else
               .review-notice Bạn cần hoàn thành tour để có thể đánh giá
@@ -211,34 +210,32 @@ block content
 
           //- Danh sách reviews
           if !reviews || reviews.length === 0
-            p.no-reviews#noReviews Chưa có đánh giá nào. Hãy là người đầu tiên!
+            p.no-reviews Chưa có đánh giá nào. Hãy là người đầu tiên!
           else
-            .review-list#reviewsList
+            .review-list
               each rv in reviews
                 .review-item
-                  .review-item__header
-                    span.review-item__author= rv.user_name
-                    span.review-item__stars!= renderStars(rv.rating)
-                    span.review-item__date= formatDate(rv.created_at)
-                  if rv.comment
-                    p.review-item__comment= rv.comment
+                  .review-item__avatar= (rv.user_name || 'K').trim().charAt(0).toUpperCase()
+                  .review-item__content
+                    .review-item__header
+                      span.review-item__author= rv.user_name
+                      span.review-item__stars!= renderStars(rv.rating)
+                      span.review-item__date= formatDate(rv.created_at)
+                    if rv.comment
+                      p.review-item__comment= rv.comment
 
             if reviewTotalPages > 1
-              .pagination.reviews-pagination#reviewsPagination
+              .pagination.reviews-pagination
                 - const reviewBase = `/tours/${tour.slug}?review_page=`
                 if reviewPage > 1
-                  a.pagination__item(href=`${reviewBase}${reviewPage - 1}#reviews`)
-                    +fa('chevron-left')
-                    |  Trước
+                  a.pagination__item(href=`${reviewBase}${reviewPage - 1}#reviews`) ← Trước
                 each p in Array.from({length: reviewTotalPages}, (_, i) => i + 1)
                   a(
                     href=`${reviewBase}${p}#reviews`
                     class=`pagination__item${p === reviewPage ? ' active' : ''}`
                   )= p
                 if reviewPage < reviewTotalPages
-                  a.pagination__item(href=`${reviewBase}${reviewPage + 1}#reviews`)
-                    | Tiếp 
-                    +fa('chevron-right')
+                  a.pagination__item(href=`${reviewBase}${reviewPage + 1}#reviews`) Tiếp →
 
       aside.tour-booking-box
         if schedules.length === 0
@@ -255,9 +252,7 @@ block content
 
           .booking-box__summary
             .summary-item
-              span.icon-text
-                +fa('calendar')
-                |  Ngày đi: 
+              span.icon-calendar 📅 Ngày đi: 
               strong
                 each s, index in upcomingDates
                   span #{formatDate(s.start_date).substring(0, 5)}
@@ -266,14 +261,10 @@ block content
                 if schedules.length > 4
                   | ...
             .summary-item
-              span.icon-text
-                +fa('location')
-                |  Điểm khởi hành: 
+              span.icon-location 📍 Điểm khởi hành: 
               strong #{nearestSchedule.departure_location}
             .summary-item
-              span.icon-text
-                +fa('user')
-                |  Số chỗ còn nhận (gần nhất): 
+              span.icon-user 👤 Số chỗ còn nhận (gần nhất): 
               strong.text-danger #{nearestSchedule.available_slots} chỗ
 
           button.btn.btn--danger.btn--block.btn--outline(type="button" onclick="openScheduleModal()") 
@@ -306,8 +297,7 @@ block content
     .modal-content
       .modal-header
         h3 Danh sách lịch trình khởi hành
-        button.modal-close(onclick="closeScheduleModal()")
-          +fa('xmark')
+        button.modal-close(onclick="closeScheduleModal()") &times;
       .modal-body
         table.schedule-table
           thead
@@ -324,9 +314,7 @@ block content
               tr
                 td= index + 1
                 td
-                  strong.icon-text
-                    +fa('calendar')
-                    | #{formatDate(s.start_date)}
+                  strong 📅 #{formatDate(s.start_date)}
                 td 
                   strong #{formatDate(s.end_date)}
                 td #{s.departure_location}
