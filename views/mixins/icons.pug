@@ -1,0 +1,35 @@
+//- Font Awesome icon mixin
+mixin fa(name, style)
+  - const prefix =
+  -   style === 'regular'
+  -     ? 'fa-regular'
+  -     : style === 'brands'
+  -       ? 'fa-brands'
+  -       : 'fa-solid'
+
+  - const icons = {
+  -   calendar: 'fa-calendar-days',
+  -   location: 'fa-location-dot',
+  -   user: 'fa-user',
+  -   users: 'fa-users',
+  -   clock: 'fa-clock',
+  -   info: 'fa-circle-info',
+  -   check: 'fa-check',
+  -   warning: 'fa-triangle-exclamation',
+  -   phone: 'fa-phone',
+  -   star: 'fa-star',
+  -   heart: 'fa-heart',
+  -   facebook: 'fa-facebook-f',
+  -   instagram: 'fa-instagram'
+  - }
+
+  - const iconClass = icons[name] || 'fa-circle-question'
+
+  i(class=`${prefix} ${iconClass} icon` aria-hidden="true")
+
+
+//- Icon + text
+mixin faText(name, text, style)
+  span.icon-text
+    +fa(name, style)
+    | #{text}
