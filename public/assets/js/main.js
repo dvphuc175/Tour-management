@@ -39,7 +39,26 @@
   });
 })();
 
-// Flash message: tự động ẩn sau 4 giây
+// Flash message
+document.querySelectorAll('[data-flash]').forEach(el => {
+  const removeFlash = () => {
+    el.style.transition = 'opacity .25s ease, transform .25s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-4px)';
+    setTimeout(() => {
+      const stack = el.closest('.flash-stack');
+      el.remove();
+      if (stack && !stack.querySelector('[data-flash]')) stack.remove();
+    }, 250);
+  };
+
+  el.querySelector('[data-flash-close]')?.addEventListener('click', removeFlash);
+
+  if (!el.classList.contains('flash-message--error')) {
+    setTimeout(removeFlash, 5000);
+  }
+});
+
 document.querySelectorAll('.flash').forEach(el => {
   setTimeout(() => {
     el.style.transition = 'opacity .4s';

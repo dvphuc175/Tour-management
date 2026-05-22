@@ -1,0 +1,29 @@
+if flashMessages && flashMessages.length
+  .flash-stack(aria-live="polite" aria-atomic="true")
+    each item in flashMessages
+      -
+        const type = item.type || 'info';
+        const icon = item.icon || 'info';
+        const actions = [];
+        if (item.action && item.action.href && item.action.label) actions.push(item.action);
+        if (item.actions && item.actions.length) {
+          actions.push(...item.actions.filter((action) => action && action.href && action.label));
+        }
+      .flash-message(class=`flash-message--${type}` data-flash)
+        .flash-message__icon
+          +fa(icon)
+        .flash-message__body
+          if item.title
+            .flash-message__title= item.title
+          if item.message
+            .flash-message__text= item.message
+          if item.details && item.details.length
+            ul.flash-message__details
+              each detail in item.details
+                li= detail
+          if actions.length
+            .flash-message__actions
+              each action in actions
+                a.flash-message__action(href=action.href)= action.label
+        button.flash-message__close(type="button" aria-label="Đóng thông báo" data-flash-close)
+          +fa('xmark')
