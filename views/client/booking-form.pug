@@ -41,7 +41,8 @@ block content
             .form-group
               label Người lớn
               .quantity-control
-                button.quantity-btn(type="button" onclick="updateCount('adult', -1)") −
+                button.quantity-btn(type="button" onclick="updateCount('adult', -1)")
+                  +fa('minus')
                 input#adultCount.quantity-input(
                   type="number" name="adult_count"
                   value="1" min="1"
@@ -49,12 +50,14 @@ block content
                   data-max-slots=schedule.available_slots
                   readonly
                 )
-                button.quantity-btn(type="button" onclick="updateCount('adult', 1)") +
-              small.form-hint #{formatPrice(tour.price_adult)} / người
+                button.quantity-btn(type="button" onclick="updateCount('adult', 1)")
+                  +fa('plus')
+              small.form-hint #{formatPrice(tour.price_adult)} / người (>13 tuổi)
             .form-group
               label Trẻ em
               .quantity-control
-                button.quantity-btn(type="button" onclick="updateCount('child', -1)") −
+                button.quantity-btn(type="button" onclick="updateCount('child', -1)")
+                  +fa('minus')
                 input#childCount.quantity-input(
                   type="number" name="child_count"
                   value="0" min="0"
@@ -62,10 +65,11 @@ block content
                   data-max-slots=schedule.available_slots
                   readonly
                 )
-                button.quantity-btn(type="button" onclick="updateCount('child', 1)") +
-              small.form-hint #{formatPrice(tour.price_child)} / bé
+                button.quantity-btn(type="button" onclick="updateCount('child', 1)")
+                  +fa('plus')
+              small.form-hint #{formatPrice(tour.price_child)} / bé (<13 tuổi)
 
-          .slots-warning(id="slotsWarning" style="display:none;color:#d32f2f;font-size:12px;margin-top:8px")
+          .slots-warning.is-hidden(id="slotsWarning")
             | Tổng số khách không được vượt quá #{schedule.available_slots} chỗ còn trống
 
           .form-group
@@ -149,10 +153,10 @@ block scripts
       const totalAfterChange = newVal + otherVal;
 
       if (totalAfterChange > maxSlots) {
-        document.getElementById('slotsWarning').style.display = 'block';
+        document.getElementById('slotsWarning').classList.remove('is-hidden');
         return;
       } else {
-        document.getElementById('slotsWarning').style.display = 'none';
+        document.getElementById('slotsWarning').classList.add('is-hidden');
       }
 
       input.value = newVal;

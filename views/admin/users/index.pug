@@ -17,7 +17,7 @@ block content
       tbody
         if users.length === 0
           tr
-            td(colspan="8" style="text-align:center;padding:32px;color:#9ca3af") Chưa có người dùng nào
+            td.table-empty(colspan="8") Chưa có người dùng nào
         each u in users
           - var isSelf = user && user.id === u.id
           tr(class=u.status === 'locked' ? 'row--locked' : '')
@@ -34,19 +34,18 @@ block content
                 = u.status === 'active' ? 'Hoạt động' : 'Đã khóa'
             td= formatDate(u.created_at)
             td
-              .user-actions(style="display:flex;gap:8px;align-items:center;flex-wrap:wrap")
+              .user-actions
                 //- Đổi role: không cho phép đổi role của chính mình
                 if isSelf
                   span.text-muted (tài khoản hiện tại)
                 else
-                  form(
+                  form.role-form(
                     action=`/admin/users/${u.id}/role?_method=PUT`
                     method="POST"
-                    style="display:flex;gap:4px;align-items:center"
                     data-confirm=`Đổi vai trò của ${u.fullname}?`
                   )
                     input(type="hidden" name="_csrf" value=csrfToken)
-                    select(name="role" class="form-control form-control--sm" style="padding:4px 6px")
+                    select(name="role" class="form-control form-control--sm form-control--compact")
                       option(value="customer" selected=(u.role==='customer')) Khách hàng
                       option(value="staff" selected=(u.role==='staff')) Nhân viên
                       option(value="admin" selected=(u.role==='admin')) Admin

@@ -143,6 +143,15 @@ const BookingController = {
         return b;
       });
 
+      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+        return res.json({
+          bookings: parsedBookings,
+          currentPage: page,
+          totalPages: result.totalPages,
+          total: result.total
+        });
+      }
+
       return res.render('client/my-bookings', {
         title: 'Đơn đặt của tôi',
         bookings: parsedBookings,

@@ -17,7 +17,7 @@ block content
       tbody
         if categories.length === 0
           tr
-            td(colspan="6" style="text-align:center;padding:32px;color:#9ca3af") Chưa có danh mục nào
+            td.table-empty(colspan="6") Chưa có danh mục nào
         each cat, i in categories
           tr
             td= i + 1
@@ -28,23 +28,26 @@ block content
               span(class=`badge badge--${cat.status}`)
                 = cat.status === 'active' ? 'Hiển thị' : 'Ẩn'
             td.action-btns
-              a.btn.btn--outline.btn--sm(href=`/admin/categories/${cat.id}/edit`) Sửa
-              form(
+              a.btn.btn--edit.btn--sm(href=`/admin/categories/${cat.id}/edit`) Sửa
+              form.form--inline(
                 action=`/admin/categories/${cat.id}?_method=DELETE`
                 method="POST"
                 data-confirm="Xóa danh mục này?"
-                style="display:inline"
               )
                 input(type="hidden" name="_csrf" value=csrfToken)
                 button.btn.btn--danger.btn--sm(type="submit") Xóa
   if totalPages > 1
-    .pagination(style="margin-top: 24px; display: flex; gap: 8px; justify-content: flex-end; align-items: center;")
+    .pagination.pagination--admin
       
       if currentPage > 1
-        a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage - 1}`) &laquo; Trở lại
+        a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage - 1}`)
+          +fa('chevron-left')
+          |  Trở lại
         
       - for (let i = 1; i <= totalPages; i++)
         a.btn.btn--sm(href=`/admin/categories?page=${i}` class=(currentPage === i ? 'btn--primary' : 'btn--outline'))= i
         
       if currentPage < totalPages
-        a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage + 1}`) Tiếp &raquo;
+        a.btn.btn--outline.btn--sm(href=`/admin/categories?page=${currentPage + 1}`)
+          | Tiếp 
+          +fa('chevron-right')
