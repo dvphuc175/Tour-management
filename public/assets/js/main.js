@@ -39,6 +39,45 @@
   });
 })();
 
+// Tour filter drawer
+(function initTourFilters() {
+  const panel = document.getElementById('tourFilterPanel');
+  const toggle = document.querySelector('[data-filter-toggle]');
+  const closeButton = document.querySelector('[data-filter-close]');
+  const backdrop = document.querySelector('[data-filter-backdrop]');
+  if (!panel || !toggle) return;
+
+  const closeFilter = () => {
+    document.body.classList.remove('filter-open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+
+  const openFilter = () => {
+    document.body.classList.add('filter-open');
+    toggle.setAttribute('aria-expanded', 'true');
+  };
+
+  toggle.addEventListener('click', () => {
+    if (document.body.classList.contains('filter-open')) closeFilter();
+    else openFilter();
+  });
+
+  closeButton?.addEventListener('click', closeFilter);
+  backdrop?.addEventListener('click', closeFilter);
+
+  panel.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', closeFilter);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeFilter();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeFilter();
+  });
+})();
+
 // Flash message
 document.querySelectorAll('[data-flash]').forEach(el => {
   const removeFlash = () => {

@@ -866,7 +866,8 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 	overflow: hidden;
 	color: var(--color-white);
 	padding: clamp(80px, 15vw, 180px) 0;
-	height: 680px;
+	min-height: min(680px, calc(100vh - var(--header-h)));
+	height: auto;
 	text-align: center;
 	background: none;
 	display: flex;
@@ -1037,6 +1038,12 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 	}
 }
 
+@media (max-width: 1100px) {
+	.tour-grid-list {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
 @media (max-width: 900px) {
 	.tour-grid {
 		grid-template-columns: repeat(2, 1fr);
@@ -1044,7 +1051,8 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 }
 
 @media (max-width: 600px) {
-	.tour-grid {
+	.tour-grid,
+	.tour-grid-list {
 		grid-template-columns: 1fr;
 	}
 }
@@ -1199,10 +1207,15 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 }
 @media (max-width: 768px) {
 	.tour-list-layout { grid-template-columns: 1fr; }
-	.filter-sidebar   { display: none; } /* ẩn trên mobile, tuần 8 làm drawer */
+	.tour-grid-list { grid-template-columns: 1fr; }
 }
 .tour-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .tour-count { font-size: 13px; color: var(--color-text-muted); }
+.filter-toggle,
+.filter-sidebar__close,
+.filter-backdrop {
+	display: none;
+}
 
 /* ── Filter sidebar ─────────────────────── */
 .filter-sidebar {
@@ -1215,12 +1228,81 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 	top: calc(var(--header-h) + 16px);
 }
 .filter-sidebar__title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+.filter-sidebar__close {
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	margin: -8px -8px 8px auto;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-bg);
+	color: var(--color-text);
+	cursor: pointer;
+}
+.filter-sidebar__close:hover {
+	background: var(--color-bg-soft);
+	color: var(--color-primary);
+}
 .filter-group { margin-bottom: 20px; }
 .filter-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
 .filter-check { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 4px 0; cursor: pointer; }
 .price-range  { display: flex; align-items: center; gap: 8px; }
 .price-range .form-control { flex: 1; padding: 8px 10px; }
 .empty-state  { text-align: center; padding: 60px 0; color: var(--color-text-muted); }
+
+@media (max-width: 768px) {
+	.tour-list-layout {
+		grid-template-columns: 1fr;
+		padding: 24px 0;
+	}
+	.tour-list-header {
+		gap: 12px;
+	}
+	.filter-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+	.filter-backdrop {
+		display: block;
+		position: fixed;
+		inset: 0;
+		background: rgba(15, 23, 42, 0.42);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity var(--transition);
+		z-index: 850;
+	}
+	.filter-sidebar {
+		display: block;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: min(340px, 88vw);
+		border-radius: 0 16px 16px 0;
+		overflow-y: auto;
+		transform: translateX(-100%);
+		transition: transform var(--transition);
+		z-index: 900;
+		box-shadow: 16px 0 40px rgba(15, 23, 42, 0.18);
+	}
+	.filter-sidebar__close {
+		display: inline-flex;
+	}
+	body.filter-open {
+		overflow: hidden;
+	}
+	body.filter-open .filter-sidebar {
+		transform: translateX(0);
+	}
+	body.filter-open .filter-backdrop {
+		opacity: 1;
+		pointer-events: auto;
+	}
+}
 
 /* ── Tour detail ─────────────────────────── */
 .tour-detail-layout {
@@ -1542,12 +1624,24 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 
 .modal-body {
   padding: 20px;
+  overflow-x: auto;
   overflow-y: auto; 
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 94%;
+    max-height: 88vh;
+  }
+  .modal-body {
+    padding: 14px;
+  }
 }
 
 /* Bảng lịch trình */
 .schedule-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -2161,7 +2255,7 @@ html {
 
 .booking-tour-image {
 	width: 100%;
-  height: 46%;
+	height: auto;
 	border-radius: var(--radius-lg);
 	overflow: hidden;
 	border: 1px solid var(--color-border);
@@ -2169,14 +2263,15 @@ html {
 
 .booking-tour-image img {
 	width: 100%;
-	height: auto;
+	height: 100%;
 	display: block;
 	aspect-ratio: 16 / 10;
 	object-fit: cover;
 }
 
 .detail-card {
-  height: 46%;
+	min-width: 0;
+	height: auto;
 	background: var(--color-bg);
 	border: 2px solid var(--color-border);
 	border-radius: var(--radius-lg);
@@ -2196,6 +2291,7 @@ html {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
+	gap: 16px;
 	padding: 12px 0;
 	border-bottom: 1px dashed var(--color-border);
 }
@@ -2214,6 +2310,7 @@ html {
 	font-weight: 600;
 	color: var(--color-text);
 	text-align: right;
+	overflow-wrap: anywhere;
 }
 
 .summary-row--total {
@@ -2492,6 +2589,23 @@ html {
 .summary-row strong { font-weight: 500; }
 .summary-row--total { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border); }
 .summary-row--total strong { font-size: 18px; color: var(--color-accent); }
+.booking-detail-page .summary-row {
+	align-items: flex-start;
+	gap: 16px;
+}
+.booking-detail-page .summary-row strong {
+	text-align: right;
+	overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+	.booking-detail-page .summary-row {
+		flex-direction: column;
+		gap: 4px;
+	}
+	.booking-detail-page .summary-row strong {
+		text-align: left;
+	}
+}
 
 /* ── Booking success ─────────────────────── */
 .success-page { text-align: center; padding: 60px 20px; }
@@ -2562,7 +2676,14 @@ html {
 .booking-item__status { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 @media (max-width: 640px) {
   .booking-item { grid-template-columns: 80px 1fr; }
-  .booking-item__status { grid-column: 1/-1; flex-direction: row; justify-content: flex-start; }
+  .booking-item__status { grid-column: 1/-1; flex-direction: row; justify-content: flex-start; align-items: stretch; flex-wrap: wrap; }
+  .booking-item__status form,
+  .booking-item__status .btn {
+    flex: 1 1 140px;
+  }
+  .booking-item__status form .btn {
+    width: 100%;
+  }
 }
 
 /* ── Booking detail ──────────────────────── */
@@ -3067,6 +3188,10 @@ html {
 
 @media (max-width: 768px) {
   :root { --header-h: 64px; }
+  .hero {
+    min-height: 520px;
+    padding: 72px 0;
+  }
   .hero__search {
     flex-direction: column;
     padding: 12px;
@@ -3075,7 +3200,7 @@ html {
   .hero__search .btn--accent { width: 100%; }
   .tour-grid { grid-template-columns: 1fr; }
   .tour-list-layout { grid-template-columns: 1fr; padding: 24px 0; }
-  .filter-sidebar { display: none; }
+  .tour-grid-list { grid-template-columns: 1fr; }
   .tour-detail-layout { grid-template-columns: 1fr; padding: 24px 0 48px; }     
   .tour-detail__title { font-size: clamp(1.35rem, 5vw, 1.75rem); }
   .booking-layout { grid-template-columns: 1fr; }
@@ -3090,10 +3215,17 @@ html {
     grid-column: 1 / -1;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 8px;
     margin-top: 10px;
+  }
+  .booking-item__status form,
+  .booking-item__status .btn {
+    flex: 1 1 140px;
+  }
+  .booking-item__status form .btn {
+    width: 100%;
   }
   .booking-item__meta {
     flex-direction: column;
