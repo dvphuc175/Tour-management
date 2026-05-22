@@ -22,11 +22,21 @@ html(lang="vi")
         if success && success.length
           .flash.flash--success
             each msg in success
-              p= msg
+              .flash__item
+                .flash__icon
+                  i.fas.fa-check-circle
+                .flash__content= msg
+                button.flash__close(type="button" aria-label="Đóng")
+                  i.fas.fa-times
         if error && error.length
           .flash.flash--error
             each msg in error
-              p= msg
+              .flash__item
+                .flash__icon
+                  i.fas.fa-exclamation-circle
+                .flash__content= msg
+                button.flash__close(type="button" aria-label="Đóng")
+                  i.fas.fa-times
 
         .admin-content
           block content

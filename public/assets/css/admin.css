@@ -295,8 +295,8 @@ code {
   margin-bottom: 6px;
 }
 .stat-card__num {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 21px;
+  font-weight: 800;
   line-height: 1.1;
 }
 .stat-card__sub {
@@ -449,10 +449,6 @@ code {
   .report-summary { grid-template-columns: 1fr; }
   .top-item { flex-direction: column; align-items: flex-start; }
   .top-item__rev { margin-top: 6px; }
-}
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--color-text-muted);
 }
 
 /* ── Toolbar ────────────────────────────── */

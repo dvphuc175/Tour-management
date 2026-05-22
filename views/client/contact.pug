@@ -1,0 +1,74 @@
+extends ../layout
+
+block content
+  //- ── Hero Contact ───────────────────────────
+  section.hero.hero--contact
+    .hero__content.container
+      h1.hero__title Liên Hệ Với Chúng Tôi
+      p.hero__sub Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn
+
+  //- ── Contact Content ────────────────────────
+  section.section
+    .container
+      .contact-grid
+        //- Contact Info
+        .contact-info
+          h2.section__title Thông Tin Liên Hệ
+          .contact-info__item
+            +fa('location-dot')
+            .contact-info__content
+              h4 Địa chỉ
+              p 123 Đường ABC, Quận 1, TP. Hồ Chí Minh
+          .contact-info__item
+            +fa('phone')
+            .contact-info__content
+              h4 Điện thoại
+              p 0345.043.213
+          .contact-info__item
+            +fa('envelope')
+            .contact-info__content
+              h4 Email
+              p info@vivuvietnam.com
+          .contact-info__item
+            +fa('clock')
+            .contact-info__content
+              h4 Giờ làm việc
+              p 8:00 - 22:00 mỗi ngày
+          
+          .contact-toggle-section
+            button.btn.btn--outline(type="button" id="toggleAdminInfo")
+              +fa('eye')
+              |  Hiển thị thông tin quản trị viên & Hotline
+          
+          .contact-admin-info#adminContactInfo
+            .contact-info__item
+              +fa('user-tie')
+              .contact-info__content
+                h4 Quản trị viên
+                p Ông Nguyễn Văn A
+            .contact-info__item
+              +fa('phone-volume')
+              .contact-info__content
+                h4 Hotline hỗ trợ
+                p 0901.234.567
+
+        //- Contact Form
+        .contact-form
+          h2.section__title Gửi Tin Nhắn Cho Chúng Tôi
+          form(action="/contact" method="POST")
+            input(type="hidden" name="_csrf" value=csrfToken)
+            .form-group
+              label Họ và tên <span class="required">*</span>
+              input.form-control(type="text" name="fullname" placeholder="Nhập họ và tên của bạn" required)
+            .form-group
+              label Email <span class="required">*</span>
+              input.form-control(type="email" name="email" placeholder="Nhập email của bạn" required)
+            .form-group
+              label Số điện thoại
+              input.form-control(type="tel" name="phone" placeholder="Nhập số điện thoại của bạn")
+            .form-group
+              label Nội dung <span class="required">*</span>
+              textarea.form-control(name="message" rows="5" placeholder="Nhập nội dung tin nhắn..." required)
+            button.btn.btn--primary.btn--block(type="submit")
+              +fa('paper-plane')
+              |  Gửi tin nhắn

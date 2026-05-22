@@ -14,7 +14,8 @@ const ClientController = {
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const offset = (page - 1) * HOME_LIMIT;
 
-      const [tours, total, categories] = await Promise.all([
+      const [featuredTours, tours, total, categories] = await Promise.all([
+        TourModel.getFeatured(HOME_LIMIT),
         TourModel.getPublic({ limit: HOME_LIMIT, offset }),
         TourModel.countPublic({}),
         CategoryModel.getActive()
@@ -22,13 +23,53 @@ const ClientController = {
 
       return res.render('client/home', {
         title: 'Trang chủ',
-        tours,
+        tours: featuredTours,
         categories,
         currentPage: page,
         totalPages: Math.ceil(total / HOME_LIMIT),
         totalTours: total,
         query: req.query
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // GET /about
+  async about(req, res, next) {
+    try {
+      return res.render('client/about', {
+        title: 'Giới thiệu'
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // GET /contact
+  async contact(req, res, next) {
+    try {
+      return res.render('client/contact', {
+        title: 'Liên hệ'
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // POST /contact
+  async submitContact(req, res, next) {
+    try {
+      const { fullname, email, phone, message } = req.body;
+
+      if (!fullname || !email || !message) {
+        req.flash('error', 'Vui lòng nhập đầy đủ họ tên, email và nội dung tin nhắn.');
+        return res.redirect('/contact');
+      }
+
+      console.log('[CONTACT FORM]', { fullname, email, phone, message });
+      req.flash('success', 'Cảm ơn bạn! Tin nhắn đã được gửi thành công. Chúng tôi sẽ liên hệ trong thời gian sớm nhất.');
+      return res.redirect('/contact');
     } catch (err) {
       next(err);
     }
