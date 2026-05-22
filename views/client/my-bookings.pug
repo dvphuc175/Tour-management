@@ -2,16 +2,16 @@ extends ../layout
 
 block content
   .container
-    .my-bookings-page#myBookingsContainer
+    .my-bookings-page
       h1.page-title Đơn đặt của tôi
 
       if bookings.length === 0
-        .empty-state#myBookingsEmptyState
+        .empty-state
           p Bạn chưa có đơn đặt tour nào.
           a.btn.btn--primary(href="/tours") Khám phá tour ngay
 
       else
-        .booking-list#myBookingsList
+        .booking-list
           each b in bookings
             .booking-item
               .booking-item__img
@@ -22,20 +22,14 @@ block content
               .booking-item__info
                 a.booking-item__tour(href=`/tours/${b.tour_slug}`)= b.tour_name
                 .booking-item__meta
-                  span.icon-text
-                    +fa('calendar')
-                    | #{formatDate(b.start_date)} – #{formatDate(b.end_date)}
-                  span.icon-text
-                    +fa('location')
-                    | #{b.departure_location}
-                  span.icon-text
-                    +fa('users')
-                    | #{b.adult_count} Người lớn / #{b.child_count} Trẻ em
+                  span 📅 #{formatDate(b.start_date)} → #{formatDate(b.end_date)}
+                  span 📍 #{b.departure_location}
+                  span 👥 #{b.adult_count} Người lớn / #{b.child_count} Trẻ em
                 .booking-item__price= formatPrice(b.total_price)
               .booking-item__status
                 span(class=`badge badge--${b.status}`)
                   = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
-                a.btn.btn--view.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
+                a.btn.btn--outline.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
                 if b.status === 'pending'
                   form(
                     action=`/my-bookings/${b.id}/cancel?_method=PUT`
@@ -46,17 +40,13 @@ block content
                     button.btn.btn--danger.btn--sm(type="submit") Hủy đơn
 
         if totalPages > 1
-          .pagination#myBookingsPagination
+          .pagination
             if currentPage > 1
-              a.pagination__item(href=`/my-bookings?page=${currentPage-1}`)
-                +fa('chevron-left')
-                |  Trước
+              a.pagination__item(href=`/my-bookings?page=${currentPage-1}`) ← Trước
             each p in Array.from({length: totalPages}, (_, i) => i + 1)
               a(
                 href=`/my-bookings?page=${p}`
                 class=`pagination__item${p === currentPage ? ' active' : ''}`
               )= p
             if currentPage < totalPages
-              a.pagination__item(href=`/my-bookings?page=${currentPage+1}`)
-                | Tiếp 
-                +fa('chevron-right')
+              a.pagination__item(href=`/my-bookings?page=${currentPage+1}`) Tiếp →

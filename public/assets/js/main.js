@@ -158,19 +158,12 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     if (!input) return;
     
     // Toggle input type between password and text
-    const icon = toggle.querySelector('i');
     if (input.type === 'password') {
       input.type = 'text';
-      if (icon) {
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      }
+      toggle.classList.add('active');
     } else {
       input.type = 'password';
-      if (icon) {
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
+      toggle.classList.remove('active');
     }
   });
 });

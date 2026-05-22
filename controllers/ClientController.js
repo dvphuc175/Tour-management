@@ -2,8 +2,8 @@ const TourModel = require('../models/TourModel');
 const CategoryModel = require('../models/CategoryModel');
 const ScheduleModel = require('../models/ScheduleModel');
 const ReviewModel = require('../models/ReviewModel');
-const LIMIT = 9; 
-const HOME_LIMIT = 8; // 6 tours per page on homepage
+const LIMIT = 8; 
+const HOME_LIMIT = 6; // 6 tours per page on homepage
 const REVIEW_LIMIT = 5;
 
 const ClientController = {
@@ -20,15 +20,6 @@ const ClientController = {
         TourModel.countPublic({}),
         CategoryModel.getActive()
       ]);
-
-      if (req.headers.accept && req.headers.accept.includes('application/json')) {
-        return res.json({
-          tours,
-          totalTours: total,
-          currentPage: page,
-          totalPages: Math.ceil(total / HOME_LIMIT)
-        });
-      }
 
       return res.render('client/home', {
         title: 'Trang chủ',
@@ -116,50 +107,6 @@ const ClientController = {
         CategoryModel.getActive()
       ]);
 
-      // Helper functions for JSON response
-      const formatPrice = (n) =>
-        new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND'
-        }).format(n);
-
-      const formatDate = (d) =>
-        new Date(d).toLocaleDateString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        });
-
-      const renderStars = (rating) => {
-        const r = Math.min(5, Math.max(0, Number(rating) || 0));
-        const full = Math.floor(r);
-        const half = r - full >= 0.5 ? 1 : 0;
-        const empty = 5 - full - half;
-        let html = '';
-        for (let i = 0; i < full; i++) {
-          html += '<i class="fa-solid fa-star stars-fa stars-fa--full" aria-hidden="true"></i>';
-        }
-        if (half) {
-          html += '<i class="fa-solid fa-star-half-stroke stars-fa stars-fa--half" aria-hidden="true"></i>';
-        }
-        for (let i = 0; i < empty; i++) {
-          html += '<i class="fa-regular fa-star stars-fa stars-fa--empty" aria-hidden="true"></i>';
-        }
-        return html;
-      };
-
-      // Check if request is AJAX
-      if (req.headers.accept && req.headers.accept.includes('application/json')) {
-        return res.json({
-          tours,
-          totalTours: total,
-          currentPage: page,
-          totalPages: Math.ceil(total / LIMIT),
-          query: req.query,
-          helpers: { formatPrice, formatDate, renderStars }
-        });
-      }
-
       return res.render('client/tour-list', {
         title: 'Khám phá tour',
         tours,
@@ -214,17 +161,6 @@ const ClientController = {
             tour.id
           )
         ]);
-      }
-
-      // Check if request is for reviews JSON only
-      if (req.headers.accept && req.headers.accept.includes('application/json') && req.query.review_page) {
-        return res.json({
-          reviews,
-          reviewPage,
-          reviewTotalPages,
-          reviewTotal,
-          tourSlug: tour.slug
-        });
       }
       
       // Parse description into sections

@@ -1,5 +1,3 @@
-include mixins/icons
-
 doctype html
 html(lang="vi")
   head
@@ -8,7 +6,7 @@ html(lang="vi")
     title= title ? `${title} | Vi Vu Việt Nam` : 'Tour Du Lịch Việt Nam'
     link(rel="preconnect" href="https://fonts.googleapis.com")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
-    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap")
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Sora:wght@600;700&display=swap")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css")
     link(rel="stylesheet" href="/assets/css/main.css")
     block head
@@ -16,6 +14,7 @@ html(lang="vi")
   body
     include partials/navbar
 
+    //- Flash messages
     if success && success.length
       .flash.flash--success
         each msg in success
@@ -35,81 +34,84 @@ html(lang="vi")
             button.flash__close(type="button" aria-label="Đóng")
               i.fas.fa-times
 
-    main.main-content
+    main.container
       block content
 
-    //- ── Footer ─────────────────────────────────
-    footer.footer#contact
-      .container
-        .footer__content
-          .footer__col
-            h3.footer__title Vi Vu Việt Nam
-            p.footer__desc Công ty chuyên cung cấp các tour du lịch chất lượng cao khắp Việt Nam. Trải nghiệm du lịch tuyệt vời cùng chúng tôi!
-            .footer__social
-              a.footer__social-link(href="#" aria-label="Facebook")
-                +fa('facebook')
-              a.footer__social-link(href="#" aria-label="Instagram")
-                +fa('instagram')
-              a.footer__social-link(href="#" aria-label="Zalo")
-                img(src="/assets/images/Zalo.jpg" alt="Zalo")
-          .footer__col
-            h3.footer__title Liên kết nhanh
-            a.footer__link(href="/") Trang chủ
-            a.footer__link(href="/tours") Khám phá tour
-            a.footer__link(href="/my-bookings") Đơn của tôi
-          .footer__col
-            h3.footer__title Liên hệ
-            .footer__contact
-              .footer__contact-item
-                +fa('location-dot')
-                span 123 Đường ABC, Quận 1, TP. Hồ Chí Minh
-              .footer__contact-item
-                +fa('phone')
-                span 0345.043.213
-              .footer__contact-item
-                +fa('envelope')
-                span info@vivuvietnam.com
-              .footer__contact-item
-                +fa('clock')
-                span 8:00 - 22:00 mỗi ngày
-        .footer__bottom
-          p &copy; 2024 Vi Vu Việt Nam. All rights reserved.
+    //- include partials/footer (Sẽ làm sau)
 
-    #zalo-widget
-      #zalo-button(onclick="toggleZaloChat()")
-        img(src="/assets/images/Zalo.jpg" alt="Chat Zalo")
+    //- Zalo Widget
+    #zalo-widget(
+      style="position:fixed; bottom:50px; right:20px; z-index:1000;"
+    )
+      //- Nút Zalo
+      #zalo-button(
+        onclick="toggleZaloChat()"
+        style="width:60px; height:60px; border-radius:12px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition:transform 0.2s; overflow:hidden; background:#fff;"
+        onmouseover="this.style.transform='scale(1.05)'"
+        onmouseout="this.style.transform='scale(1)'"
+      )
+        img(
+          src="/assets/images/Zalo.jpg"
+          alt="Chat Zalo"
+          style="width:100%; height:100%; object-fit:cover;"
+        )
 
-      #zalo-chat-window
-        .zalo-header
-          img(src="/assets/images/Zalo.jpg" alt="Zalo")
+      //- Cửa sổ chat
+      #zalo-chat-window(
+        style="display:none; position:absolute; bottom:75px; right:0; width:300px; background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden;"
+      )
+        //- Header
+        .zalo-header(
+          style="background:linear-gradient(135deg, #0068ff 0%, #0051cc 100%); padding:16px; color:#fff; display:flex; align-items:center; gap:12px;"
+        )
+          img(
+            src="/assets/images/Zalo.jpg"
+            alt="Zalo"
+            style="width:40px; height:40px; border-radius:10px; object-fit:cover; border:2px solid rgba(255,255,255,0.3);"
+          )
           div
-            .zalo-header__title Vi Vu Việt Nam
-            .zalo-header__sub Hỗ trợ 24/7
-          span.zalo-header__close(onclick="toggleZaloChat()")
-            +fa('xmark')
+            div(style="font-weight:600; font-size:15px;") Vi Vu Việt Nam
+            div(style="font-size:12px; opacity:0.9;") Hỗ trợ 24/7
+          span(
+            onclick="toggleZaloChat()"
+            style="margin-left:auto; cursor:pointer; font-size:20px; opacity:0.8;"
+            onmouseover="this.style.opacity='1'"
+            onmouseout="this.style.opacity='0.8'"
+          ) &times;
 
-        .zalo-body
-          p
-            +fa('hand')
-            |  Xin chào!
+        //- Body
+        .zalo-body(style="padding:20px; text-align:center; background:#f8f9fa;")
+          p(style="color:#666; font-size:14px; margin:0 0 16px 0;")
+            | Xin chào! 👋
             br
             | Chúng tôi có thể giúp gì cho bạn?
-          a.zalo-body__cta(href="https://zalo.me/0345043213" target="_blank")
-            +fa('comment')
-            |  Chat ngay trên Zalo
+          a(
+            href="https://zalo.me/0345043213"
+            target="_blank"
+            style="display:block; background:#0068ff; color:#fff; text-decoration:none; padding:12px 20px; border-radius:20px; font-weight:500; transition:background 0.2s;"
+            onmouseover="this.style.background='#0051cc'"
+            onmouseout="this.style.background='#0068ff'"
+          )
+            | 💬 Chat ngay trên Zalo
 
     script(src="/assets/js/main.js")
     block scripts
 
     script.
       function toggleZaloChat() {
-        document.getElementById('zalo-chat-window').classList.toggle('is-open');
+        const chatWindow = document.getElementById('zalo-chat-window');
+        if (chatWindow.style.display === 'none') {
+          chatWindow.style.display = 'block';
+        } else {
+          chatWindow.style.display = 'none';
+        }
       }
 
+      //- Đóng chat khi click ra ngoài
       document.addEventListener('click', function(e) {
         const widget = document.getElementById('zalo-widget');
         const chatWindow = document.getElementById('zalo-chat-window');
-        if (chatWindow.classList.contains('is-open') && !widget.contains(e.target)) {
-          chatWindow.classList.remove('is-open');
+        if (chatWindow.style.display === 'block' && !widget.contains(e.target)) {
+          chatWindow.style.display = 'none';
         }
       });
