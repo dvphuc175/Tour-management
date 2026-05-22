@@ -5,8 +5,8 @@ block content
 
     .booking-detail-header
       h2 Đơn ##{booking.id}
-      span(class=`badge badge--${booking.status} badge--lg`)
-        = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[booking.status]
+      span(class=bookingStatus.bookingBadgeClass(booking.status, 'badge--lg'))
+        = bookingStatus.bookingStatusLabel(booking.status)
 
     .booking-detail-grid
 
@@ -61,11 +61,11 @@ block content
         h3.detail-card__title Thanh toán
         .summary-row
           span Phương thức
-          strong= booking.payment_method === 'vnpay' ? 'VNPay' : 'Tiền mặt'
+          strong= bookingStatus.paymentMethodLabel(booking.payment_method)
         .summary-row
           span Trạng thái
-          span(class=`badge badge--${booking.payment_status}`)
-            = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[booking.payment_status]
+          span(class=bookingStatus.paymentBadgeClass(booking.payment_status))
+            = bookingStatus.paymentStatusLabel(booking.payment_status)
         if booking.transaction_id
           .summary-row
             span Mã GD
@@ -79,8 +79,8 @@ block content
       a.btn.btn--outline(href="/admin/bookings") ← Quay lại
 
       //- Chỉ hiện "Xác nhận đơn" với đơn CASH đang pending
-      if booking.status === 'pending' && booking.payment_method === 'cash'
-        form(
+      if bookingStatus.canAdminConfirmCashBooking(booking)
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/confirm?_method=PUT`
           method="POST"
           data-confirm="Xác nhận đã nhận tiền mặt và duyệt đơn này?"
@@ -90,12 +90,12 @@ block content
           button.btn.btn--primary(type="submit") ✓ Xác nhận & Nhận tiền mặt
 
       //- VNPay pending: chỉ hiển thị trạng thái, không có nút duyệt
-      if booking.status === 'pending' && booking.payment_method === 'vnpay'
-        span.badge.badge--pending(style="padding:8px 14px") Chờ khách thanh toán VNPay
+      if bookingStatus.isAdminAwaitingVnpayPayment(booking)
+        span.badge.badge--pending.badge--lg-pad Chờ khách thanh toán VNPay
 
       //- Nút "Hoàn thành tour" — cả 2 luồng, khi đã confirmed
-      if booking.status === 'confirmed'
-        form(
+      if bookingStatus.canAdminCompleteBooking(booking)
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/complete?_method=PUT`
           method="POST"
           data-confirm="Đánh dấu tour này đã hoàn thành?"
@@ -105,8 +105,8 @@ block content
           button.btn.btn--primary(type="submit") ✓ Hoàn thành tour
 
       //- Hủy đơn — không hủy khi đã completed
-      if booking.status !== 'cancelled' && booking.status !== 'completed'
-        form(
+      if bookingStatus.canAdminCancelBooking(booking)
+        form.form--inline(
           action=`/admin/bookings/${booking.id}/cancel?_method=PUT`
           method="POST"
           data-confirm="Hủy đơn này và hoàn lại chỗ cho lịch trình?"

@@ -3,6 +3,7 @@
   const navbar = document.querySelector('.navbar');
   const toggle = document.querySelector('.navbar__toggle');
   const backdrop = document.querySelector('.navbar__backdrop');
+  const closeButton = document.querySelector('[data-navbar-close]');
   if (!navbar || !toggle) return;
 
   const closeMenu = () => {
@@ -23,6 +24,7 @@
   });
 
   backdrop?.addEventListener('click', closeMenu);
+  closeButton?.addEventListener('click', closeMenu);
 
   navbar.querySelectorAll('.navbar__menu a, .navbar__auth a').forEach(link => {
     link.addEventListener('click', () => {
@@ -50,42 +52,72 @@
   window.addEventListener('scroll', updateNavbarScrollState);
 })();
 
-// Flash messages: auto hide and close button
-(function initFlashMessages() {
-  const flashContainers = document.querySelectorAll('.flash');
-  
-  flashContainers.forEach(flashContainer => {
-    const flashItems = flashContainer.querySelectorAll('.flash__item');
-    
-    flashItems.forEach(item => {
-      // Auto hide after 5 seconds
-      const autoHideTimeout = setTimeout(() => {
-        closeFlashItem(item);
-      }, 5000);
-      
-      // Close button click
-      const closeBtn = item.querySelector('.flash__close');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          clearTimeout(autoHideTimeout);
-          closeFlashItem(item);
-        });
-      }
-    });
+// Tour filter drawer
+(function initTourFilters() {
+  const panel = document.getElementById('tourFilterPanel');
+  const toggle = document.querySelector('[data-filter-toggle]');
+  const closeButton = document.querySelector('[data-filter-close]');
+  const backdrop = document.querySelector('[data-filter-backdrop]');
+  if (!panel || !toggle) return;
+
+  const closeFilter = () => {
+    document.body.classList.remove('filter-open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+
+  const openFilter = () => {
+    document.body.classList.add('filter-open');
+    toggle.setAttribute('aria-expanded', 'true');
+  };
+
+  toggle.addEventListener('click', () => {
+    if (document.body.classList.contains('filter-open')) closeFilter();
+    else openFilter();
   });
-  
-  function closeFlashItem(item) {
-    item.classList.add('is-closing');
-    setTimeout(() => {
-      item.remove();
-      // If container is empty, remove it
-      const container = item.closest('.flash');
-      if (container && container.querySelectorAll('.flash__item').length === 0) {
-        container.remove();
-      }
-    }, 300);
-  }
+
+  closeButton?.addEventListener('click', closeFilter);
+  backdrop?.addEventListener('click', closeFilter);
+
+  panel.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', closeFilter);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeFilter();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeFilter();
+  });
 })();
+
+// Flash message
+document.querySelectorAll('[data-flash]').forEach(el => {
+  const removeFlash = () => {
+    el.style.transition = 'opacity .25s ease, transform .25s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-4px)';
+    setTimeout(() => {
+      const stack = el.closest('.flash-stack');
+      el.remove();
+      if (stack && !stack.querySelector('[data-flash]')) stack.remove();
+    }, 250);
+  };
+
+  el.querySelector('[data-flash-close]')?.addEventListener('click', removeFlash);
+
+  if (!el.classList.contains('flash-message--error')) {
+    setTimeout(removeFlash, 5000);
+  }
+});
+
+document.querySelectorAll('.flash').forEach(el => {
+  setTimeout(() => {
+    el.style.transition = 'opacity .4s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 400);
+  }, 4000);
+});
 
 // Confirm khi xóa / hủy
 document.querySelectorAll('[data-confirm]').forEach(form => {
@@ -603,13 +635,28 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
 // AJAX Pagination for my-bookings page
 (function initMyBookingsPagination() {
+  const BOOKING_STATUS_FALLBACK = {
+    pending: { label: 'Chờ xác nhận', badge: 'pending' },
+    confirmed: { label: 'Đã xác nhận', badge: 'confirmed' },
+    cancelled: { label: 'Đã hủy', badge: 'cancelled' },
+    completed: { label: 'Hoàn thành', badge: 'completed' }
+  };
+
+  function getBookingUi(b) {
+    const fallback = BOOKING_STATUS_FALLBACK[b.status] || {
+      label: b.status || 'Không rõ',
+      badge: 'unknown'
+    };
+
+    return {
+      statusLabel: b.ui?.bookingStatusLabel || fallback.label,
+      statusBadge: b.ui?.bookingStatusBadge || fallback.badge,
+      canCancel: b.ui?.canUserCancel ?? b.status === 'pending'
+    };
+  }
+
   function generateBookingItem(b, csrfToken) {
-    let statusText = {
-      pending: 'Chờ xác nhận',
-      confirmed: 'Đã xác nhận',
-      cancelled: 'Đã hủy',
-      completed: 'Hoàn thành'
-    }[b.status] || b.status;
+    const bookingUi = getBookingUi(b);
 
     let html = `<div class="booking-item">
       <div class="booking-item__img">`;
@@ -637,10 +684,10 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         <div class="booking-item__price">${formatPrice(b.total_price)}</div>
       </div>
       <div class="booking-item__status">
-        <span class="badge badge--${b.status}">${statusText}</span>
+        <span class="badge badge--${bookingUi.statusBadge}">${bookingUi.statusLabel}</span>
         <a class="btn btn--outline btn--sm" href="/my-bookings/${b.id}">Chi tiết</a>`;
     
-    if (b.status === 'pending') {
+    if (bookingUi.canCancel) {
       html += `<form action="/my-bookings/${b.id}/cancel?_method=PUT" method="POST" data-confirm="Bạn chắc chắn muốn hủy đơn này?">
         <input type="hidden" name="_csrf" value="${csrfToken}">
         <button class="btn btn--danger btn--sm" type="submit">Hủy đơn</button>

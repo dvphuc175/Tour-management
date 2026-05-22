@@ -5,8 +5,11 @@ block content
 		.tour-list-layout
 
 			//- Sidebar filter
-			aside.filter-sidebar
+			.filter-backdrop(data-filter-backdrop aria-hidden="true")
+			aside#tourFilterPanel.filter-sidebar(aria-label="Bộ lọc tour")
 				form#filterForm(method="GET" action="/tours")
+					button.filter-sidebar__close(type="button" data-filter-close aria-label="Đóng bộ lọc")
+						+fa('xmark')
 					h3.filter-sidebar__title Lọc tour
 
 					.filter-group
@@ -57,7 +60,15 @@ block content
 			//- Main content
 			.tour-list-main
 				.tour-list-header
-					p.tour-count Tìm thấy #{totalTours} tour
+					p.tour-count#tourCount Tìm thấy #{totalTours} tour
+					button.btn.btn--outline.filter-toggle(
+						type="button"
+						data-filter-toggle
+						aria-controls="tourFilterPanel"
+						aria-expanded="false"
+					)
+						+fa('filter')
+						|  Lọc
 
 				if tours.length === 0
 					.empty-state

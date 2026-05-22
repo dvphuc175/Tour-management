@@ -27,10 +27,10 @@ block content
                   span 👥 #{b.adult_count} Người lớn / #{b.child_count} Trẻ em
                 .booking-item__price= formatPrice(b.total_price)
               .booking-item__status
-                span(class=`badge badge--${b.status}`)
-                  = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
-                a.btn.btn--outline.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
-                if b.status === 'pending'
+                span(class=bookingStatus.bookingBadgeClass(b.status))
+                  = bookingStatus.bookingStatusLabel(b.status)
+                a.btn.btn--view.btn--sm(href=`/my-bookings/${b.id}`) Chi tiết
+                if bookingStatus.canUserCancelBooking(b)
                   form(
                     action=`/my-bookings/${b.id}/cancel?_method=PUT`
                     method="POST"

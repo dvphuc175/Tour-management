@@ -1,3 +1,5 @@
+include mixins/icons
+
 doctype html
 html(lang="vi")
   head
@@ -14,27 +16,9 @@ html(lang="vi")
   body
     include partials/navbar
 
-    //- Flash messages
-    if success && success.length
-      .flash.flash--success
-        each msg in success
-          .flash__item
-            .flash__icon
-              i.fas.fa-check-circle
-            .flash__content= msg
-            button.flash__close(type="button" aria-label="Đóng")
-              i.fas.fa-times
-    if error && error.length
-      .flash.flash--error
-        each msg in error
-          .flash__item
-            .flash__icon
-              i.fas.fa-exclamation-circle
-            .flash__content= msg
-            button.flash__close(type="button" aria-label="Đóng")
-              i.fas.fa-times
+    include partials/flash
 
-    main.container
+    main.main-content
       block content
 
     //- include partials/footer (Sẽ làm sau)
