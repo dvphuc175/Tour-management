@@ -5,8 +5,8 @@ block content
 
     .booking-detail-header
       h2 Đơn ##{booking.id}
-      span(class=`badge badge--${booking.status} badge--lg`)
-        = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[booking.status]
+      span(class=bookingStatus.bookingBadgeClass(booking.status, 'badge--lg'))
+        = bookingStatus.bookingStatusLabel(booking.status)
 
     .booking-detail-grid
 
@@ -61,11 +61,11 @@ block content
         h3.detail-card__title Thanh toán
         .summary-row
           span Phương thức
-          strong= booking.payment_method === 'vnpay' ? 'VNPay' : 'Tiền mặt'
+          strong= bookingStatus.paymentMethodLabel(booking.payment_method)
         .summary-row
           span Trạng thái
-          span(class=`badge badge--${booking.payment_status}`)
-            = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[booking.payment_status]
+          span(class=bookingStatus.paymentBadgeClass(booking.payment_status))
+            = bookingStatus.paymentStatusLabel(booking.payment_status)
         if booking.transaction_id
           .summary-row
             span Mã GD
@@ -81,7 +81,7 @@ block content
         |  Quay lại
 
       //- Chỉ hiện "Xác nhận đơn" với đơn CASH đang pending
-      if booking.status === 'pending' && booking.payment_method === 'cash'
+      if bookingStatus.canAdminConfirmCashBooking(booking)
         form.form--inline(
           action=`/admin/bookings/${booking.id}/confirm?_method=PUT`
           method="POST"
@@ -93,11 +93,11 @@ block content
             |  Xác nhận & Nhận tiền mặt
 
       //- VNPay pending: chỉ hiển thị trạng thái, không có nút duyệt
-      if booking.status === 'pending' && booking.payment_method === 'vnpay'
+      if bookingStatus.isAdminAwaitingVnpayPayment(booking)
         span.badge.badge--pending.badge--lg-pad Chờ khách thanh toán VNPay
 
       //- Nút "Hoàn thành tour" — cả 2 luồng, khi đã confirmed
-      if booking.status === 'confirmed'
+      if bookingStatus.canAdminCompleteBooking(booking)
         form.form--inline(
           action=`/admin/bookings/${booking.id}/complete?_method=PUT`
           method="POST"
@@ -109,7 +109,7 @@ block content
             |  Hoàn thành tour
 
       //- Hủy đơn — không hủy khi đã completed
-      if booking.status !== 'cancelled' && booking.status !== 'completed'
+      if bookingStatus.canAdminCancelBooking(booking)
         form.form--inline(
           action=`/admin/bookings/${booking.id}/cancel?_method=PUT`
           method="POST"

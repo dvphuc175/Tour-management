@@ -2326,42 +2326,6 @@ html {
 	color: var(--color-danger-pink);
 }
 
-.badge {
-	display: inline-flex;
-	align-items: center;
-	padding: 6px 12px;
-	border-radius: var(--radius-sm);
-	font-size: 12px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
-
-.badge--pending {
-	background: var(--color-warning-softest);
-	color: var(--color-warning-dark);
-}
-
-.badge--confirmed {
-	background: var(--color-success-softest);
-	color: var(--color-success-dark);
-}
-
-.badge--cancelled {
-	background: var(--color-danger-softest);
-	color: var(--color-danger-deep);
-}
-
-.badge--completed {
-	background: var(--color-primary-soft);
-	color: var(--color-primary-dk);
-}
-
-.badge--lg {
-	padding: 8px 16px;
-	font-size: 13px;
-}
-
 @media (max-width: 900px) {
 	.booking-detail-grid {
 		grid-template-columns: 1fr;
@@ -2712,7 +2676,6 @@ html {
   margin-bottom: 14px;
 }
 .booking-detail-actions { display: flex; gap: 10px; }
-.badge--lg { font-size: 13px; padding: 5px 14px; }
 .payment-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
 .vnpay-timer-box {
   background: var(--color-white)3cd;
@@ -2757,11 +2720,14 @@ html {
 
 /* ── Badge variants ──────────────────────── */
 .badge {
-  display: inline-block;
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .badge--pending { background: var(--color-warning-bg); color: var(--color-warning-text); }
 .badge--confirmed { background: var(--color-confirmed-bg); color: var(--color-primary-deep); }
@@ -2770,6 +2736,8 @@ html {
 .badge--success { background: var(--color-success-softest); color: var(--color-success-deep); }
 .badge--failed { background: var(--color-danger-softest); color: var(--color-danger-dark); }
 .badge--refunded { background: var(--color-refunded-bg); color: var(--color-refunded-text); }
+.badge--unknown { background: var(--color-gray-lighter); color: var(--color-text-muted); }
+.badge--lg { font-size: 13px; padding: 6px 14px; }
 
 /* ── Payment method selector ─────────────── */
 .payment-method-group {

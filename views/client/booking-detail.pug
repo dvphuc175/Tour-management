@@ -9,7 +9,7 @@ block content
           +fa('arrow-left')
           |  Quay lại
 
-        if booking.status === 'pending'
+        if bookingStatus.canUserCancelBooking(booking)
           form(
             action=`/my-bookings/${booking.id}/cancel?_method=PUT`
             method="POST"
@@ -20,10 +20,10 @@ block content
 
       .booking-detail-header
         h1 Đơn đặt ##{booking.id}
-        span(class=`badge badge--${booking.status} badge--lg`)
-          = {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[booking.status]
+        span(class=bookingStatus.bookingBadgeClass(booking.status, 'badge--lg'))
+          = bookingStatus.bookingStatusLabel(booking.status)
 
-      if booking.payment_method === 'cash' && booking.status === 'pending'
+      if bookingStatus.isCashPendingBooking(booking)
         .info-box.info-box--cash
           p
             +fa('info')
@@ -89,16 +89,22 @@ block content
 
             .summary-row
               span Phương thức
-              strong= booking.payment_method === 'vnpay' ? 'VNPay' : 'Tiền mặt'
+              strong= bookingStatus.paymentMethodLabel(booking.payment_method)
 
             .summary-row
               span Trạng thái thanh toán
-              span(class=`badge badge--${booking.payment_status}`)
-                = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[booking.payment_status]
+              span(class=bookingStatus.paymentBadgeClass(booking.payment_status))
+                = bookingStatus.paymentStatusLabel(booking.payment_status)
+
+            if bookingStatus.clientBookingNotice(booking) && !bookingStatus.isCashPendingBooking(booking)
+              .tip-box
+                p
+                  +fa('info')
+                  |  #{bookingStatus.clientBookingNotice(booking)}
 
             .payment-actions
               
-              if booking.payment_method === 'vnpay' && (booking.payment_status === 'pending' || booking.payment_status === 'failed') && booking.status === 'pending'
+              if bookingStatus.canRetryVnpayPayment(booking)
                 
                 .vnpay-timer-box(data-created-at=booking.created_at)
                   p
@@ -114,7 +120,7 @@ block content
                     | Thanh toán ngay qua VNPay
 
 
-              if booking.payment_status === 'success'
+              if bookingStatus.isPaymentSuccess(booking)
                 .tip-box
                   p
                     +fa('check')
@@ -122,7 +128,7 @@ block content
                   if booking.paid_at
                     p Thời gian: #{formatDate(booking.paid_at)}
 
-              if booking.status === 'confirmed'
+              if bookingStatus.canShowCancelSupport(booking)
                 button.btn.btn--outline-danger.btn--block.btn--support-cancel(
                   type="button"
                   onclick="openCancelPolicyModal()"

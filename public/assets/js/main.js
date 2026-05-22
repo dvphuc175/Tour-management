@@ -629,13 +629,28 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
 // AJAX Pagination for my-bookings page
 (function initMyBookingsPagination() {
+  const BOOKING_STATUS_FALLBACK = {
+    pending: { label: 'Chờ xác nhận', badge: 'pending' },
+    confirmed: { label: 'Đã xác nhận', badge: 'confirmed' },
+    cancelled: { label: 'Đã hủy', badge: 'cancelled' },
+    completed: { label: 'Hoàn thành', badge: 'completed' }
+  };
+
+  function getBookingUi(b) {
+    const fallback = BOOKING_STATUS_FALLBACK[b.status] || {
+      label: b.status || 'Không rõ',
+      badge: 'unknown'
+    };
+
+    return {
+      statusLabel: b.ui?.bookingStatusLabel || fallback.label,
+      statusBadge: b.ui?.bookingStatusBadge || fallback.badge,
+      canCancel: b.ui?.canUserCancel ?? b.status === 'pending'
+    };
+  }
+
   function generateBookingItem(b, csrfToken) {
-    let statusText = {
-      pending: 'Chờ xác nhận',
-      confirmed: 'Đã xác nhận',
-      cancelled: 'Đã hủy',
-      completed: 'Hoàn thành'
-    }[b.status] || b.status;
+    const bookingUi = getBookingUi(b);
 
     let html = `<div class="booking-item">
       <div class="booking-item__img">`;
@@ -663,10 +678,10 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         <div class="booking-item__price">${formatPrice(b.total_price)}</div>
       </div>
       <div class="booking-item__status">
-        <span class="badge badge--${b.status}">${statusText}</span>
+        <span class="badge badge--${bookingUi.statusBadge}">${bookingUi.statusLabel}</span>
         <a class="btn btn--outline btn--sm" href="/my-bookings/${b.id}">Chi tiết</a>`;
     
-    if (b.status === 'pending') {
+    if (bookingUi.canCancel) {
       html += `<form action="/my-bookings/${b.id}/cancel?_method=PUT" method="POST" data-confirm="Bạn chắc chắn muốn hủy đơn này?">
         <input type="hidden" name="_csrf" value="${csrfToken}">
         <button class="btn btn--danger btn--sm" type="submit">Hủy đơn</button>

@@ -27,8 +27,9 @@ block content
         .summary-row
           span Trạng thái
           strong
-            span.badge.badge--pending Chờ xác nhận
-        if booking.payment_method === 'cash'
+            span(class=bookingStatus.bookingBadgeClass(booking.status || 'pending'))
+              = bookingStatus.bookingStatusLabel(booking.status || 'pending')
+        if bookingStatus.isCashPendingBooking(booking)
           .info-box.info-box--cash-page
             p
               +fa('info')

@@ -10,6 +10,7 @@ const sanitizeHtml = require('sanitize-html');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const { csrf } = require('./middlewares/csrf');
+const bookingStatus = require('./utils/bookingStatus');
 const app = express()
 
 const FLASH_DEFAULTS = {
@@ -193,6 +194,7 @@ app.use((req, res, next) => {
     }
     return html;
   };
+  res.locals.bookingStatus = bookingStatus;
     next(); });
 
 app.use('/', require('./routes/auth'));

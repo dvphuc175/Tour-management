@@ -3,6 +3,7 @@ const ScheduleModel = require('../models/ScheduleModel');
 const TourModel = require('../models/TourModel');
 const { bookingSchema } = require('../validators/bookingSchema');
 const EmailService = require('../services/emailService');
+const bookingStatus = require('../utils/bookingStatus');
 const BookingController = {
 
   //GET/booking/:scheduleId
@@ -174,7 +175,7 @@ const BookingController = {
         } catch {
           b.tour_images = [];
         }
-        return b;
+        return bookingStatus.decorateBooking(b);
       });
 
       if (req.headers.accept && req.headers.accept.includes('application/json')) {
