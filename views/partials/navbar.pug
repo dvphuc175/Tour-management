@@ -15,18 +15,34 @@ nav.navbar
 
     #navbar-panel.navbar__panel
       .navbar__menu
+        a(href="/" class=currentPath === '/' ? 'navbar__link--active' : '') Trang chủ
+        a(href="/about" class=currentPath === '/about' ? 'navbar__link--active' : '') Giới thiệu
         a(href="/tours" class=(currentPath && currentPath.startsWith('/tours')) ? 'navbar__link--active' : '') Khám phá tour
-        a(href="/my-bookings" class=currentPath === '/my-bookings' ? 'navbar__link--active' : '') Đơn của tôi
-        a(href="#contact") Liên hệ
+        a(href="/contact" class=currentPath === '/contact' ? 'navbar__link--active' : '') Liên hệ
 
       .navbar__auth
         if user
-          span.navbar__user Xin chào, #{user.fullname}
-          if user.role === 'admin'
-            a.btn.btn--outline.btn--sm(href="/admin") Admin
-          form.form--inline(action="/logout?_method=DELETE" method="POST")
-            input(type="hidden" name="_csrf" value=csrfToken)
-            button.btn.btn--outline.btn--sm(type="submit") Đăng xuất
+          .navbar__dropdown
+            button.navbar__dropdown-toggle(type="button" aria-haspopup="true" aria-expanded="false")
+              +fa('user')
+              |  Xin chào, #{user.fullname}
+            .navbar__dropdown-menu
+              a.navbar__dropdown-item(href="/profile")
+                +fa('user-circle')
+                |  Thông tin tài khoản
+              a.navbar__dropdown-item(href="/my-bookings")
+                +fa('ticket')
+                |  Đơn của tôi
+              if user.role === 'admin'
+                a.navbar__dropdown-item(href="/admin")
+                  +fa('gear')
+                  |  Quản trị
+              .navbar__dropdown-divider
+              form.form--inline(action="/logout?_method=DELETE" method="POST")
+                input(type="hidden" name="_csrf" value=csrfToken)
+                button.navbar__dropdown-item(type="submit")
+                  +fa('right-from-bracket')
+                  |  Đăng xuất
         else
           a.navbar__link(href="/login") Đăng nhập
           a.btn.btn--primary.btn--sm(href="/register") Đăng ký

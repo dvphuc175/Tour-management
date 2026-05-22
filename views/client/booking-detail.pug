@@ -32,7 +32,17 @@ block content
             | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
             strong 24 giờ.
             |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
-            
+
+      if booking.payment_status === 'success'
+        .tip-box
+          p
+            +fa('check')
+            |  Đã thanh toán thành công
+          if booking.paid_at
+            p Thời gian: #{formatDate(booking.paid_at)}
+
+      
+
       .booking-detail-grid
 
         .booking-detail-left
@@ -96,6 +106,14 @@ block content
               span(class=`badge badge--${booking.payment_status}`)
                 = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[booking.payment_status]
 
+            if booking.status === 'confirmed'
+              button.btn.btn--outline-danger.btn--block.btn--support-cancel(
+                type="button"
+                onclick="openCancelPolicyModal()"
+              )
+                +fa('warning')
+                |  Hỗ trợ Hủy / Dời ngày đi  
+
             .payment-actions
               
               if booking.payment_method === 'vnpay' && (booking.payment_status === 'pending' || booking.payment_status === 'failed') && booking.status === 'pending'
@@ -113,22 +131,8 @@ block content
                   else
                     | Thanh toán ngay qua VNPay
 
+              
 
-              if booking.payment_status === 'success'
-                .tip-box
-                  p
-                    +fa('check')
-                    |  Đã thanh toán thành công
-                  if booking.paid_at
-                    p Thời gian: #{formatDate(booking.paid_at)}
-
-              if booking.status === 'confirmed'
-                button.btn.btn--outline-danger.btn--block.btn--support-cancel(
-                  type="button"
-                  onclick="openCancelPolicyModal()"
-                )
-                  +fa('warning')
-                  |  Hỗ trợ Hủy / Dời ngày đi
 
   #cancelPolicyModal.modal.modal--policy
     .modal-content

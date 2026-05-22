@@ -216,12 +216,14 @@ block content
             .review-list#reviewsList
               each rv in reviews
                 .review-item
-                  .review-item__header
-                    span.review-item__author= rv.user_name
-                    span.review-item__stars!= renderStars(rv.rating)
-                    span.review-item__date= formatDate(rv.created_at)
-                  if rv.comment
-                    p.review-item__comment= rv.comment
+                  .review-item__avatar= (rv.user_name || 'K').trim().charAt(0).toUpperCase()
+                  .review-item__content
+                    .review-item__header
+                      span.review-item__author= rv.user_name
+                      span.review-item__stars!= renderStars(rv.rating)
+                      span.review-item__date= formatDate(rv.created_at)
+                    if rv.comment
+                      p.review-item__comment= rv.comment
 
             if reviewTotalPages > 1
               .pagination.reviews-pagination#reviewsPagination
@@ -340,3 +342,54 @@ block scripts
         closeScheduleModal();
       }
     }
+
+    // Tour navigation active state
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('.tour-nav-link');
+      
+      // Set active on click
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Set active on scroll
+      const sections = document.querySelectorAll('.tour-section, #reviews');
+      
+      window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 200;
+          if (window.pageYOffset >= sectionTop) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        if (current) {
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+
+      // Set initial active based on URL hash
+      const hash = window.location.hash;
+      if (hash) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === hash) {
+            link.classList.add('active');
+          }
+        });
+      } else {
+        // Set first link as active by default
+        if (navLinks.length > 0) {
+          navLinks[0].classList.add('active');
+        }
+      }
+    });

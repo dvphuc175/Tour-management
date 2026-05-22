@@ -285,7 +285,7 @@ async function countPublic({
 }
 
 
-// Public: lấy tour nổi bật cho trang chủ
+// Public: lấy tour nổi bật cho trang chủ (sắp xếp theo đánh giá và số đơn đặt)
 async function getFeatured(limit = 6) {
   const sql = `
     SELECT
@@ -298,7 +298,8 @@ async function getFeatured(limit = 6) {
       MIN(s.start_date) AS next_departure,
       SUM(s.available_slots) AS total_available,
       rv_stats.avg_rating,
-      COALESCE(rv_stats.review_count, 0) AS review_count
+      COALESCE(rv_stats.review_count, 0) AS review_count,
+      COALESCE(bk_stats.booking_count, 0) AS booking_count
     FROM TOURS t
     LEFT JOIN CATEGORIES c
       ON t.category_id = c.id
@@ -313,9 +314,18 @@ async function getFeatured(limit = 6) {
       FROM REVIEWS
       GROUP BY tour_id
     ) rv_stats ON rv_stats.tour_id = t.id
+    LEFT JOIN (
+      SELECT s.tour_id, COUNT(b.id) AS booking_count
+      FROM BOOKINGS b
+      JOIN TOUR_SCHEDULES s ON b.schedule_id = s.id
+      GROUP BY s.tour_id
+    ) bk_stats ON bk_stats.tour_id = t.id
     WHERE t.status = 'active'
     GROUP BY t.id
-    ORDER BY t.created_at DESC
+    ORDER BY 
+      COALESCE(rv_stats.avg_rating, 0) DESC,
+      COALESCE(bk_stats.booking_count, 0) DESC,
+      t.created_at DESC
     LIMIT ${Number(limit)}
   `;
 

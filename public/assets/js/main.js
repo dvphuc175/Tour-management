@@ -1,4 +1,4 @@
-// Navbar mobile menu
+// Navbar mobile menu + scroll state
 (function initNavbar() {
   const navbar = document.querySelector('.navbar');
   const toggle = document.querySelector('.navbar__toggle');
@@ -37,16 +37,55 @@
   window.addEventListener('resize', () => {
     if (window.innerWidth > 991) closeMenu();
   });
+
+  // Navbar scroll state
+  const updateNavbarScrollState = () => {
+    if (window.scrollY > 10) {
+      navbar.classList.add('is-scrolled');
+    } else {
+      navbar.classList.remove('is-scrolled');
+    }
+  };
+  updateNavbarScrollState();
+  window.addEventListener('scroll', updateNavbarScrollState);
 })();
 
-// Flash message: tự động ẩn sau 4 giây
-document.querySelectorAll('.flash').forEach(el => {
-  setTimeout(() => {
-    el.style.transition = 'opacity .4s';
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 400);
-  }, 4000);
-});
+// Flash messages: auto hide and close button
+(function initFlashMessages() {
+  const flashContainers = document.querySelectorAll('.flash');
+  
+  flashContainers.forEach(flashContainer => {
+    const flashItems = flashContainer.querySelectorAll('.flash__item');
+    
+    flashItems.forEach(item => {
+      // Auto hide after 5 seconds
+      const autoHideTimeout = setTimeout(() => {
+        closeFlashItem(item);
+      }, 5000);
+      
+      // Close button click
+      const closeBtn = item.querySelector('.flash__close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          clearTimeout(autoHideTimeout);
+          closeFlashItem(item);
+        });
+      }
+    });
+  });
+  
+  function closeFlashItem(item) {
+    item.classList.add('is-closing');
+    setTimeout(() => {
+      item.remove();
+      // If container is empty, remove it
+      const container = item.closest('.flash');
+      if (container && container.querySelectorAll('.flash__item').length === 0) {
+        container.remove();
+      }
+    }, 300);
+  }
+})();
 
 // Confirm khi xóa / hủy
 document.querySelectorAll('[data-confirm]').forEach(form => {
@@ -836,5 +875,25 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
   const reviewsSection = document.getElementById('reviews');
   if (reviewsSection) {
     reviewsSection.addEventListener('click', handleReviewsPaginationClick);
+  }
+})();
+
+// Contact page: Toggle admin info
+(function initContactToggle() {
+  const toggleBtn = document.getElementById('toggleAdminInfo');
+  const adminInfo = document.getElementById('adminContactInfo');
+  
+  if (toggleBtn && adminInfo) {
+    toggleBtn.addEventListener('click', () => {
+      adminInfo.classList.toggle('show');
+      
+      // Update button text and icon
+      const icon = toggleBtn.querySelector('i');
+      if (adminInfo.classList.contains('show')) {
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ẩn thông tin quản trị viên & Hotline';
+      } else {
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Hiển thị thông tin quản trị viên & Hotline';
+      }
+    });
   }
 })();
