@@ -102,31 +102,12 @@ app.use((req, res, next) => {
       year: 'numeric'
     });
   res.locals.renderStars = (rating) => {
-    const r = Math.min(5, Math.max(0, Number(rating) || 0));
-    const full = Math.floor(r);
-    const half = r - full >= 0.5 ? 1 : 0;
+    const full  = Math.floor(rating);
+    const half  = rating - full >= 0.5 ? 1 : 0;
     const empty = 5 - full - half;
-    let html = '';
-    for (let i = 0; i < full; i++) {
-      html += '<i class="fa-solid fa-star stars-fa stars-fa--full" aria-hidden="true"></i>';
-    }
-    if (half) {
-      html += '<i class="fa-solid fa-star-half-stroke stars-fa stars-fa--half" aria-hidden="true"></i>';
-    }
-    for (let i = 0; i < empty; i++) {
-      html += '<i class="fa-regular fa-star stars-fa stars-fa--empty" aria-hidden="true"></i>';
-    }
-    return html;
-  };
-  res.locals.renderStarRating = (rating) => {
-    const n = Math.min(5, Math.max(0, Math.round(Number(rating) || 0)));
-    let html = '';
-    for (let i = 1; i <= 5; i++) {
-      html += i <= n
-        ? '<i class="fa-solid fa-star stars-fa stars-fa--full" aria-hidden="true"></i>'
-        : '<i class="fa-regular fa-star stars-fa stars-fa--empty" aria-hidden="true"></i>';
-    }
-    return html;
+    return '★'.repeat(full)
+        + (half ? '⯨' : '')
+        + '☆'.repeat(empty);
   };
     next(); });
 

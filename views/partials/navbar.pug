@@ -1,34 +1,24 @@
 nav.navbar
-  .navbar__inner
-    .navbar__brand
-      a(href="/").navbar__logo Vi Vu Việt Nam
+  .navbar__brand
+    a(href="/").title Vi Vu Việt Nam
+    
 
-    button.navbar__toggle(
-      type="button"
-      aria-label="Mở menu"
-      aria-expanded="false"
-      aria-controls="navbar-panel"
-    )
-      span.navbar__toggle-bar
-      span.navbar__toggle-bar
-      span.navbar__toggle-bar
+  .navbar__menu
+    a(href="/tours") Khám phá tour
+    a(href="/my-bookings") Đơn của tôi
+    a(href="/") Liên hệ
 
-    #navbar-panel.navbar__panel
-      .navbar__menu
-        a(href="/tours" class=(currentPath && currentPath.startsWith('/tours')) ? 'navbar__link--active' : '') Khám phá tour
-        a(href="/my-bookings" class=currentPath === '/my-bookings' ? 'navbar__link--active' : '') Đơn của tôi
-        a(href="#contact") Liên hệ
+  .navbar__auth
+    if user
+      span.navbar__user Xin chào, #{user.fullname}
+      if user.role === 'admin'
+        a(href="/admin") Admin
+      form(action="/logout?_method=DELETE" method="POST" style="display:inline")
+        input(type="hidden" name="_csrf" value=csrfToken)
+        button.btn.btn--outline.btn--sm(type="submit") Đăng xuất
+    else
+      a(href="/login") Đăng nhập
+      a.btn.btn--primary(href="/register") Đăng ký
 
-      .navbar__auth
-        if user
-          span.navbar__user Xin chào, #{user.fullname}
-          if user.role === 'admin'
-            a.btn.btn--outline.btn--sm(href="/admin") Admin
-          form.form--inline(action="/logout?_method=DELETE" method="POST")
-            input(type="hidden" name="_csrf" value=csrfToken)
-            button.btn.btn--outline.btn--sm(type="submit") Đăng xuất
-        else
-          a.navbar__link(href="/login") Đăng nhập
-          a.btn.btn--primary.btn--sm(href="/register") Đăng ký
 
-  .navbar__backdrop(aria-hidden="true")
+    

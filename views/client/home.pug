@@ -3,8 +3,8 @@ extends ../layout
 block content
 
 	//- ── Hero ─────────────────────────────────
-	section.hero.hero--home
-		.hero__content.container
+	section.hero
+		.hero__content
 			h1.hero__title Khám phá Việt Nam theo cách của bạn
 			p.hero__sub Hàng trăm tour chất lượng — đặt dễ, đi vui
 			form.hero__search(action="/tours" method="GET")
@@ -12,47 +12,36 @@ block content
 					type="text" name="search"
 					placeholder="Tìm tour, điểm đến..."
 				)
-				button.btn.btn--accent(type="submit")
-					+fa('search')
-					|  Tìm kiếm
-
+				button.btn.btn--accent(type="submit") Tìm kiếm
 
 	//- ── Danh mục ─────────────────────────────
-	section.section.section--gray
+	section.section
 		.container
-			.section-header.section-header--centered
-				h2.section__title Danh mục tour
-				p.section__subtitle Khám phá theo sở thích của bạn
+			h2.section__title Danh mục tour
 			.category-grid
 				each cat in categories
 					a.category-card(href=`/tours?category=${cat.id}`)
 						span.category-card__name= cat.name
 
 	//- ── Tour nổi bật ─────────────────────────
-	section.section#homeTourSection
+	section.section.section--gray
 		.container
 			.section-header
 				h2.section__title Tour nổi bật
-				a.section__link(href="/tours")
-					| Xem tất cả 
-					+fa('chevron-right')
-			.tour-grid#homeTourGrid
+				a.section__link(href="/tours") Xem tất cả →
+			.tour-grid
 				each tour in tours
 					include ../partials/tour-card
 
 			//- Phân trang
 			if totalPages > 1
-				.pagination#homePagination
+				.pagination
 					if currentPage > 1
-						a.pagination__item(href=`/?page=${currentPage-1}`)
-							+fa('chevron-left')
-							|  Trước
+						a.pagination__item(href=`/?page=${currentPage-1}`) ← Trước
 					each p in Array.from({length: totalPages}, (_, i) => i + 1)
 						a(
 							href=`/?page=${p}`
 							class=`pagination__item${p === currentPage ? ' active' : ''}`
 						)= p
 					if currentPage < totalPages
-						a.pagination__item(href=`/?page=${currentPage+1}`)
-							| Tiếp 
-							+fa('chevron-right')
+						a.pagination__item(href=`/?page=${currentPage+1}`) Tiếp →
