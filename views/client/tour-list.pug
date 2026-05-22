@@ -55,34 +55,30 @@ block content
 					a.btn.btn--outline.btn--block(href="/tours") Xóa bộ lọc
 
 			//- Main content
-			.tour-list-main#tourListContainer
+			.tour-list-main
 				.tour-list-header
-					p.tour-count#tourCount Tìm thấy #{totalTours} tour
+					p.tour-count Tìm thấy #{totalTours} tour
 
 				if tours.length === 0
-					.empty-state#tourEmptyState
+					.empty-state
 						p Không tìm thấy tour phù hợp.
 						a.btn.btn--outline(href="/tours") Xem tất cả tour
 
 				else
-					.tour-grid-list#tourGrid
+					.tour-grid
 						each tour in tours
 							include ../partials/tour-card
 
 					//- Phân trang
 					if totalPages > 1
-						.pagination#paginationContainer
+						.pagination
 							- const base = `/tours?search=${query.search||''}&category=${query.category||''}&min_price=${query.min_price||''}&max_price=${query.max_price||''}`
 							if currentPage > 1
-								a.pagination__item(href=`${base}&page=${currentPage-1}`)
-									+fa('chevron-left')
-									|  Trước
+								a.pagination__item(href=`${base}&page=${currentPage-1}`) ← Trước
 							each p in Array.from({length: totalPages}, (_, i) => i + 1)
 								a(
 									href=`${base}&page=${p}`
 									class=`pagination__item${p === currentPage ? ' active' : ''}`
 								)= p
 							if currentPage < totalPages
-								a.pagination__item(href=`${base}&page=${currentPage+1}`)
-									| Tiếp 
-									+fa('chevron-right')
+								a.pagination__item(href=`${base}&page=${currentPage+1}`) Tiếp →

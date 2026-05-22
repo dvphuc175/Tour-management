@@ -3,8 +3,7 @@ extends ../layout
 block content
   .container
     .success-page
-      .success-icon
-        +fa('check')
+      .success-icon ✓
       h1.success-title Đặt tour thành công!
       p.success-sub Đơn đặt ##{booking.id} đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận sớm nhất.
 
@@ -29,14 +28,13 @@ block content
           strong
             span.badge.badge--pending Chờ xác nhận
         if booking.payment_method === 'cash'
-          .info-box.info-box--cash-page
-            p
-              +fa('info')
-              |  Đơn đặt của bạn đang chờ xác nhận.
-            p
-              | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
-              strong 24 giờ.
-              |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
+        .info-box(style="background:#d1ecf1; border-left:4px solid #17a2b8; padding:12px 16px; margin:16px 0; border-radius:4px;")
+          p(style="font-weight:bold; margin-bottom:8px; color:#0c5460;")
+            | ℹ️ Đơn đặt của bạn đang chờ xác nhận.
+          p(style="margin:0; color:#0c5460;")
+            | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
+            strong 24 giờ.
+            |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.    
       .success-actions
         a.btn.btn--primary(href="/my-bookings") Xem đơn của tôi
         a.btn.btn--outline(href="/tours") Khám phá thêm tour

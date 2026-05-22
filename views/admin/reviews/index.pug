@@ -15,19 +15,20 @@ block content
       tbody
         if reviews.length === 0
           tr
-            td.table-empty(colspan="6") Chưa có đánh giá nào
+            td(colspan="6" style="text-align:center;padding:32px;color:#9ca3af") Chưa có đánh giá nào
         each rv in reviews
           tr
             td= rv.tour_name
             td= rv.user_name
-            td.stars-display!= renderStarRating(rv.rating)
+            td.stars-display= '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating)
             td.review-comment= rv.comment || '—'
             td= formatDate(rv.created_at)
             td
-              form.form--inline(
+              form(
                 action=`/admin/reviews/${rv.id}?_method=DELETE`
                 method="POST"
                 data-confirm="Xóa đánh giá này?"
+                style="display:inline"
               )
                 input(type="hidden" name="_csrf" value=csrfToken)
                 button.btn.btn--danger.btn--sm(type="submit") Xóa

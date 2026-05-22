@@ -5,8 +5,7 @@ block content
     .result-page
 
       if success
-        .result-icon.result-icon--success
-          +fa('check')
+        .result-icon.result-icon--success ✓
         h1.result-title Thanh toán thành công!
         p.result-sub= message
         if amount
@@ -16,8 +15,7 @@ block content
           a.btn.btn--outline(href="/tours") Khám phá tour khác
 
       else
-        .result-icon.result-icon--fail
-          +fa('xmark')
+        .result-icon.result-icon--fail ✕
         h1.result-title Thanh toán thất bại
         p.result-sub= message
         .result-actions

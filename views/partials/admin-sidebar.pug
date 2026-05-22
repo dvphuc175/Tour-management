@@ -1,37 +1,30 @@
 - var isAdminRole = user && user.role === 'admin'
 aside.admin-sidebar
   .sidebar__logo
-    a(href="/admin")
-      +fa('plane')
-      |  Tour Admin
+    a(href="/admin") &#9992; Tour Admin
 
   nav.sidebar__nav
     a(href="/admin" class=currentPath === '/admin' ? 'active' : '')
-      +fa('chart')
-      |  Dashboard
+      | Dashboard
     if isAdminRole
       a(href="/admin/tours" class=(currentPath && currentPath.startsWith('/admin/tours')) ? 'active' : '')
-        +fa('map')
-        |  Quản lý tour & lịch trình
+        | Quản lý tour & lịch trình
       a(href="/admin/categories" class=(currentPath && currentPath.startsWith('/admin/categories')) ? 'active' : '')
-        +fa('folder')
-        |  Danh mục
+        | Danh mục
     a(href="/admin/bookings" class=(currentPath && currentPath.startsWith('/admin/bookings')) ? 'active' : '')
-      +fa('ticket')
-      |  Đơn đặt tour
+      | Đơn đặt tour
     if isAdminRole
       a(href="/admin/users" class=(currentPath && currentPath.startsWith('/admin/users')) ? 'active' : '')
-        +fa('users')
-        |  Người dùng
+        | Người dùng
       a(href="/admin/reviews" class=(currentPath && currentPath.startsWith('/admin/reviews')) ? 'active' : '')
-        +fa('star')
-        |  Đánh giá
+        | Đánh giá
       a(href="/admin/reports" class=currentPath === '/admin/reports' ? 'active' : '')
-        +fa('chart-pie')
-        |  Báo cáo
+        | Báo cáo
   .sidebar__footer
     a.sidebar__link.sidebar__link--ghost(href="/")
-      +fa('house')
+      svg.sidebar__icon(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+        path(d="M3 12l9-9 9 9")
+        path(d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10")
       span Xem trang web
     if user
       .sidebar__user
@@ -42,5 +35,8 @@ aside.admin-sidebar
     form.sidebar__logout(action="/logout?_method=DELETE" method="POST" data-confirm="Bạn chắc chắn muốn đăng xuất?")
       input(type="hidden" name="_csrf" value=csrfToken)
       button.sidebar__logout-btn(type="submit")
-        +fa('logout')
+        svg.sidebar__icon(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+          path(d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4")
+          polyline(points="16 17 21 12 16 7")
+          line(x1="21" y1="12" x2="9" y2="12")
         span Đăng xuất

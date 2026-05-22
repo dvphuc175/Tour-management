@@ -2,4 +2,3 @@ node_modules/
 .env 
 *.log
 database/seed.sql
-ui_ux_redesign_plan.md
