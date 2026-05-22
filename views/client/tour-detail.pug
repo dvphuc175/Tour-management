@@ -283,6 +283,25 @@ block content
             strong ĐẶT GIỮ CHỖ NGAY
             small Đặt ngay ngày #{formatDate(nearestSchedule.start_date)}
 
+  .mobile-booking-bar
+    if schedules.length === 0
+      .mobile-booking-bar__price
+        span Lịch trình
+        strong Chưa có ngày đi
+      a.btn.btn--outline.btn--sm(href="/tours") Xem tour khác
+    else
+      - const mobileSchedule = schedules[0]
+      .mobile-booking-bar__price
+        span Giá từ
+        strong= formatPrice(tour.price_adult)
+        small #{formatDate(mobileSchedule.start_date)} · #{mobileSchedule.available_slots} chỗ
+      .mobile-booking-bar__actions
+        button.btn.btn--outline.btn--sm(type="button" onclick="openScheduleModal()") Lịch đi
+        if mobileSchedule.available_slots > 0
+          a.btn.btn--primary.btn--sm(href=`/booking/${mobileSchedule.id}`) Đặt ngay
+        else
+          button.btn.btn--outline.btn--sm(type="button" disabled) Đã đầy
+
   #scheduleModal.modal
     .modal-content
       .modal-header
@@ -326,17 +345,30 @@ block content
 block scripts
   script(src="/assets/js/tour-gallery.js")
   script.
+    const scheduleModal = document.getElementById('scheduleModal');
+
     function openScheduleModal() {
-      document.getElementById('scheduleModal').classList.add('show');
+      if (!scheduleModal) return;
+      scheduleModal.classList.add('show');
       document.body.style.overflow = 'hidden'; 
     }
+
     function closeScheduleModal() {
-      document.getElementById('scheduleModal').classList.remove('show');
-      document.body.style.overflow = 'auto';
+      if (!scheduleModal) return;
+      scheduleModal.classList.remove('show');
+      document.body.style.overflow = '';
     }
-    window.onclick = function(event) {
-      const modal = document.getElementById('scheduleModal');
-      if (event.target == modal) {
+
+    if (scheduleModal) {
+      scheduleModal.addEventListener('click', function(event) {
+        if (event.target === scheduleModal) {
+          closeScheduleModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && scheduleModal && scheduleModal.classList.contains('show')) {
         closeScheduleModal();
       }
-    }
+    });

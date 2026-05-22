@@ -3,6 +3,7 @@
   const navbar = document.querySelector('.navbar');
   const toggle = document.querySelector('.navbar__toggle');
   const backdrop = document.querySelector('.navbar__backdrop');
+  const closeButton = document.querySelector('[data-navbar-close]');
   if (!navbar || !toggle) return;
 
   const closeMenu = () => {
@@ -23,6 +24,7 @@
   });
 
   backdrop?.addEventListener('click', closeMenu);
+  closeButton?.addEventListener('click', closeMenu);
 
   navbar.querySelectorAll('.navbar__menu a, .navbar__auth a').forEach(link => {
     link.addEventListener('click', () => {

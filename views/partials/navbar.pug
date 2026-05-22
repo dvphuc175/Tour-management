@@ -14,6 +14,11 @@ nav.navbar
       span.navbar__toggle-bar
 
     #navbar-panel.navbar__panel
+      .navbar__panel-head
+        span.navbar__panel-title Menu
+        button.navbar__close(type="button" data-navbar-close aria-label="Đóng menu")
+          +fa('xmark')
+
       .navbar__menu
         a(href="/tours" class=(currentPath && currentPath.startsWith('/tours')) ? 'navbar__link--active' : '') Khám phá tour
         a(href="/my-bookings" class=currentPath === '/my-bookings' ? 'navbar__link--active' : '') Đơn của tôi

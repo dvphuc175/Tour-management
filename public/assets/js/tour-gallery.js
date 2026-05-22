@@ -219,6 +219,28 @@ document.addEventListener('DOMContentLoaded', function() {
 			nextImage();
 		}
 	});
+
+	const mainImg = document.getElementById('mainImg');
+	if (mainImg) {
+		let touchStartX = 0;
+		let touchStartY = 0;
+
+		mainImg.addEventListener('touchstart', function(e) {
+			const touch = e.changedTouches[0];
+			touchStartX = touch.clientX;
+			touchStartY = touch.clientY;
+		}, { passive: true });
+
+		mainImg.addEventListener('touchend', function(e) {
+			const touch = e.changedTouches[0];
+			const deltaX = touch.clientX - touchStartX;
+			const deltaY = touch.clientY - touchStartY;
+
+			if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+			if (deltaX > 0) prevImage();
+			else nextImage();
+		}, { passive: true });
+	}
 });
 
 // Initialize itinerary accordion
