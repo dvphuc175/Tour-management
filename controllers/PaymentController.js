@@ -49,13 +49,24 @@ const PaymentController = {
   // GET /payment/vnpay/return 
   async vnpayReturn(req, res, next) {
     try {
-      const verify    = vnpay.verifyReturnUrl(req.query);
       const txnRef    = req.query.vnp_TxnRef || '';
       
       const bookingId = txnRef.split('_')[0];
 
       if (!bookingId) {
         return res.render('client/payment-result', { title: 'Kết quả thanh toán', success: false, message: 'Mã đơn hàng không hợp lệ' });
+      }
+
+      let verify;
+      try {
+        verify = vnpay.verifyReturnUrl(req.query);
+      } catch (verifyErr) {
+        return res.render('client/payment-result', {
+          title: 'Thanh toán thất bại',
+          success: false,
+          message: 'Thông tin thanh toán không hợp lệ',
+          bookingId
+        });
       }
 
       if (!verify.isVerified || !verify.isSuccess) {
