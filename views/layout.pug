@@ -36,6 +36,15 @@ html(lang="vi")
             .flash__content= msg
             button.flash__close(type="button" aria-label="Đóng")
               i.fas.fa-times
+    if info && info.length
+      .flash.flash--info
+        each msg in info
+          .flash__item
+            .flash__icon
+              i.fas.fa-info-circle
+            .flash__content= msg
+            button.flash__close(type="button" aria-label="Đóng")
+              i.fas.fa-times
 
     main.main-content
       block content
