@@ -10,47 +10,7 @@ const sanitizeHtml = require('sanitize-html');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const { csrf } = require('./middlewares/csrf');
-const bookingStatus = require('./utils/bookingStatus');
 const app = express()
-
-const FLASH_DEFAULTS = {
-  success: { title: 'Thành công', icon: 'check' },
-  error: { title: 'Không thể thực hiện', icon: 'warning' },
-  info: { title: 'Thông báo', icon: 'info' }
-};
-
-function normalizeFlashMessage(type, value) {
-  const defaults = FLASH_DEFAULTS[type] || FLASH_DEFAULTS.info;
-
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return {
-      type,
-      title: value.title || defaults.title,
-      message: value.message || value.text || '',
-      details: Array.isArray(value.details) ? value.details : [],
-      icon: value.icon || defaults.icon,
-      action: value.action || null,
-      actions: Array.isArray(value.actions) ? value.actions : []
-    };
-  }
-
-  return {
-    type,
-    title: defaults.title,
-    message: String(value || ''),
-    details: [],
-    icon: defaults.icon,
-    action: null,
-    actions: []
-  };
-}
-
-function collectFlashMessages(req) {
-  return ['success', 'info', 'error'].flatMap((type) =>
-    req.flash(type).map((msg) => normalizeFlashMessage(type, msg))
-  );
-}
-
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
@@ -83,37 +43,11 @@ app.use(session({
 }));
 
 app.use(flash());
-app.use((req, res, next) => {
-  const redirect = res.redirect.bind(res);
-  const render = res.render.bind(res);
-
-  res.locals.success = [];
-  res.locals.error = [];
-  res.locals.info = [];
-  res.locals.flashMessages = [];
-  res.locals.user = req.session.user || null;
-  res.locals.currentPath = req.path;
-
-  res.redirect = (...args) => {
-    if (!req.session || typeof req.session.save !== 'function') {
-      return redirect(...args);
-    }
-
-    return req.session.save((err) => {
-      if (err) return next(err);
-      return redirect(...args);
-    });
-  };
-
-  res.render = (...args) => {
-    res.locals.flashMessages = collectFlashMessages(req);
-    return render(...args);
-  };
-
-  next();
-});
 app.use(csrf);
 app.use((req, res, next) => { 
+    res.locals.success = req.flash('success'); 
+    res.locals.error = req.flash('error'); 
+    res.locals.info = req.flash('info');
     res.locals.user = req.session.user || null; 
     res.locals.currentPath = req.path;
 
@@ -168,14 +102,32 @@ app.use((req, res, next) => {
       year: 'numeric'
     });
   res.locals.renderStars = (rating) => {
-    const full  = Math.floor(rating);
-    const half  = rating - full >= 0.5 ? 1 : 0;
+    const r = Math.min(5, Math.max(0, Number(rating) || 0));
+    const full = Math.floor(r);
+    const half = r - full >= 0.5 ? 1 : 0;
     const empty = 5 - full - half;
-    return '★'.repeat(full)
-        + (half ? '⯨' : '')
-        + '☆'.repeat(empty);
+    let html = '';
+    for (let i = 0; i < full; i++) {
+      html += '<i class="fa-solid fa-star stars-fa stars-fa--full" aria-hidden="true"></i>';
+    }
+    if (half) {
+      html += '<i class="fa-solid fa-star-half-stroke stars-fa stars-fa--half" aria-hidden="true"></i>';
+    }
+    for (let i = 0; i < empty; i++) {
+      html += '<i class="fa-regular fa-star stars-fa stars-fa--empty" aria-hidden="true"></i>';
+    }
+    return html;
   };
-  res.locals.bookingStatus = bookingStatus;
+  res.locals.renderStarRating = (rating) => {
+    const n = Math.min(5, Math.max(0, Math.round(Number(rating) || 0)));
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= n
+        ? '<i class="fa-solid fa-star stars-fa stars-fa--full" aria-hidden="true"></i>'
+        : '<i class="fa-regular fa-star stars-fa stars-fa--empty" aria-hidden="true"></i>';
+    }
+    return html;
+  };
     next(); });
 
 app.use('/', require('./routes/auth'));

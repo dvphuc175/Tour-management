@@ -3,7 +3,6 @@ const ScheduleModel = require('../models/ScheduleModel');
 const TourModel = require('../models/TourModel');
 const { bookingSchema } = require('../validators/bookingSchema');
 const EmailService = require('../services/emailService');
-const bookingStatus = require('../utils/bookingStatus');
 const BookingController = {
 
   //GET/booking/:scheduleId
@@ -15,23 +14,14 @@ const BookingController = {
       const schedule = await ScheduleModel.findById(scheduleId);
 
       if (!schedule) {
-        req.flash('error', {
-          title: 'Không tìm thấy lịch trình',
-          message: 'Lịch trình bạn chọn không còn tồn tại. Vui lòng chọn một lịch trình khác.',
-          icon: 'warning',
-          action: { label: 'Xem tour', href: '/tours' }
-        });
+        req.flash('error', 'Lịch trình không tồn tại');
         return res.redirect('/tours');
       }
 
       const tour = await TourModel.findById(schedule.tour_id);
       
       if (schedule.status !== 'active' || schedule.available_slots === 0) {
-        req.flash('error', {
-          title: 'Lịch trình không khả dụng',
-          message: 'Lịch trình này không còn chỗ hoặc đã bị hủy. Vui lòng chọn ngày khởi hành khác.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Lịch trình không còn chỗ hoặc đã bị hủy');
         return res.redirect(tour ? `/tours/${tour.slug}` : '/tours');
       }
 
@@ -56,11 +46,7 @@ const BookingController = {
       const { error, value } = bookingSchema.validate(req.body, { abortEarly: true });
 
       if (error) {
-        req.flash('error', {
-          title: 'Thông tin đặt tour chưa hợp lệ',
-          message: error.details[0].message,
-          icon: 'warning'
-        });
+        req.flash('error', error.details[0].message);
         return res.redirect(`/booking/${req.body.schedule_id || ''}`);
       }
 
@@ -72,12 +58,7 @@ const BookingController = {
 
       const schedule = await ScheduleModel.findById(schedule_id);
       if (!schedule) {
-        req.flash('error', {
-          title: 'Không tìm thấy lịch trình',
-          message: 'Lịch trình bạn chọn không còn tồn tại. Vui lòng chọn một lịch trình khác.',
-          icon: 'warning',
-          action: { label: 'Xem tour', href: '/tours' }
-        });
+        req.flash('error', 'Lịch trình không tồn tại');
         return res.redirect('/tours');
       }
 
@@ -87,11 +68,7 @@ const BookingController = {
       const diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
 
       if (diffDays < 3) {
-        req.flash('error', {
-          title: 'Ngày khởi hành quá gần',
-          message: 'Vui lòng chọn lịch trình khác cách ngày khởi hành ít nhất 3 ngày.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Lịch trình này quá gần ngày khởi hành. Vui lòng chọn lịch trình khác cách ít nhất 3 ngày.');
         return res.redirect(`/tours/${schedule.tour_slug || 'tours'}`);
       }
 
@@ -115,24 +92,12 @@ const BookingController = {
       if (payment_method === 'vnpay') {
         return res.redirect(`/payment/vnpay/${bookingId}`);
       } else {
-        req.flash('success', {
-          title: 'Đặt tour thành công',
-          message: `Đơn #${bookingId} đã được ghi nhận. Vui lòng chờ nhân viên xác nhận thanh toán tiền mặt.`,
-          icon: 'receipt',
-          actions: [
-            { label: 'Xem đơn đặt', href: `/my-bookings/${bookingId}` },
-            { label: 'Đơn của tôi', href: '/my-bookings' }
-          ]
-        });
+        req.flash('success', 'Đặt tour thành công! Vui lòng chờ xác nhận.');
         return res.redirect(`/booking/success/${bookingId}`);
       }
 
     } catch (err) {
-      req.flash('error', {
-        title: 'Không thể tạo đơn đặt tour',
-        message: err.message,
-        icon: 'warning'
-      });
+      req.flash('error', err.message);
       const backUrl = req.body.schedule_id ? `/booking/${req.body.schedule_id}` : '/tours';
       res.redirect(backUrl);
     }
@@ -175,8 +140,17 @@ const BookingController = {
         } catch {
           b.tour_images = [];
         }
-        return bookingStatus.decorateBooking(b);
+        return b;
       });
+
+      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+        return res.json({
+          bookings: parsedBookings,
+          currentPage: page,
+          totalPages: result.totalPages,
+          total: result.total
+        });
+      }
 
       return res.render('client/my-bookings', {
         title: 'Đơn đặt của tôi',
@@ -200,11 +174,7 @@ const BookingController = {
       );
 
       if (!booking) {
-        req.flash('error', {
-          title: 'Không tìm thấy đơn đặt',
-          message: 'Đơn đặt này không tồn tại hoặc không thuộc tài khoản của bạn.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không tìm thấy đơn đặt');
         return res.redirect('/my-bookings');
       }
 
@@ -228,11 +198,7 @@ const BookingController = {
       );
 
       if (!booking) {
-        req.flash('error', {
-          title: 'Không tìm thấy đơn đặt',
-          message: 'Đơn đặt này không tồn tại hoặc không thuộc tài khoản của bạn.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không tìm thấy đơn đặt');
       } else {
         await BookingModel.cancelByUser(bookingId, req.session.user.id);
 
@@ -245,20 +211,11 @@ const BookingController = {
           ).catch(console.error);
         }
 
-        req.flash('success', {
-          title: 'Đã hủy đơn đặt',
-          message: `Đơn #${bookingId} đã được hủy và số chỗ đã được hoàn lại cho lịch trình.`,
-          icon: 'check',
-          action: { label: 'Xem đơn của tôi', href: '/my-bookings' }
-        });
+        req.flash('success', 'Đã hủy đơn đặt thành công.');
       }
 
     } catch (err) {
-      req.flash('error', {
-        title: 'Không thể hủy đơn',
-        message: err.message || 'Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu lỗi vẫn tiếp diễn.',
-        icon: 'warning'
-      });
+      req.flash('error', err.message || 'Không thể hủy đơn. Vui lòng thử lại.');
     }
 
     const referer = req.get('Referer') || '';

@@ -106,11 +106,7 @@ async detail(req, res, next) {
       const booking = rows[0];
 
       if (!booking) {
-        req.flash('error', {
-          title: 'Không tìm thấy đơn đặt',
-          message: 'Đơn đặt này không tồn tại hoặc đã bị xóa.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không tìm thấy đơn đặt');
         return res.redirect('/admin/bookings');
       }
 
@@ -146,21 +142,13 @@ async detail(req, res, next) {
 
       if (b.status === 'cancelled') {
         await conn.commit();
-        req.flash('info', {
-          title: 'Đơn đã được hủy',
-          message: `Đơn #${b.id} đã ở trạng thái hủy trước đó.`,
-          icon: 'info'
-        });
+        req.flash('info', 'Đơn đã được hủy trước đó');
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
       if (b.status === 'completed') {
         await conn.commit();
-        req.flash('error', {
-          title: 'Không thể hủy đơn',
-          message: 'Đơn đã hoàn thành không thể chuyển sang trạng thái hủy.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không thể hủy đơn đã hoàn thành');
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
@@ -202,13 +190,9 @@ async detail(req, res, next) {
 
       req.flash(
         'success',
-        {
-          title: 'Đã hủy đơn đặt',
-          message: wasConfirmed
-            ? 'Trạng thái thanh toán đã chuyển sang "Đã hoàn tiền". Vui lòng xử lý hoàn tiền thủ công cho khách.'
-            : `Đơn #${b.id} đã được hủy và số chỗ đã được hoàn lại.`,
-          icon: 'check'
-        }
+        wasConfirmed
+          ? 'Đã hủy đơn. Trạng thái thanh toán chuyển sang "Đã hoàn tiền" — vui lòng xử lý hoàn tiền thủ công cho khách.'
+          : 'Đã hủy đơn đặt'
       );
       return res.redirect(`/admin/bookings/${req.params.id}`);
 
@@ -234,11 +218,7 @@ async detail(req, res, next) {
       );
       if (!rows[0]) {
         await conn.rollback();
-        req.flash('error', {
-          title: 'Không thể xác nhận đơn',
-          message: 'Đơn không hợp lệ, không ở trạng thái chờ hoặc không phải thanh toán tiền mặt.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không thể xác nhận: đơn không hợp lệ hoặc không phải thanh toán tiền mặt');
         return res.redirect(`/admin/bookings/${bookingId}`);
       }
 
@@ -251,11 +231,7 @@ async detail(req, res, next) {
       if (bookingData.contact_email) {
         EmailService.sendSuccessEmail(bookingId, bookingData.contact_email, bookingData.contact_name).catch(console.error);
       }
-      req.flash('success', {
-        title: 'Đã xác nhận đơn',
-        message: `Đơn #${bookingId} đã được xác nhận và ghi nhận thanh toán tiền mặt.`,
-        icon: 'receipt'
-      });
+      req.flash('success', 'Đã xác nhận đơn và ghi nhận thanh toán tiền mặt');
       res.redirect(`/admin/bookings/${bookingId}`);
     } catch (err) {
       await conn.rollback(); next(err);
@@ -278,20 +254,12 @@ async detail(req, res, next) {
       const bookingData = rows[0] || null;
 
       if (!bookingData) {
-        req.flash('error', {
-          title: 'Không tìm thấy đơn hàng',
-          message: 'Đơn hàng này không tồn tại hoặc đã bị xóa.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không tìm thấy đơn hàng.');
         return res.redirect('/admin/bookings');
       }
 
       if (bookingData.status !== 'confirmed') {
-        req.flash('error', {
-          title: 'Không thể hoàn thành đơn',
-          message: 'Chỉ có thể đánh dấu hoàn thành các đơn đã được xác nhận.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Chỉ có thể hoàn thành các đơn đã được xác nhận.');
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
@@ -299,11 +267,7 @@ async detail(req, res, next) {
       const startDate = new Date(bookingData.start_date);
 
       if (now < startDate) {
-        req.flash('error', {
-          title: 'Tour chưa khởi hành',
-          message: 'Không thể đánh dấu hoàn thành trước ngày khởi hành.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Tour này chưa khởi hành! Không thể đánh dấu hoàn thành sớm.');
         return res.redirect(`/admin/bookings/${req.params.id}`);
       }
 
@@ -315,11 +279,7 @@ async detail(req, res, next) {
         ).catch(console.error);
       }
 
-      req.flash('success', {
-        title: 'Đã hoàn thành đơn',
-        message: `Đơn #${bookingId} đã được đánh dấu hoàn thành.`,
-        icon: 'check'
-      });
+      req.flash('success', 'Đã đánh dấu hoàn thành đơn đặt tour!');
       res.redirect(`/admin/bookings/${req.params.id}`);
     } catch (err) {
       next(err);

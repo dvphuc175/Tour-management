@@ -5,15 +5,18 @@ block content
   .toolbar
     .filter-tabs
       a(href="/admin/bookings" class=(!currentStatus && !currentPayment)?'filter-tab active':'filter-tab') Tất cả
-      each s in bookingStatus.bookingStatusKeys
+      //- each s in bookingStatus.bookingStatusKeys
+      each s in ['pending','confirmed','cancelled','completed']
         a(
           href=`/admin/bookings?status=${s}`
           class=(currentStatus===s && !currentPayment)?'filter-tab active':'filter-tab'
-        )= bookingStatus.bookingStatusLabel(s)
+        )= {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[s]
+        //- )= bookingStatus.bookingStatusLabel(s)
       a(
         href="/admin/bookings?payment=refunded"
         class=currentPayment==='refunded'?'filter-tab active':'filter-tab'
-      )= bookingStatus.paymentStatusLabel('refunded')
+      ) Đã hoàn tiền
+      //- )= bookingStatus.paymentStatusLabel('refunded')
 
   .table-wrap
     table.data-table
@@ -27,11 +30,11 @@ block content
           th Đặt cọc
           th Phương thức thanh toán
           th Trạng thái
-          th
+          th Thao tác
       tbody
         if bookings.length === 0
           tr
-            td(colspan="9" style="text-align:center;padding:32px;color:#9ca3af") Không có đơn nào
+            td.table-empty(colspan="9") Không có đơn nào
         each b in bookings
           tr
             td= b.id
@@ -41,15 +44,24 @@ block content
             td= b.tour_name
             td= formatDate(b.start_date)
             td= formatPrice(b.total_price)
+            //- td
+            //-   span(class=bookingStatus.paymentBadgeClass(b.payment_status))
+            //-     = bookingStatus.paymentStatusLabel(b.payment_status)
+            //- td= bookingStatus.paymentMethodLabel(b.payment_method)
+            //- td
+            //-   span(class=bookingStatus.bookingBadgeClass(b.status))
+            //-     = bookingStatus.bookingStatusLabel(b.status)
+            //- td
+            //-   a.btn.btn--outline.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
             td
-              span(class=bookingStatus.paymentBadgeClass(b.payment_status))
-                = bookingStatus.paymentStatusLabel(b.payment_status)
-            td= bookingStatus.paymentMethodLabel(b.payment_method)
+              span(class=`badge badge--${b.payment_status}`)
+                = {pending:'Chưa thanh toán',success:'Đã thanh toán',failed:'Thất bại',refunded:'Đã hoàn tiền'}[b.payment_status]
+            td= {vnpay:'VNPay',cash:'Tiền mặt'}[b.payment_method]
             td
-              span(class=bookingStatus.bookingBadgeClass(b.status))
-                = bookingStatus.bookingStatusLabel(b.status)
+              span(class=`badge badge--${b.status}`)
+                = {pending:'Chờ xác nhận',confirmed:'Xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[b.status]
             td
-              a.btn.btn--outline.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
+              a.btn.btn--view.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
 
   - var baseUrl = '/admin/bookings?' + (currentStatus ? `status=${currentStatus}` : (currentPayment ? `payment=${currentPayment}` : ''))
   +pagination(currentPage, totalPages, baseUrl)

@@ -15,31 +15,18 @@ const AuthController = {
 
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        req.flash('error', {
-          title: 'Đăng nhập thất bại',
-          message: 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Email hoặc mật khẩu không đúng');
         return res.redirect('/login');
       }
 
       if (user.status === 'locked') {
-        req.flash('error', {
-          title: 'Tài khoản đã bị khóa',
-          message: 'Vui lòng liên hệ bộ phận hỗ trợ để được kiểm tra và mở lại tài khoản.',
-          icon: 'warning',
-          action: { label: 'Liên hệ hỗ trợ', href: '/#contact' }
-        });
+        req.flash('error', 'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ.');
         return res.redirect('/login');
       }
 
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        req.flash('error', {
-          title: 'Đăng nhập thất bại',
-          message: 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Email hoặc mật khẩu không đúng');
         return res.redirect('/login');
       }
 
@@ -50,13 +37,7 @@ const AuthController = {
         role:     user.role
       };
 
-      req.flash('success', {
-        title: `Chào mừng trở lại, ${user.fullname}!`,
-        message: user.role === 'admin' || user.role === 'staff'
-          ? 'Bạn sẽ được chuyển đến khu vực quản trị.'
-          : 'Bạn đã đăng nhập thành công và có thể tiếp tục đặt tour.',
-        icon: 'user'
-      });
+      req.flash('success', `Chào mừng trở lại, ${user.fullname}!`);
       const returnTo = req.session.returnTo;
       delete req.session.returnTo;
       
@@ -89,12 +70,7 @@ const AuthController = {
 
     if (error) {
   const messages = error.details.map(e => e.message);
-  req.flash('error', {
-    title: 'Đăng ký chưa hoàn tất',
-    message: 'Vui lòng kiểm tra lại các thông tin bên dưới.',
-    icon: 'warning',
-    details: messages
-  });
+  req.flash('error', messages);
   return req.session.save(() => {
     res.redirect('/register');
   });
@@ -104,12 +80,7 @@ const AuthController = {
     
     const existing = await UserModel.findByEmail(email);
     if (existing) {
-      req.flash('error', {
-        title: 'Email đã tồn tại',
-        message: 'Email này đã được đăng ký. Bạn có thể đăng nhập hoặc dùng email khác.',
-        icon: 'warning',
-        action: { label: 'Đăng nhập', href: '/login' }
-      });
+      req.flash('error', 'Email này đã được đăng ký');
       return res.redirect('/register');
     }
 
@@ -123,11 +94,7 @@ const AuthController = {
       phone
     });
 
-    req.flash('success', {
-      title: 'Đăng ký thành công',
-      message: 'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để bắt đầu đặt tour.',
-      icon: 'check'
-    });
+    req.flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
     return req.session.save(() => {
       res.redirect('/login');
 });

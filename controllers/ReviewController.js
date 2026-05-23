@@ -15,11 +15,7 @@ const ReviewController = {
       // 1. Validate input bằng Joi
       const { error, value } = reviewSchema.validate(req.body, { abortEarly: true });
       if (error) {
-        req.flash('error', {
-          title: 'Chưa thể gửi đánh giá',
-          message: error.details[0].message,
-          icon: 'warning'
-        });
+        req.flash('error', error.details[0].message);
         return redirectBack(req, res);
       }
 
@@ -29,12 +25,7 @@ const ReviewController = {
       const canReview = await ReviewModel.hasCompletedBooking(userId, tour_id);
 
       if (!canReview) {
-        req.flash('error', {
-          title: 'Chưa thể đánh giá tour',
-          message: 'Bạn cần hoàn thành tour trước khi gửi đánh giá.',
-          icon: 'warning',
-          action: { label: 'Xem đơn của tôi', href: '/my-bookings' }
-        });
+        req.flash('error', 'Bạn cần hoàn thành tour trước khi đánh giá');
         return redirectBack(req, res);
       }
 
@@ -42,11 +33,7 @@ const ReviewController = {
       const alreadyReviewed = await ReviewModel.hasReviewed(userId, tour_id);
 
       if (alreadyReviewed) {
-        req.flash('info', {
-          title: 'Bạn đã đánh giá tour này',
-          message: 'Mỗi tài khoản chỉ có thể gửi một đánh giá cho mỗi tour.',
-          icon: 'info'
-        });
+        req.flash('error', 'Bạn đã đánh giá tour này rồi');
         return redirectBack(req, res);
       }
 
@@ -55,11 +42,7 @@ const ReviewController = {
         await ReviewModel.create({ tour_id, user_id: userId, rating, comment });
       } catch (err) {
         if (err && err.code === 'ER_DUP_ENTRY') {
-          req.flash('info', {
-            title: 'Bạn đã đánh giá tour này',
-            message: 'Mỗi tài khoản chỉ có thể gửi một đánh giá cho mỗi tour.',
-            icon: 'info'
-          });
+          req.flash('error', 'Bạn đã đánh giá tour này rồi');
           return redirectBack(req, res);
         }
         throw err;
@@ -67,11 +50,7 @@ const ReviewController = {
 
       const tour = await TourModel.findById(tour_id);
 
-      req.flash('success', {
-        title: 'Cảm ơn bạn đã đánh giá',
-        message: 'Nhận xét của bạn đã được ghi nhận và sẽ hiển thị trong danh sách đánh giá.',
-        icon: 'star'
-      });
+      req.flash('success', 'Cảm ơn bạn đã đánh giá!');
 
       return res.redirect(tour ? `/tours/${tour.slug}#reviews` : '/tours');
     } catch (err) {
@@ -84,11 +63,7 @@ const ReviewController = {
     try {
       await ReviewModel.delete(req.params.id);
 
-      req.flash('success', {
-        title: 'Đã xóa đánh giá',
-        message: 'Đánh giá đã được gỡ khỏi hệ thống.',
-        icon: 'check'
-      });
+      req.flash('success', 'Đã xóa đánh giá');
 
       return redirectBack(req, res, '/admin/reviews');
     } catch (err) {

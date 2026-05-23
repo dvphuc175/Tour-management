@@ -3,7 +3,8 @@ extends ../layout
 block content
   .container
     .success-page
-      .success-icon ✓
+      .success-icon
+        +fa('check')
       h1.success-title Đặt tour thành công!
       p.success-sub Đơn đặt ##{booking.id} đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận sớm nhất.
 
@@ -26,9 +27,8 @@ block content
         .summary-row
           span Trạng thái
           strong
-            span(class=bookingStatus.bookingBadgeClass(booking.status || 'pending'))
-              = bookingStatus.bookingStatusLabel(booking.status || 'pending')
-        if bookingStatus.isCashPendingBooking(booking)
+            span.badge.badge--pending Chờ xác nhận
+        if booking.payment_method === 'cash'
           .info-box.info-box--cash-page
             p
               +fa('info')

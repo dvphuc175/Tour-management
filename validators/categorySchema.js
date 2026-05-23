@@ -20,7 +20,7 @@ const categorySchema = Joi.object({
     }),
 
   status: Joi.string()
-    .valid('active', 'hidden')
+    .valid('active', 'inactive')
     .optional()
 });
 module.exports = categorySchema;

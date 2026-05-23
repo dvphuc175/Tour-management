@@ -55,6 +55,15 @@ block scripts
       const reportData = !{chartData};
       const reportCtx = document.getElementById('reportChart');
       if (reportCtx) {
+        const ctx = reportCtx.getContext('2d');
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient1.addColorStop(0, 'rgba(59, 130, 246, 0.45)');
+        gradient1.addColorStop(1, 'rgba(59, 130, 246, 0.03)');
+        
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 280);
+        gradient2.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
+        gradient2.addColorStop(1, 'rgba(245, 158, 11, 0.03)');
+        
         new Chart(reportCtx, {
           type: 'line',
           data: {
@@ -63,30 +72,86 @@ block scripts
               {
                 label: 'Doanh thu',
                 data: reportData.revenue,
-                borderColor: '#0b74de',
-                backgroundColor: 'rgba(11, 116, 222, 0.18)',
-                tension: 0.35,
+                borderColor: '#3b82f6',
+                backgroundColor: gradient1,
+                borderWidth: 3,
+                tension: 0.4,
                 fill: true,
-                pointRadius: 3
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 3
               },
               {
                 label: 'Đơn đặt',
                 data: reportData.bookings,
-                borderColor: '#ff8a00',
-                backgroundColor: 'rgba(255, 138, 0, 0.14)',
-                tension: 0.35,
+                borderColor: '#f59e0b',
+                backgroundColor: gradient2,
+                borderWidth: 3,
+                tension: 0.4,
                 fill: true,
-                pointRadius: 3
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#f59e0b',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 3
               }
             ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart'
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+            plugins: { 
+              legend: { 
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                  font: {
+                    size: 13,
+                    weight: 600
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: '#1f2937',
+                padding: 12,
+                titleFont: { size: 14, weight: 700 },
+                bodyFont: { size: 13 },
+                cornerRadius: 10,
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      label += new Intl.NumberFormat('vi-VN').format(context.parsed.y);
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
             scales: {
+              x: { 
+                grid: { display: false },
+                ticks: { font: { weight: 600 }, color: '#64748b' }
+              },
               y: {
+                grid: { color: 'rgba(226, 232, 240, 0.5)' },
                 ticks: {
+                  font: { weight: 600 },
+                  color: '#64748b',
                   callback: value => new Intl.NumberFormat('vi-VN').format(value)
                 }
               }

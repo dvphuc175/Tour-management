@@ -119,6 +119,43 @@ document.querySelectorAll('.flash').forEach(el => {
   }, 4000);
 });
 
+// Flash messages: auto hide and close button
+(function initFlashMessages() {
+  const flashContainers = document.querySelectorAll('.flash');
+  
+  flashContainers.forEach(flashContainer => {
+    const flashItems = flashContainer.querySelectorAll('.flash__item');
+    
+    flashItems.forEach(item => {
+      // Auto hide after 5 seconds
+      const autoHideTimeout = setTimeout(() => {
+        closeFlashItem(item);
+      }, 5000);
+      
+      // Close button click
+      const closeBtn = item.querySelector('.flash__close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          clearTimeout(autoHideTimeout);
+          closeFlashItem(item);
+        });
+      }
+    });
+  });
+  
+  function closeFlashItem(item) {
+    item.classList.add('is-closing');
+    setTimeout(() => {
+      item.remove();
+      // If container is empty, remove it
+      const container = item.closest('.flash');
+      if (container && container.querySelectorAll('.flash__item').length === 0) {
+        container.remove();
+      }
+    }, 300);
+  }
+})();
+
 // Confirm khi xóa / hủy
 document.querySelectorAll('[data-confirm]').forEach(form => {
   form.addEventListener('submit', e => {
@@ -190,12 +227,19 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     if (!input) return;
     
     // Toggle input type between password and text
+    const icon = toggle.querySelector('i');
     if (input.type === 'password') {
       input.type = 'text';
-      toggle.classList.add('active');
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
     } else {
       input.type = 'password';
-      toggle.classList.remove('active');
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
     }
   });
 });
@@ -657,6 +701,12 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
   function generateBookingItem(b, csrfToken) {
     const bookingUi = getBookingUi(b);
+    let statusText = {
+      pending: 'Chờ xác nhận',
+      confirmed: 'Đã xác nhận',
+      cancelled: 'Đã hủy',
+      completed: 'Hoàn thành'
+    }[b.status] || b.status;
 
     let html = `<div class="booking-item">
       <div class="booking-item__img">`;
@@ -684,10 +734,11 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         <div class="booking-item__price">${formatPrice(b.total_price)}</div>
       </div>
       <div class="booking-item__status">
-        <span class="badge badge--${bookingUi.statusBadge}">${bookingUi.statusLabel}</span>
+        <span class="badge badge--${b.status}">${statusText}</span>
+        //<span class="badge badge--${bookingUi.statusBadge}">${bookingUi.statusLabel}</span>
         <a class="btn btn--outline btn--sm" href="/my-bookings/${b.id}">Chi tiết</a>`;
-    
-    if (bookingUi.canCancel) {
+    //if (bookingUi.canCancel) {
+    if (b.status === 'pending') {
       html += `<form action="/my-bookings/${b.id}/cancel?_method=PUT" method="POST" data-confirm="Bạn chắc chắn muốn hủy đơn này?">
         <input type="hidden" name="_csrf" value="${csrfToken}">
         <button class="btn btn--danger btn--sm" type="submit">Hủy đơn</button>
