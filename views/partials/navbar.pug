@@ -14,11 +14,6 @@ nav.navbar
       span.navbar__toggle-bar
 
     #navbar-panel.navbar__panel
-      .navbar__panel-head
-        span.navbar__panel-title Menu
-        button.navbar__close(type="button" data-navbar-close aria-label="Đóng menu")
-          +fa('xmark')
-
       .navbar__menu
         a(href="/" class=currentPath === '/' ? 'navbar__link--active' : '') Trang chủ
         a(href="/about" class=currentPath === '/about' ? 'navbar__link--active' : '') Giới thiệu
@@ -52,4 +47,4 @@ nav.navbar
           a.navbar__link(href="/login") Đăng nhập
           a.btn.btn--primary.btn--sm(href="/register") Đăng ký
 
-    
+  .navbar__backdrop(aria-hidden="true")

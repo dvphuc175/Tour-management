@@ -12,29 +12,15 @@ const PaymentController = {
       const booking = await BookingModel.findByIdAndUser(req.params.bookingId, req.session.user.id);
 
       if (!booking) {
-        req.flash('error', {
-          title: 'Không tìm thấy đơn đặt',
-          message: 'Đơn đặt này không tồn tại hoặc không thuộc tài khoản của bạn.',
-          icon: 'warning'
-        });
+        req.flash('error', 'Không tìm thấy đơn đặt');
         return res.redirect('/my-bookings');
       }
       if (booking.payment_status === 'success') {
-        req.flash('info', {
-          title: 'Đơn đã được thanh toán',
-          message: `Đơn #${booking.id} đã ghi nhận thanh toán thành công trước đó.`,
-          icon: 'info',
-          action: { label: 'Xem chi tiết đơn', href: `/my-bookings/${booking.id}` }
-        });
+        req.flash('error', 'Đơn này đã được thanh toán');
         return res.redirect(`/my-bookings/${booking.id}`);
       }
       if (booking.status !== 'pending' && booking.status !== 'confirmed') {
-        req.flash('error', {
-          title: 'Không thể thanh toán đơn này',
-          message: 'Đơn hiện không ở trạng thái phù hợp để thanh toán VNPay.',
-          icon: 'warning',
-          action: { label: 'Xem chi tiết đơn', href: `/my-bookings/${booking.id}` }
-        });
+        req.flash('error', 'Đơn không hợp lệ để thanh toán');
         return res.redirect(`/my-bookings/${booking.id}`);
       }
       

@@ -12,11 +12,9 @@ async function isAuth(req, res, next) {
   );
   
   if (!rows[0] || rows[0].status === 'locked') {
-    return req.session.regenerate((err) => {
-      if (err) return next(err);
-      req.flash('error', 'Tài khoản của bạn đã bị khóa bởi Quản trị viên');
-      return res.redirect('/login');
-    });
+    req.session.destroy(() => {});
+    req.flash('error', 'Tài khoản của bạn đã bị khóa bởi Quản trị viên');
+    return res.redirect('/login');
   }
   
   // Đồng bộ role hiện tại trong DB vào session — admin có thể đổi role mà không cần user logout.

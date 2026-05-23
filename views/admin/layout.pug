@@ -9,6 +9,7 @@ html(lang="vi")
     link(rel="preconnect" href="https://fonts.googleapis.com")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
     link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Sora:wght@600;700&display=swap")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css")
     link(rel="stylesheet" href="/assets/css/main.css")
     link(rel="stylesheet" href="/assets/css/admin.css")
     block head
@@ -18,12 +19,61 @@ html(lang="vi")
       include ../partials/admin-sidebar
       .admin-main
         .admin-topbar
+          button.admin-sidebar-toggle(type="button" aria-label="Mở menu" onclick="toggleAdminSidebar()")
+            +fa('bars')
           h1.admin-page-title= title
 
-        include ../partials/flash
+        //- Flash messages
+        if success && success.length
+          .flash.flash--success
+            each msg in success
+              .flash__item
+                .flash__icon
+                  i.fas.fa-check-circle
+                .flash__content= msg
+                button.flash__close(type="button" aria-label="Đóng")
+                  i.fas.fa-times
+        if error && error.length
+          .flash.flash--error
+            each msg in error
+              .flash__item
+                .flash__icon
+                  i.fas.fa-exclamation-circle
+                .flash__content= msg
+                button.flash__close(type="button" aria-label="Đóng")
+                  i.fas.fa-times
 
         .admin-content
           block content
 
     script(src="/assets/js/main.js")
+    script.
+      function toggleAdminSidebar() {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const body = document.body;
+        const toggleIcon = document.querySelector('.admin-sidebar-toggle i');
+        
+        sidebar.classList.toggle('is-open');
+        body.classList.toggle('sidebar-open');
+        
+        if (sidebar.classList.contains('is-open')) {
+          toggleIcon.classList.remove('fa-bars');
+          toggleIcon.classList.add('fa-xmark');
+        } else {
+          toggleIcon.classList.remove('fa-xmark');
+          toggleIcon.classList.add('fa-bars');
+        }
+      }
+      document.addEventListener('click', function(e) {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const toggle = document.querySelector('.admin-sidebar-toggle');
+        const toggleIcon = document.querySelector('.admin-sidebar-toggle i');
+        
+        if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+          sidebar.classList.remove('is-open');
+          document.body.classList.remove('sidebar-open');
+          toggleIcon.classList.remove('fa-xmark');
+          toggleIcon.classList.add('fa-bars');
+        }
+      });
     block scripts
