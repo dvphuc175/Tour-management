@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  .container
+    .error-page
+      h1.error-page__code 403
+      h2.error-page__title Không có quyền truy cập
+      p.error-page__desc= message || 'Bạn không có quyền truy cập chức năng này.'
+      a.btn.btn--primary(href="/") Về trang chủ
