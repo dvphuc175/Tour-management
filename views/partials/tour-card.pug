@@ -3,7 +3,12 @@ include ../mixins/icons
 a.tour-card(href=`/tours/${tour.slug}`)
 	.tour-card__img
 		if tour.images && tour.images.length
-			img(src=tour.images[0] alt=tour.name loading="lazy")
+			img(
+				src=tour.images[0]
+				alt=tour.name
+				loading="lazy"
+				onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();"
+			)
 		else
 			.tour-card__img-placeholder
 		if tour.category_name

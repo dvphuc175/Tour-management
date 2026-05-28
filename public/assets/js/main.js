@@ -348,7 +348,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       <div class="tour-card__img">`;
     
     if (tour.images && tour.images.length) {
-      html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy">`;
+      html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
     } else {
       html += `<div class="tour-card__img-placeholder"></div>`;
     }
@@ -650,7 +650,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
             <div class="tour-card__img">`;
           
           if (tour.images && tour.images.length) {
-            html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy">`;
+            html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
           } else {
             html += `<div class="tour-card__img-placeholder"></div>`;
           }
