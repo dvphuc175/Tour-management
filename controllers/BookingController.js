@@ -19,6 +19,10 @@ const BookingController = {
       }
 
       const tour = await TourModel.findById(schedule.tour_id);
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/tours');
+      }
       
       if (schedule.status !== 'active' || schedule.available_slots === 0) {
         req.flash('error', 'Lịch trình không còn chỗ hoặc đã bị hủy');
@@ -73,6 +77,11 @@ const BookingController = {
       }
 
       const tour = await TourModel.findById(schedule.tour_id);
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/tours');
+      }
+
       const total_price = adults * tour.price_adult + children * tour.price_child;
 
       const bookingId = await BookingModel.createWithTransaction({

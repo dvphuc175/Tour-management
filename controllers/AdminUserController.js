@@ -70,7 +70,22 @@ const AdminUserController = {
         return res.redirect(returnTo);
       }
 
-      await UserModel.toggleStatus(req.params.id);
+      const target = await UserModel.findById(req.params.id);
+      if (!target) {
+        req.flash('error', 'Không tìm thấy người dùng');
+        return res.redirect(returnTo);
+      }
+
+      if (target.role === 'admin') {
+        req.flash('error', 'Không thể khóa tài khoản admin');
+        return res.redirect(returnTo);
+      }
+
+      const result = await UserModel.toggleStatus(req.params.id);
+      if (!result.affectedRows) {
+        req.flash('error', 'Không thể cập nhật trạng thái tài khoản');
+        return res.redirect(returnTo);
+      }
 
       req.flash('success', 'Đã cập nhật trạng thái tài khoản');
       res.redirect(returnTo);

@@ -74,6 +74,13 @@ const CategoryController = {
     try {
       const { name, description, status } = req.body;
       const { id } = req.params;
+      const category = await CategoryModel.findById(id);
+
+      if (!category) {
+        req.flash('error', 'Không tìm thấy danh mục');
+        return res.redirect('/admin/categories');
+      }
+
       const { error } = categorySchema.validate(req.body);
 
       if (error) {
@@ -86,7 +93,12 @@ const CategoryController = {
         req.flash('error', 'Tên danh mục này đã tồn tại');
         return res.redirect(`/admin/categories/${id}/edit`);
       }
-      await CategoryModel.update(id, { name: name.trim(), description, status });
+      const result = await CategoryModel.update(id, { name: name.trim(), description, status });
+      if (!result.affectedRows) {
+        req.flash('error', 'Không thể cập nhật danh mục');
+        return res.redirect('/admin/categories');
+      }
+
         req.flash('success', 'Cập nhật danh mục thành công');
         return req.session.save(() => {
           res.redirect('/admin/categories');
@@ -98,6 +110,15 @@ const CategoryController = {
   async delete(req, res, next) {
     try {
       const categoryId = req.params.id;
+      const category = await CategoryModel.findById(categoryId);
+
+      if (!category) {
+        req.flash('error', 'Không tìm thấy danh mục');
+        return req.session.save(() => {
+          res.redirect('/admin/categories');
+        });
+      }
+
       const hasTours = await CategoryModel.checkHasTours(categoryId);
       if (hasTours) {
         req.flash('error', 'Không thể xóa! Danh mục này đang chứa các tour du lịch.');
@@ -105,7 +126,14 @@ const CategoryController = {
           res.redirect('/admin/categories');
         });
       }
-      await CategoryModel.delete(categoryId);
+      const result = await CategoryModel.delete(categoryId);
+      if (!result.affectedRows) {
+        req.flash('error', 'Không thể xóa danh mục');
+        return req.session.save(() => {
+          res.redirect('/admin/categories');
+        });
+      }
+
       req.flash('success', 'Đã xóa danh mục thành công!');
       req.session.save(() => {
         res.redirect('/admin/categories');

@@ -70,6 +70,12 @@ const TourController = {
         price_child
       } = value;
 
+      const category = await CategoryModel.findById(category_id);
+      if (!category) {
+        req.flash('error', 'Không tìm thấy danh mục');
+        return res.redirect('/admin/tours/create');
+      }
+
       const slug = makeSlug(name);
 
       if (await TourModel.isSlugExists(slug)) {
@@ -149,6 +155,12 @@ const TourController = {
         return res.redirect('/admin/tours');
       }
 
+      const category = await CategoryModel.findById(category_id);
+      if (!category) {
+        req.flash('error', 'Không tìm thấy danh mục');
+        return res.redirect(`/admin/tours/${id}/edit`);
+      }
+
       const slug = makeSlug(name);
 
       if (await TourModel.isSlugExists(slug, id)) {
@@ -203,6 +215,12 @@ const TourController = {
   async delete(req, res, next) {
     try {
       const tourId = req.params.id;
+      const tour = await TourModel.findById(tourId);
+
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/admin/tours');
+      }
 
       const rows = await query(
         `SELECT b.id FROM BOOKINGS b 
@@ -216,7 +234,12 @@ const TourController = {
         return res.redirect('/admin/tours');
       }
 
-      await TourModel.delete(tourId);
+      const result = await TourModel.delete(tourId);
+      if (!result.affectedRows) {
+        req.flash('error', 'Không thể xóa tour');
+        return res.redirect('/admin/tours');
+      }
+
       req.flash('success', 'Đã xóa tour thành công');
       res.redirect('/admin/tours');
 

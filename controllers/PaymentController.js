@@ -53,7 +53,7 @@ const PaymentController = {
       
       const bookingId = txnRef.split('_')[0];
 
-      if (!bookingId) {
+      if (!bookingId || !/^\d+$/.test(bookingId)) {
         return res.render('client/payment-result', { title: 'Kết quả thanh toán', success: false, message: 'Mã đơn hàng không hợp lệ' });
       }
 
@@ -70,11 +70,21 @@ const PaymentController = {
       }
 
       if (!verify.isVerified || !verify.isSuccess) {
-        await PaymentModel.updateVnpay(bookingId, {
+        const updateResult = await PaymentModel.updateVnpay(bookingId, {
           status: 'failed',
           transactionId: req.query.vnp_TransactionNo || null,
           paidAt: null, method: 'vnpay'
         });
+
+        if (!updateResult.affectedRows) {
+          return res.render('client/payment-result', {
+            title: 'Thanh toán thất bại',
+            success: false,
+            message: 'Không tìm thấy đơn thanh toán',
+            bookingId
+          });
+        }
+
         return res.render('client/payment-result', {
           title: 'Thanh toán thất bại', success: false,
           message: 'Giao dịch không thành công hoặc bị hủy', bookingId
@@ -88,26 +98,46 @@ const PaymentController = {
       try {
         await conn.beginTransaction();
 
-        await conn.execute(
+        const [bookingData] = await conn.execute(
+          `SELECT 
+             b.id,
+             b.status,
+             b.contact_email,
+             b.contact_name,
+             p.id AS payment_id
+           FROM BOOKINGS b
+           JOIN PAYMENTS p ON p.booking_id = b.id
+           WHERE b.id = ?
+           FOR UPDATE`,
+          [bookingId]
+        );
+
+        if (!bookingData[0]) {
+          await conn.rollback();
+          return res.render('client/payment-result', {
+            title: 'Thanh toán thất bại',
+            success: false,
+            message: 'Không tìm thấy đơn thanh toán',
+            bookingId
+          });
+        }
+
+        const [paymentResult] = await conn.execute(
           `UPDATE PAYMENTS SET status='success', method='vnpay', transaction_id=?, paid_at=NOW() WHERE booking_id=?`,
           [req.query.vnp_TransactionNo, bookingId]
         );
+
+        if (!paymentResult.affectedRows) {
+          throw new Error('Không thể cập nhật thanh toán');
+        }
 
         await conn.execute(
           "UPDATE BOOKINGS SET status='confirmed' WHERE id=? AND status='pending'",
           [bookingId]
         );
 
-        // Lấy thông tin email và tên khách hàng NGAY TRONG TRANSACTION
-        const [bookingData] = await conn.execute(
-          "SELECT contact_email, contact_name FROM BOOKINGS WHERE id = ?",
-          [bookingId]
-        );
-        
-        if (bookingData && bookingData.length > 0) {
-          contactEmail = bookingData[0].contact_email;
-          contactName = bookingData[0].contact_name;
-        }
+        contactEmail = bookingData[0].contact_email;
+        contactName = bookingData[0].contact_name;
 
         await conn.commit();
       } catch (dbErr) {
