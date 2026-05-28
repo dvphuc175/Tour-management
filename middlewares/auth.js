@@ -1,4 +1,12 @@
 const { query } = require('../config/db');
+
+function renderForbidden(res, message = 'Không có quyền truy cập') {
+  return res.status(403).render('403', {
+    title: 'Không có quyền truy cập',
+    message
+  });
+}
+
 // Yêu cầu đã đăng nhập; đồng thời re-check status/role từ DB phòng admin đổi giữa chừng.
 async function isAuth(req, res, next) {
   if (!req.session.user) {
@@ -27,14 +35,14 @@ async function isAuth(req, res, next) {
 // Chỉ admin
 function isAdmin(req, res, next) {
   if (req.session.user?.role === 'admin') return next();
-  return res.status(403).render('error', { message: 'Không có quyền truy cập' });
+  return renderForbidden(res);
 }
  
 // Admin hoặc staff (dùng cho khu vực quản lý đơn đặt)
 function isStaff(req, res, next) {
   const role = req.session.user?.role;
   if (role === 'admin' || role === 'staff') return next();
-  return res.status(403).render('error', { message: 'Không có quyền truy cập' });
+  return renderForbidden(res);
 }
  
 module.exports = { isAuth, isAdmin, isStaff };

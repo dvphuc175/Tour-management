@@ -45,8 +45,8 @@ function csrf(req, res, next) {
     req.get('csrf-token');
  
   if (!timingSafeEqualString(submitted, req.session.csrfToken)) {
-    res.status(403);
-    return res.render('error', {
+    return res.status(403).render('403', {
+      title: 'Phiên không hợp lệ',
       message: 'Phiên không hợp lệ hoặc đã hết hạn. Vui lòng tải lại trang và thử lại.'
     });
   }

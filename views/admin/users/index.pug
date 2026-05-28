@@ -2,6 +2,31 @@ extends ../layout
 include ../_pagination
 
 block content
+  .toolbar
+    form.filter-form(method="GET" action="/admin/users")
+      input.form-control.form-control--sm.filter-search(
+        type="search"
+        name="q"
+        placeholder="Tìm tên, email, SĐT"
+        value=filters.q
+      )
+      select.form-control.form-control--sm(name="role" onchange="this.form.submit()")
+        option(value="" selected=!filters.role) Tất cả vai trò
+        option(value="admin" selected=filters.role==='admin') Admin
+        option(value="staff" selected=filters.role==='staff') Nhân viên
+        option(value="customer" selected=filters.role==='customer') Khách hàng
+      select.form-control.form-control--sm(name="status" onchange="this.form.submit()")
+        option(value="" selected=!filters.status) Tất cả trạng thái
+        option(value="active" selected=filters.status==='active') Hoạt động
+        option(value="locked" selected=filters.status==='locked') Đã khóa
+      button.btn.btn--primary.btn--sm(type="submit")
+        +fa('search')
+        |  Lọc
+      if hasFilters
+        a.btn.btn--outline.btn--sm(href="/admin/users")
+          +fa('rotate')
+          |  Xóa lọc
+
   .table-wrap
     table.data-table
       thead
@@ -17,7 +42,7 @@ block content
       tbody
         if users.length === 0
           tr
-            td.table-empty(colspan="8") Chưa có người dùng nào
+            td.table-empty(colspan="8")= hasFilters ? 'Không tìm thấy người dùng phù hợp' : 'Chưa có người dùng nào'
         each u in users
           - var isSelf = user && user.id === u.id
           tr(class=u.status === 'locked' ? 'row--locked' : '')
@@ -45,6 +70,7 @@ block content
                     data-confirm=`Đổi vai trò của ${u.fullname}?`
                   )
                     input(type="hidden" name="_csrf" value=csrfToken)
+                    input(type="hidden" name="returnTo" value=returnTo)
                     select(name="role" class="form-control form-control--sm form-control--compact")
                       option(value="customer" selected=(u.role==='customer')) Khách hàng
                       option(value="staff" selected=(u.role==='staff')) Nhân viên
@@ -57,9 +83,10 @@ block content
                       data-confirm=u.status==='active' ? `Khóa tài khoản ${u.fullname}?` : `Mở khóa tài khoản ${u.fullname}?`
                     )
                       input(type="hidden" name="_csrf" value=csrfToken)
+                      input(type="hidden" name="returnTo" value=returnTo)
                       button(
                         type="submit"
                         class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--outline'}`
                       )= u.status === 'active' ? 'Khóa' : 'Mở khóa'
 
-  +pagination(currentPage, totalPages, '/admin/users')
+  +pagination(currentPage, totalPages, paginationBaseUrl)
