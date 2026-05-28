@@ -1,27 +1,94 @@
 const { query, getConnection } = require('../config/db');
 const EmailService = require('../services/emailService');
+
+const VALID_BOOKING_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed'];
+const VALID_PAYMENT_STATUSES = ['pending', 'success', 'failed', 'refunded'];
+const VALID_PAYMENT_METHODS = ['vnpay', 'cash'];
+
+function normalizeSearch(value) {
+  return typeof value === 'string' ? value.trim().slice(0, 100) : '';
+}
+
+function normalizeBookingFilters(queryParams) {
+  return {
+    q: normalizeSearch(queryParams.q),
+    status: VALID_BOOKING_STATUSES.includes(queryParams.status) ? queryParams.status : '',
+    payment: VALID_PAYMENT_STATUSES.includes(queryParams.payment) ? queryParams.payment : '',
+    method: VALID_PAYMENT_METHODS.includes(queryParams.method) ? queryParams.method : ''
+  };
+}
+
+function buildListUrl(path, filters) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.set(key, value);
+  });
+
+  const queryString = params.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
+function buildBookingWhere(filters) {
+  let where = ' WHERE 1=1';
+  const params = [];
+
+  if (filters.q) {
+    const keyword = filters.q.replace(/^#/, '').trim();
+    const likeKeyword = `%${filters.q}%`;
+    const searchConditions = [
+      't.name LIKE ?',
+      'u.fullname LIKE ?',
+      'u.email LIKE ?',
+      'b.contact_name LIKE ?',
+      'b.contact_email LIKE ?',
+      'b.contact_phone LIKE ?'
+    ];
+    const searchParams = [
+      likeKeyword,
+      likeKeyword,
+      likeKeyword,
+      likeKeyword,
+      likeKeyword,
+      likeKeyword
+    ];
+
+    if (/^\d+$/.test(keyword)) {
+      searchConditions.unshift('b.id = ?');
+      searchParams.unshift(Number(keyword));
+    }
+
+    where += ` AND (${searchConditions.join(' OR ')})`;
+    params.push(...searchParams);
+  }
+
+  if (filters.status) {
+    where += ' AND b.status = ?';
+    params.push(filters.status);
+  }
+
+  if (filters.payment) {
+    where += ' AND p.status = ?';
+    params.push(filters.payment);
+  }
+
+  if (filters.method) {
+    where += ' AND p.method = ?';
+    params.push(filters.method);
+  }
+
+  return { where, params };
+}
+
 const AdminBookingController = {
 
   async index(req, res, next) {
     try {
-      const status = req.query.status || null;
-      const payment = req.query.payment || null;
-      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const filters = normalizeBookingFilters(req.query);
+      const page = Math.max(1, parseInt(req.query.page, 10) || 1);
       const limit = 10;
       const offset = (page - 1) * limit;
-
-      let where = ' WHERE 1=1';
-      const params = [];
-
-      if (status) {
-        where += ' AND b.status = ?';
-        params.push(status);
-      }
-
-      if (payment) {
-        where += ' AND p.status = ?';
-        params.push(payment);
-      }
+      const { where, params } = buildBookingWhere(filters);
 
       const baseFrom = `
         FROM BOOKINGS b
@@ -60,8 +127,9 @@ const AdminBookingController = {
       return res.render('admin/bookings/index', {
         title: 'Quản lý đơn đặt',
         bookings,
-        currentStatus: status,
-        currentPayment: payment,
+        filters,
+        hasFilters: Boolean(filters.q || filters.status || filters.payment || filters.method),
+        paginationBaseUrl: buildListUrl('/admin/bookings', filters),
         currentPage: page,
         totalPages
       });

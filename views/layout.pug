@@ -63,7 +63,8 @@ html(lang="vi")
             h3.footer__title Liên kết nhanh
             a.footer__link(href="/") Trang chủ
             a.footer__link(href="/tours") Khám phá tour
-            a.footer__link(href="/my-bookings") Đơn của tôi
+            if !user || user.role === 'customer'
+              a.footer__link(href="/my-bookings") Đơn của tôi
             a.footer__link(href="/contact") Liên hệ
           .footer__col
             h3.footer__title Danh mục phổ biến

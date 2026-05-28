@@ -1,6 +1,10 @@
 extends ../layout
 
 block content
+  - const isBookingRestricted = user && (user.role === 'admin' || user.role === 'staff')
+  - const canBookTour = !isBookingRestricted
+  - const bookingRestrictedMessage = 'Tài khoản quản trị hoặc nhân viên không thể đặt tour'
+
   .container
     .tour-detail-layout
 
@@ -122,7 +126,10 @@ block content
                             i.fa-regular.fa-eye-slash.schedule-eye-slash.hidden(id=`eye-slash-${s.id}`)
                         td
                           if s.available_slots > 0
-                            a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                            if canBookTour
+                              a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                            else
+                              button.btn.btn--outline.btn--sm(type="button" disabled title=bookingRestrictedMessage) Chọn
                           else
                             button.btn.btn--outline.btn--sm(disabled) Đã đầy
                       // Expandable price detail row
@@ -281,9 +288,14 @@ block content
           button.btn.btn--danger.btn--block.btn--outline(type="button" onclick="openScheduleModal()") 
             | XEM LỊCH ĐI CÁC NGÀY KHÁC
           
-          a.btn.btn--primary.btn--block.btn--book-cta(href=`/booking/${nearestSchedule.id}`)
-            strong ĐẶT GIỮ CHỖ NGAY
-            small Đặt ngay ngày #{formatDate(nearestSchedule.start_date)}
+          if canBookTour
+            a.btn.btn--primary.btn--block.btn--book-cta(href=`/booking/${nearestSchedule.id}`)
+              strong ĐẶT GIỮ CHỖ NGAY
+              small Đặt ngay ngày #{formatDate(nearestSchedule.start_date)}
+          else
+            button.btn.btn--outline.btn--block.btn--book-cta(type="button" disabled title=bookingRestrictedMessage)
+              strong KHÔNG THỂ ĐẶT TOUR
+              small Dùng tài khoản khách hàng để đặt tour
 
   .mobile-booking-bar
     if schedules.length === 0
@@ -300,7 +312,10 @@ block content
       .mobile-booking-bar__actions
         button.btn.btn--outline.btn--sm(type="button" onclick="openScheduleModal()") Lịch đi
         if mobileSchedule.available_slots > 0
-          a.btn.btn--primary.btn--sm(href=`/booking/${mobileSchedule.id}`) Đặt ngay
+          if canBookTour
+            a.btn.btn--primary.btn--sm(href=`/booking/${mobileSchedule.id}`) Đặt ngay
+          else
+            button.btn.btn--outline.btn--sm(type="button" disabled title=bookingRestrictedMessage) Đặt ngay
         else
           button.btn.btn--outline.btn--sm(type="button" disabled) Đã đầy
 
@@ -340,7 +355,10 @@ block content
                 td= formatPrice(tour.price_adult)
                 td
                   if s.available_slots > 0
-                    a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                    if canBookTour
+                      a.btn.btn--primary.btn--sm(href=`/booking/${s.id}`) Chọn
+                    else
+                      button.btn.btn--outline.btn--sm(type="button" disabled title=bookingRestrictedMessage) Chọn
                   else
                     button.btn.btn--outline.btn--sm(disabled) Đã đầy
 
