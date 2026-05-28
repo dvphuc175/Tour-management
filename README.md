@@ -58,7 +58,7 @@ Dự án xây dựng theo hướng **monolith server-rendered** dùng Express + 
 - **Bảo mật:** middleware CSRF (token + `timingSafeEqual`), `sanitize-html` chống XSS cho rich text, cookie HttpOnly/SameSite.
 - **Validation:** Joi 18
 - **Upload ảnh:** `multer` + `multer-storage-cloudinary` lưu lên Cloudinary CDN.
-- **Thanh toán:** VNPay sandbox (SDK `vnpay@^2.5.0`, sử dụng Return URL).
+- **Thanh toán:** VNPay sandbox (SDK `vnpay@^2.5.0`, sử dụng IPN và Return URL).
 - **Email:** `nodemailer` (Gmail SMTP với App Password).
 - **Tác vụ nền:** `node-cron` cho 3 cron job định kỳ.
 - **Khác:** `connect-flash`, `method-override`, `cookie-parser`, `slugify`, `dotenv`.
@@ -201,6 +201,8 @@ Các biến môi trường cần điền:
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Khóa Cloudinary |
 | `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`, `VNPAY_URL`, `VNPAY_RETURN_URL` | Cấu hình VNPay Sandbox |
 | `EMAIL_USER`, `EMAIL_PASS` | Gmail + App Password (16 ký tự, KHÔNG dùng mật khẩu thường) |
+
+VNPay IPN URL cần cấu hình trên trang quản trị VNPay Sandbox là `/payment/vnpay/ipn`. Khi test ở máy local, endpoint này phải được public qua domain deploy hoặc tunnel như ngrok/cloudflared thì VNPay mới gọi được.
  
 **Bước 4:** Khởi tạo cơ sở dữ liệu:
  
