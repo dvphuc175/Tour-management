@@ -1,5 +1,5 @@
 if flashMessages && flashMessages.length
-  .flash-stack(aria-live="polite" aria-atomic="true")
+  .flash(aria-live="polite" aria-atomic="true")
     each item in flashMessages
       -
         const type = item.type || 'info';
@@ -9,21 +9,20 @@ if flashMessages && flashMessages.length
         if (item.actions && item.actions.length) {
           actions.push(...item.actions.filter((action) => action && action.href && action.label));
         }
-      .feature-card(class=`flash-message--${type}` data-flash)
-        .flash-message__icon
+      .flash__item(class=`flash--${type}`)
+        .flash__icon
           +fa(icon)
-        .flash-message__body
+        .flash__content
           if item.title
-            .flash-message__title= item.title
+            div= item.title
           if item.message
-            .flash-message__text= item.message
+            div= item.message
           if item.details && item.details.length
-            ul.flash-message__details
-              each detail in item.details
-                li= detail
+            each detail in item.details
+              div= `- ${detail}`
           if actions.length
-            .flash-message__actions
-              each action in actions
-                a.flash-message__action(href=action.href)= action.label
-        button.flash-message__close(type="button" aria-label="Đóng thông báo" data-flash-close)
+            each action in actions
+              div
+                a(href=action.href)= action.label
+        button.flash__close(type="button" aria-label="Đóng")
           +fa('xmark')
