@@ -9,7 +9,7 @@ if flashMessages && flashMessages.length
         if (item.actions && item.actions.length) {
           actions.push(...item.actions.filter((action) => action && action.href && action.label));
         }
-      .flash-message(class=`flash-message--${type}` data-flash)
+      .feature-card(class=`flash-message--${type}` data-flash)
         .flash-message__icon
           +fa(icon)
         .flash-message__body

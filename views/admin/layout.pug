@@ -22,7 +22,7 @@ html(lang="vi")
           button.admin-sidebar-toggle(type="button" aria-label="Mở menu" onclick="toggleAdminSidebar()")
             +fa('bars')
           h1.admin-page-title= title
-
+        include ../partials/flash
         //- Flash messages
         if success && success.length
           .flash.flash--success

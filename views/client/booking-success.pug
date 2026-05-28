@@ -2,41 +2,76 @@ extends ../layout
 
 block content
   .container
-    .success-page
-      .success-icon
-        +fa('check')
-      h1.success-title Đặt tour thành công!
-      p.success-sub Đơn đặt ##{booking.id} đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận sớm nhất.
+    .success-page.booking-success-modern
+      .success-hero(data-aos="fade-up")
+        .success-icon
+          +fa('circle-check')
+        .success-hero__content
+          h1.success-title Đặt tour thành công!
+          p.success-sub
+            | Cảm ơn bạn đã tin tưởng Vi Vu Việt Nam. Đơn 
+            strong ##{booking.id}
+            |  đã được ghi nhận và đang chờ xác nhận.
 
-      .success-card
-        .summary-row
-          span Tour
-          strong= booking.tour_name
-        .summary-row
-          span Ngày đi
-          strong= formatDate(booking.start_date)
-        .summary-row
-          span Khởi hành
-          strong= booking.departure_location
-        .summary-row
-          span Người lớn / Trẻ em
-          strong #{booking.adult_count} / #{booking.child_count}
-        .summary-row
-          span Tổng tiền
-          strong.price= formatPrice(booking.total_price)
-        .summary-row
-          span Trạng thái
-          strong
+      .success-layout
+        .success-card(data-aos="fade-up")
+          .success-card__header
+            h2 Chi tiết đơn đặt tour
             span.badge.badge--pending Chờ xác nhận
-        if booking.payment_method === 'cash'
-          .info-box.info-box--cash-page
-            p
-              +fa('info')
-              |  Đơn đặt của bạn đang chờ xác nhận.
-            p
-              | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
-              strong 24 giờ.
-              |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
-      .success-actions
-        a.btn.btn--primary(href="/my-bookings") Xem đơn của tôi
-        a.btn.btn--outline(href="/tours") Khám phá thêm tour
+          .summary-row
+            span Mã đơn
+            strong ##{booking.id}
+          .summary-row
+            span Tour
+            strong= booking.tour_name
+          .summary-row
+            span Ngày đi
+            strong= formatDate(booking.start_date)
+          .summary-row
+            span Điểm khởi hành
+            strong= booking.departure_location
+          .summary-row
+            span Số lượng khách
+            strong #{booking.adult_count} người lớn / #{booking.child_count} trẻ em
+          .summary-row.summary-row--total
+            span Tổng thanh toán
+            strong.price= formatPrice(booking.total_price)
+          .summary-row
+            span Phương thức thanh toán
+            strong= booking.payment_method === 'cash' ? 'Tiền mặt' : 'VNPay'
+          if booking.payment_method === 'cash'
+            .info-box.info-box--cash-page
+              p
+                +fa('info-circle')
+                |  Vui lòng thanh toán tại văn phòng trong vòng 
+                strong 24 giờ
+                |  để giữ chỗ.
+              p Hệ thống sẽ tự động hủy giữ chỗ nếu quá thời hạn trên.
+
+        .success-note-card(data-aos="fade-up" data-aos-delay="100")
+          h3.success-note-card__title Tiếp theo sẽ như thế nào?
+          ul.success-timeline
+            li.success-timeline__item
+              span.success-timeline__dot
+              .success-timeline__content
+                strong Nhân viên xác nhận đơn
+                p Chúng tôi gọi điện/email xác nhận thông tin trong thời gian sớm nhất.
+            li.success-timeline__item
+              span.success-timeline__dot
+              .success-timeline__content
+                strong Hướng dẫn thanh toán
+                p Bạn sẽ nhận hướng dẫn thanh toán phù hợp theo phương thức đã chọn.
+            li.success-timeline__item
+              span.success-timeline__dot
+              .success-timeline__content
+                strong Nhắc lịch trước ngày đi
+                p Trước ngày khởi hành, hệ thống gửi thông tin cần chuẩn bị cho chuyến đi.
+          .success-help
+            +fa('headset')
+            span Cần hỗ trợ ngay? Gọi 
+            a(href="tel:0345043213") 0345 043 213
+
+      .success-actions(data-aos="fade-up" data-aos-delay="160")
+        a.btn.btn--primary(href=`/my-bookings/${booking.id}`) Xem chi tiết đơn
+        a.btn.btn--outline(href="/my-bookings") Danh sách đơn của tôi
+        a.btn.btn--accent(href="/tours") Khám phá thêm tour

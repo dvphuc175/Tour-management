@@ -30,7 +30,6 @@ const AdminDashboardController = {
 
       res.render('admin/dashboard', {
         title: 'Dashboard',
-        currentPath: '/admin',
         summary,
         topTours,
         currentYear,
@@ -83,8 +82,6 @@ const AdminDashboardController = {
 
       res.render('admin/reports', {
         title: 'Báo cáo doanh thu',
-        currentPath: '/admin/reports',
-
         rows,
         totals,
         from,

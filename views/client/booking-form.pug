@@ -15,21 +15,27 @@ block content
           h3.form-section-title Thông tin liên hệ
           .form-row
             .form-group
-              label Họ và tên *
+              label 
+                |Họ và tên
+                span.required *
               input.form-control(
                 type="text" name="contact_name"
                 value=prefill.contact_name
                 required
               )
             .form-group
-              label Số điện thoại *
+              label 
+                | Số điện thoại
+                span.required *
               input.form-control(
                 type="tel" name="contact_phone"
                 placeholder="0901234567"
                 required
               )
           .form-group
-            label Email liên hệ *
+            label 
+              | Email liên hệ
+              span.required *
             input.form-control(
               type="email" name="contact_email"
               value=prefill.contact_email
@@ -39,35 +45,39 @@ block content
           h3.form-section-title Số lượng hành khách
           .form-row
             .form-group
-              label Người lớn
-              .quantity-control
-                button.quantity-btn(type="button" onclick="updateCount('adult', -1)")
-                  +fa('minus')
-                input#adultCount.quantity-input(
-                  type="number" name="adult_count"
-                  value="1" min="1"
-                  max=schedule.available_slots
-                  data-max-slots=schedule.available_slots
-                  readonly
-                )
-                button.quantity-btn(type="button" onclick="updateCount('adult', 1)")
-                  +fa('plus')
-              small.form-hint #{formatPrice(tour.price_adult)} / người (>13 tuổi)
+              .passenger-row
+                .passenger-info
+                  .passenger-label Người lớn
+                  .passenger-price #{formatPrice(tour.price_adult)} / người (>13 tuổi)
+                .quantity-control
+                  button.quantity-btn(type="button" onclick="updateCount('adult', -1)")
+                    +fa('minus')
+                  input#adultCount.quantity-input(
+                    type="number" name="adult_count"
+                    value="1" min="1"
+                    max=schedule.available_slots
+                    data-max-slots=schedule.available_slots
+                    readonly
+                  )
+                  button.quantity-btn(type="button" onclick="updateCount('adult', 1)")
+                    +fa('plus')
             .form-group
-              label Trẻ em
-              .quantity-control
-                button.quantity-btn(type="button" onclick="updateCount('child', -1)")
-                  +fa('minus')
-                input#childCount.quantity-input(
-                  type="number" name="child_count"
-                  value="0" min="0"
-                  max=schedule.available_slots
-                  data-max-slots=schedule.available_slots
-                  readonly
-                )
-                button.quantity-btn(type="button" onclick="updateCount('child', 1)")
-                  +fa('plus')
-              small.form-hint #{formatPrice(tour.price_child)} / bé (<13 tuổi)
+              .passenger-row
+                .passenger-info
+                  .passenger-label Trẻ em
+                  .passenger-price #{formatPrice(tour.price_child)} / bé (<13 tuổi)
+                .quantity-control
+                  button.quantity-btn(type="button" onclick="updateCount('child', -1)")
+                    +fa('minus')
+                  input#childCount.quantity-input(
+                    type="number" name="child_count"
+                    value="0" min="0"
+                    max=schedule.available_slots
+                    data-max-slots=schedule.available_slots
+                    readonly
+                  )
+                  button.quantity-btn(type="button" onclick="updateCount('child', 1)")
+                    +fa('plus')
 
           .slots-warning.is-hidden(id="slotsWarning")
             | Tổng số khách không được vượt quá #{schedule.available_slots} chỗ còn trống
@@ -99,7 +109,7 @@ block content
                 onchange="updatePayBtn(this.value)"
               )
               .payment-method-card
-                .payment-method-card__logo 💵
+                .payment-method-card__logos 💵
                 .payment-method-card__name Thanh toán tiền mặt
                 .payment-method-card__desc Đến văn phòng thanh toán — chờ admin xác nhận
 
@@ -158,6 +168,12 @@ block scripts
       } else {
         document.getElementById('slotsWarning').classList.add('is-hidden');
       }
+      //- if (totalAfterChange > maxSlots) {
+      //-   document.getElementById('slotsWarning').style.display = 'block';
+      //-   return;
+      //- } else {
+      //-   document.getElementById('slotsWarning').style.display = 'none';
+      //- }
 
       input.value = newVal;
       calcPrice();

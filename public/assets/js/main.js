@@ -52,6 +52,65 @@
   window.addEventListener('scroll', updateNavbarScrollState);
 })();
 
+// Scroll animation library
+(function initAOS() {
+  if (typeof AOS === 'undefined') return;
+  AOS.init({
+    duration: 750,
+    easing: 'ease-out-cubic',
+    once: true,
+    offset: 70
+  });
+})();
+
+// Auto apply scroll animations across pages
+(function initGlobalScrollAnimations() {
+  const animationGroups = [
+    {
+      selector: '.section-header, .page-header, .hero__content, .auth-card, .contact-map',
+      effect: 'fade-up',
+      baseDelay: 0,
+      step: 0
+    },
+    {
+      selector: '.tour-card, .feature-card, .category-card, .highlight-card, .experience-card, .booking-item, .stat-card, .report-card, .admin-card',
+      effect: 'zoom-in-up',
+      baseDelay: 30,
+      step: 60
+    },
+    {
+      selector: '.table-responsive, .booking-detail-card, .tour-detail-main, .tour-detail-sidebar, .profile-card, .sidebar-menu, .tab-content',
+      effect: 'fade-up',
+      baseDelay: 20,
+      step: 50
+    },
+    {
+      selector: 'form.card, .form-card, .payment-method-option, .review-item, .schedule-table-wrapper',
+      effect: 'fade-up',
+      baseDelay: 40,
+      step: 60
+    }
+  ];
+
+  window.applyGlobalAOS = function applyGlobalAOS(root = document) {
+    animationGroups.forEach(group => {
+      const nodes = root.querySelectorAll(group.selector);
+      nodes.forEach((node, index) => {
+        if (node.hasAttribute('data-aos')) return;
+        node.setAttribute('data-aos', group.effect);
+        const delay = Math.min(360, group.baseDelay + (index % 6) * group.step);
+        if (delay > 0) node.setAttribute('data-aos-delay', String(delay));
+      });
+    });
+
+    if (typeof AOS !== 'undefined') {
+      AOS.refreshHard();
+    }
+  };
+
+  window.applyGlobalAOS();
+})();
+
 // Tour filter drawer
 (function initTourFilters() {
   const panel = document.getElementById('tourFilterPanel');
@@ -230,12 +289,14 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     const icon = toggle.querySelector('i');
     if (input.type === 'password') {
       input.type = 'text';
+      // toggle.classList.add('active');
       if (icon) {
         icon.classList.remove('fa-eye');
         icon.classList.add('fa-eye-slash');
       }
     } else {
       input.type = 'password';
+      // toggle.classList.remove('active');
       if (icon) {
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
@@ -424,6 +485,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       
       // Update URL without reload
       history.pushState(null, '', url);
+      window.applyGlobalAOS?.();
       
       // Update filter form with current values
       updateFilterForm(data.query);
@@ -645,6 +707,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       
       // Update URL without reload
       history.pushState(null, '', url);
+      window.applyGlobalAOS?.();
       
     } catch (error) {
       console.error('Error loading home page:', error);
@@ -829,6 +892,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       
       // Update URL without reload
       history.pushState(null, '', url);
+      window.applyGlobalAOS?.();
       
     } catch (error) {
       console.error('Error loading my bookings page:', error);
@@ -943,6 +1007,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       
       // Update URL without reload
       history.pushState(null, '', url);
+      window.applyGlobalAOS?.();
       
       // Scroll to reviews section
       const reviewsSection = document.getElementById('reviews');
@@ -993,3 +1058,75 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     });
   }
 })();
+
+// Account Page - Tab Switching & Edit Profile
+(function initAccountPage() {
+  // Tab switching
+  const menuItems = document.querySelectorAll('.sidebar-menu-item');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetTab = item.getAttribute('data-tab');
+
+      // Update active menu item
+      menuItems.forEach(mi => mi.classList.remove('active'));
+      item.classList.add('active');
+
+      // Show corresponding tab content
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === `${targetTab}-tab`) {
+          content.classList.add('active');
+        }
+      });
+    });
+  });
+
+  // Edit Profile functionality
+  const editProfileBtn = document.getElementById('edit-profile-btn');
+  const cancelEditBtn = document.getElementById('cancel-edit-btn');
+  const profileViewSection = document.querySelector('.profile-view-section');
+  const profileEditSection = document.querySelector('.profile-edit-section');
+
+  if (editProfileBtn) {
+    editProfileBtn.addEventListener('click', () => {
+      if (profileViewSection) profileViewSection.classList.add('hidden');
+      if (profileEditSection) profileEditSection.classList.remove('hidden');
+    });
+  }
+
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+      if (profileEditSection) profileEditSection.classList.add('hidden');
+      if (profileViewSection) profileViewSection.classList.remove('hidden');
+    });
+  }
+
+  // Password Toggle (Show/Hide) functionality
+  const passwordToggleBtns = document.querySelectorAll('.password-toggle-btn');
+
+  passwordToggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrapper = btn.closest('.password-input-wrapper');
+      if (!wrapper) return;
+
+      const input = wrapper.querySelector('.form-control-password');
+      const icon = btn.querySelector('i');
+
+      if (input && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+    });
+  });
+})();
+

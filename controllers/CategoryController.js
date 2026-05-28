@@ -25,8 +25,7 @@ const CategoryController = {
   // GET /admin/categories/create
   showCreate(req, res) {
     res.render('admin/categories/form', {
-      title: 'Thêm danh mục', category: null,
-      currentPath: req.path
+      title: 'Thêm danh mục', category: null
     });
   },
 
@@ -63,8 +62,7 @@ const CategoryController = {
         return res.redirect('/admin/categories'); 
       }
       res.render('admin/categories/form', {
-        title: 'Sửa danh mục', category,
-        currentPath: req.path
+        title: 'Sửa danh mục', category
       });
     } catch (err) { next(err); }
   },

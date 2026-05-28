@@ -91,6 +91,24 @@ const UserModel = {
       [role, id]
     );
     return result.affectedRows;
+  },
+
+  // Cập nhật thông tin người dùng (tên, số điện thoại)
+  async updateProfile(id, { fullname, phone }) {
+    const result = await query(
+      'UPDATE USERS SET fullname = ?, phone = ? WHERE id = ?',
+      [fullname, phone, id]
+    );
+    return result.affectedRows;
+  },
+
+  // Cập nhật mật khẩu
+  async updatePassword(id, password) {
+    const result = await query(
+      'UPDATE USERS SET password = ? WHERE id = ?',
+      [password, id]
+    );
+    return result.affectedRows;
   }
 };
 

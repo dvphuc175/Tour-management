@@ -28,8 +28,7 @@ const TourController = {
         categories,
         currentPage: page,
         totalPages: Math.ceil(total / LIMIT),
-        query: req.query,
-        currentPath: req.path
+        query: req.query
       });
     } catch (err) {
       next(err);
@@ -44,8 +43,7 @@ const TourController = {
       res.render('admin/tours/form', {
         title: 'Thêm tour mới',
         tour: null,
-        categories,
-        currentPath: req.path
+        categories
       });
     } catch (err) {
       next(err);
@@ -115,8 +113,7 @@ const TourController = {
       res.render('admin/tours/form', {
         title: 'Sửa tour',
         tour,
-        categories,
-        currentPath: req.path
+        categories
       });
     } catch (err) {
       next(err);
