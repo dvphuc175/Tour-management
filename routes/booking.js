@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const BookingController = require('../controllers/BookingController');
-const { isAuth } = require('../middlewares/auth');
+const { isAuth, isCustomer } = require('../middlewares/auth');
 
 router.get('/booking/success/:id', isAuth, BookingController.success);
 router.get('/booking/:scheduleId', isAuth, BookingController.showForm);

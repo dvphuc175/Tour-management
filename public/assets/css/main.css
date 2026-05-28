@@ -9350,3 +9350,22 @@ html:has(.tour-detail-layout) {
     font-size: 28px;
   }
 }
+
+/* Keep the mobile navbar drawer hidden during Android pinch-zoom */
+@media (max-width: 991px) {
+  .navbar__panel {
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(100%, 0, 0);
+    transition:
+      transform var(--transition),
+      visibility 0s linear var(--transition);
+  }
+
+  .navbar.is-open .navbar__panel {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+    transition: transform var(--transition);
+  }
+}

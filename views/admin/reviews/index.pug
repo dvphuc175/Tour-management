@@ -2,6 +2,29 @@ extends ../layout
 include ../_pagination
 
 block content
+  .toolbar
+    form.filter-form(method="GET" action="/admin/reviews")
+      input.form-control.form-control--sm.filter-search(
+        type="search"
+        name="q"
+        placeholder="Tìm tour, khách hàng, nhận xét"
+        value=filters.q
+      )
+      select.form-control.form-control--sm(name="rating" onchange="this.form.submit()")
+        option(value="" selected=!filters.rating) Tất cả số sao
+        option(value="5" selected=filters.rating==='5') 5 sao
+        option(value="4" selected=filters.rating==='4') 4 sao
+        option(value="3" selected=filters.rating==='3') 3 sao
+        option(value="2" selected=filters.rating==='2') 2 sao
+        option(value="1" selected=filters.rating==='1') 1 sao
+      button.btn.btn--primary.btn--sm(type="submit")
+        +fa('search')
+        |  Lọc
+      if hasFilters
+        a.btn.btn--outline.btn--sm(href="/admin/reviews")
+          +fa('rotate')
+          |  Xóa lọc
+
   .table-wrap
     table.data-table
       thead
@@ -15,7 +38,7 @@ block content
       tbody
         if reviews.length === 0
           tr
-            td.table-empty(colspan="6") Chưa có đánh giá nào
+            td.table-empty(colspan="6")= hasFilters ? 'Không tìm thấy đánh giá phù hợp' : 'Chưa có đánh giá nào'
         each rv in reviews
           tr
             td= rv.tour_name
@@ -32,4 +55,4 @@ block content
                 input(type="hidden" name="_csrf" value=csrfToken)
                 button.btn.btn--danger.btn--sm(type="submit") Xóa
 
-  +pagination(currentPage, totalPages, '/admin/reviews')
+  +pagination(currentPage, totalPages, paginationBaseUrl)

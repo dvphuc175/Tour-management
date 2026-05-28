@@ -3,20 +3,36 @@ include ../_pagination
 
 block content
   .toolbar
-    .filter-tabs
-      a(href="/admin/bookings" class=(!currentStatus && !currentPayment)?'filter-tab active':'filter-tab') Tất cả
-      //- each s in bookingStatus.bookingStatusKeys
-      each s in ['pending','confirmed','cancelled','completed']
-        a(
-          href=`/admin/bookings?status=${s}`
-          class=(currentStatus===s && !currentPayment)?'filter-tab active':'filter-tab'
-        )= {pending:'Chờ xác nhận',confirmed:'Đã xác nhận',cancelled:'Đã hủy',completed:'Hoàn thành'}[s]
-        //- )= bookingStatus.bookingStatusLabel(s)
-      a(
-        href="/admin/bookings?payment=refunded"
-        class=currentPayment==='refunded'?'filter-tab active':'filter-tab'
-      ) Đã hoàn tiền
-      //- )= bookingStatus.paymentStatusLabel('refunded')
+    form.filter-form(method="GET" action="/admin/bookings")
+      input.form-control.form-control--sm.filter-search(
+        type="search"
+        name="q"
+        placeholder="Tìm mã đơn, khách hàng, tour"
+        value=filters.q
+      )
+      select.form-control.form-control--sm(name="status" onchange="this.form.submit()")
+        option(value="" selected=!filters.status) Tất cả trạng thái
+        option(value="pending" selected=filters.status==='pending') Chờ xác nhận
+        option(value="confirmed" selected=filters.status==='confirmed') Đã xác nhận
+        option(value="cancelled" selected=filters.status==='cancelled') Đã hủy
+        option(value="completed" selected=filters.status==='completed') Hoàn thành
+      select.form-control.form-control--sm(name="payment" onchange="this.form.submit()")
+        option(value="" selected=!filters.payment) Tất cả thanh toán
+        option(value="pending" selected=filters.payment==='pending') Chưa thanh toán
+        option(value="success" selected=filters.payment==='success') Đã thanh toán
+        option(value="failed" selected=filters.payment==='failed') Thất bại
+        option(value="refunded" selected=filters.payment==='refunded') Đã hoàn tiền
+      select.form-control.form-control--sm(name="method" onchange="this.form.submit()")
+        option(value="" selected=!filters.method) Tất cả phương thức
+        option(value="vnpay" selected=filters.method==='vnpay') VNPay
+        option(value="cash" selected=filters.method==='cash') Tiền mặt
+      button.btn.btn--primary.btn--sm(type="submit")
+        +fa('search')
+        |  Lọc
+      if hasFilters
+        a.btn.btn--outline.btn--sm(href="/admin/bookings")
+          +fa('rotate')
+          |  Xóa lọc
 
   .table-wrap
     table.data-table
@@ -27,14 +43,14 @@ block content
           th Tour
           th Ngày đi
           th Tổng tiền
-          th Đặt cọc
-          th Phương thức thanh toán
+          th Thanh toán
+          th(title="Phương thức thanh toán") PTTT
           th Trạng thái
           th Thao tác
       tbody
         if bookings.length === 0
           tr
-            td.table-empty(colspan="9") Không có đơn nào
+            td.table-empty(colspan="9")= hasFilters ? 'Không tìm thấy đơn phù hợp' : 'Không có đơn nào'
         each b in bookings
           tr
             td= b.id
@@ -63,5 +79,4 @@ block content
             td
               a.btn.btn--view.btn--sm(href=`/admin/bookings/${b.id}`) Chi tiết
 
-  - var baseUrl = '/admin/bookings?' + (currentStatus ? `status=${currentStatus}` : (currentPayment ? `payment=${currentPayment}` : ''))
-  +pagination(currentPage, totalPages, baseUrl)
+  +pagination(currentPage, totalPages, paginationBaseUrl)
