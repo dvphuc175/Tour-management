@@ -19,8 +19,7 @@ const AdminUserController = {
         title: 'Quản lý người dùng',
         users,
         currentPage: page,
-        totalPages: Math.ceil(total / limit) || 1,
-        currentPath: req.path
+        totalPages: Math.ceil(total / limit) || 1
       });
     } catch (err) { next(err); }
   },
@@ -95,8 +94,7 @@ const AdminUserController = {
         title: 'Quản lý đánh giá',
         reviews,
         currentPage: page,
-        totalPages: Math.ceil(total / limit) || 1,
-        currentPath: req.path
+        totalPages: Math.ceil(total / limit) || 1
       });
     } catch (err) { next(err); }
   }

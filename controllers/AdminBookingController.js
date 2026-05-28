@@ -63,8 +63,7 @@ const AdminBookingController = {
         currentStatus: status,
         currentPayment: payment,
         currentPage: page,
-        totalPages,
-        currentPath: req.path
+        totalPages
       });
 
     } catch (err) {
@@ -116,8 +115,7 @@ async detail(req, res, next) {
 
       return res.render('admin/bookings/detail', {
         title: `Đơn #${booking.id}`,
-        booking,
-        currentPath: req.path
+        booking
       });
 
     } catch (err) {
