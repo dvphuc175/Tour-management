@@ -762,33 +762,40 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     };
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function generateBookingItem(b, csrfToken) {
     const bookingUi = getBookingUi(b);
-    let statusText = {
-      pending: 'Chờ xác nhận',
-      confirmed: 'Đã xác nhận',
-      cancelled: 'Đã hủy',
-      completed: 'Hoàn thành'
-    }[b.status] || b.status;
+    const tourName = escapeHtml(b.tour_name);
+    const departureLocation = escapeHtml(b.departure_location);
+    const tourSlug = encodeURIComponent(b.tour_slug || '');
+    const imageSrc = b.tour_images && b.tour_images.length ? escapeHtml(b.tour_images[0]) : '';
 
     let html = `<div class="booking-item">
       <div class="booking-item__img">`;
     
-    if (b.tour_images && b.tour_images.length) {
-      html += `<img src="${b.tour_images[0]}" alt="${b.tour_name}">`;
+    if (imageSrc) {
+      html += `<img src="${imageSrc}" alt="${tourName}">`;
     } else {
       html += `<div class="booking-item__img-empty"></div>`;
     }
     
     html += `</div>
       <div class="booking-item__info">
-        <a class="booking-item__tour" href="/tours/${b.tour_slug}">${b.tour_name}</a>
+        <a class="booking-item__tour" href="/tours/${tourSlug}">${tourName}</a>
         <div class="booking-item__meta">
           <span class="icon-text">
             <i class="fa-solid fa-calendar"></i> ${formatDate(b.start_date)} – ${formatDate(b.end_date)}
           </span>
           <span class="icon-text">
-            <i class="fa-solid fa-location-dot"></i> ${b.departure_location}
+            <i class="fa-solid fa-location-dot"></i> ${departureLocation}
           </span>
           <span class="icon-text">
             <i class="fa-solid fa-users"></i> ${b.adult_count} Người lớn / ${b.child_count} Trẻ em
@@ -797,12 +804,9 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         <div class="booking-item__price">${formatPrice(b.total_price)}</div>
       </div>
       <div class="booking-item__status">
-        
-        <span class="badge badge--${b.status}">${statusText}</span>
-        //<span class="badge badge--${bookingUi.statusBadge}">${bookingUi.statusLabel}</span>
-        <a class="btn btn--outline btn--sm" href="/my-bookings/${b.id}">Chi tiết</a>`;
-    //if (bookingUi.canCancel) {
-    if (b.status === 'pending') {
+        <span class="badge badge--${escapeHtml(bookingUi.statusBadge)}">${escapeHtml(bookingUi.statusLabel)}</span>
+        <a class="btn btn--view btn--sm" href="/my-bookings/${b.id}">Chi tiết</a>`;
+    if (bookingUi.canCancel) {
       html += `<form action="/my-bookings/${b.id}/cancel?_method=PUT" method="POST" data-confirm="Bạn chắc chắn muốn hủy đơn này?">
         <input type="hidden" name="_csrf" value="${csrfToken}">
         <button class="btn btn--danger btn--sm" type="submit">Hủy đơn</button>
@@ -870,7 +874,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       } else {
         if (myBookingsEmptyStateEl) myBookingsEmptyStateEl.style.display = 'none';
         if (myBookingsListEl) {
-          myBookingsListEl.style.display = 'block';
+          myBookingsListEl.style.display = '';
           myBookingsListEl.innerHTML = data.bookings.map(b => generateBookingItem(b, csrfToken)).join('');
         }
       }

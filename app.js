@@ -7,6 +7,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride= require('method-override');
 const sanitizeHtml = require('sanitize-html');
+const util = require('util');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const { csrf } = require('./middlewares/csrf');
@@ -122,8 +123,48 @@ app.use((req, res, next) => {
   next();
 });
 app.use(csrf);
-app.use((req, res, next) => { 
-  // Tạo helper cleanHtml để dùng trong Pug
+app.use((req, res, next) => {
+    const flashTypes = ['success', 'error', 'info'];
+    const originalFlash = req.flash.bind(req);
+
+    flashTypes.forEach(type => {
+      res.locals[type] = originalFlash(type);
+    });
+
+    req.flash = (type, ...args) => {
+      if (type && args.length > 0) {
+        const result = originalFlash(type, ...args);
+        const localMessages = res.locals[type] || (res.locals[type] = []);
+        const message = args.length > 1 ? util.format(...args) : args[0];
+
+        if (Array.isArray(message)) {
+          localMessages.push(...message);
+        } else {
+          localMessages.push(message);
+        }
+
+        return result;
+      }
+
+      return originalFlash(type, ...args);
+    };
+
+    const originalRedirect = res.redirect.bind(res);
+    res.redirect = (...args) => {
+      if (!req.session || typeof req.session.save !== 'function' || res.headersSent) {
+        return originalRedirect(...args);
+      }
+
+      return req.session.save(err => {
+        if (err) return next(err);
+        return originalRedirect(...args);
+      });
+    };
+
+    res.locals.user = req.session.user || null; 
+    res.locals.currentPath = req.path;
+
+    // Tạo helper cleanHtml để dùng trong Pug
   res.locals.cleanHtml = (html) => {
     if (!html) return '';
     return sanitizeHtml(html, {
