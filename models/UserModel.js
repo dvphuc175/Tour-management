@@ -1,5 +1,31 @@
 const { query } = require('../config/db');
 
+function buildUserFilters({ q = '', role = '', status = '' } = {}) {
+  const conditions = [];
+  const params = [];
+  const keyword = String(q || '').trim();
+
+  if (keyword) {
+    conditions.push('(fullname LIKE ? OR email LIKE ? OR phone LIKE ?)');
+    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+  }
+
+  if (role) {
+    conditions.push('role = ?');
+    params.push(role);
+  }
+
+  if (status) {
+    conditions.push('status = ?');
+    params.push(status);
+  }
+
+  return {
+    where: conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '',
+    params
+  };
+}
+
 const UserModel = {
   // Tìm user theo email (dùng cho login)
   async findByEmail(email) {
@@ -28,19 +54,24 @@ const UserModel = {
     return result.insertId;
   },
 
-  async getAll({ limit = 20, offset = 0 } = {}) {
-    const parsedLimit = Number(limit) || 20;
-    const parsedOffset = Number(offset) || 0;
+  async getAll({ limit = 20, offset = 0, q = '', role = '', status = '' } = {}) {
+    const parsedLimit = Math.max(1, parseInt(limit, 10) || 20);
+    const parsedOffset = Math.max(0, parseInt(offset, 10) || 0);
+    const { where, params } = buildUserFilters({ q, role, status });
+
     return query(
       `SELECT id, fullname, email, phone, role, status, created_at 
-       FROM USERS 
+       FROM USERS
+       ${where}
        ORDER BY created_at DESC 
-       LIMIT ${parsedLimit} OFFSET ${parsedOffset}`
+       LIMIT ${parsedLimit} OFFSET ${parsedOffset}`,
+      params
     );
   },
 
-  async countAll() {
-    const rows = await query(`SELECT COUNT(*) AS total FROM USERS`);
+  async countAll(filters = {}) {
+    const { where, params } = buildUserFilters(filters);
+    const rows = await query(`SELECT COUNT(*) AS total FROM USERS ${where}`, params);
     return rows[0].total;
   },
 

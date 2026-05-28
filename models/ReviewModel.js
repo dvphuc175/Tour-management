@@ -1,5 +1,26 @@
 const { query } = require('../config/db');
 
+function buildReviewFilters({ q = '', rating = '' } = {}) {
+  const conditions = [];
+  const params = [];
+  const keyword = String(q || '').trim();
+
+  if (keyword) {
+    conditions.push('(t.name LIKE ? OR u.fullname LIKE ? OR r.comment LIKE ?)');
+    params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+  }
+
+  if (rating) {
+    conditions.push('r.rating = ?');
+    params.push(parseInt(rating, 10));
+  }
+
+  return {
+    where: conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '',
+    params
+  };
+}
+
 const ReviewModel = {
   // Lấy danh sách review theo tour (có phân trang)
   async getByTourId(tourId, { limit = null, offset = 0 } = {}) {
@@ -93,7 +114,8 @@ const ReviewModel = {
   },
 
   // Lấy tất cả review
-  async getAll({ limit = null, offset = 0 } = {}) {
+  async getAll({ limit = null, offset = 0, q = '', rating = '' } = {}) {
+    const { where, params } = buildReviewFilters({ q, rating });
     let sql = `
       SELECT 
         r.*,
@@ -104,16 +126,25 @@ const ReviewModel = {
         ON r.user_id = u.id
       JOIN TOURS t 
         ON r.tour_id = t.id
+      ${where}
       ORDER BY r.created_at DESC
     `;
     if (limit !== null) {
       sql += ` LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`;
     }
-    return query(sql);
+    return query(sql, params);
   },
 
-  async countAll() {
-    const rows = await query(`SELECT COUNT(*) AS total FROM REVIEWS`);
+  async countAll(filters = {}) {
+    const { where, params } = buildReviewFilters(filters);
+    const rows = await query(
+      `SELECT COUNT(*) AS total
+       FROM REVIEWS r
+       JOIN USERS u ON r.user_id = u.id
+       JOIN TOURS t ON r.tour_id = t.id
+       ${where}`,
+      params
+    );
     return rows[0].total;
   },
 

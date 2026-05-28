@@ -796,6 +796,7 @@ button.btn[disabled] {
 	margin-left: auto;
 }
 .filter-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.filter-search { flex: 1 1 260px; min-width: min(260px, 100%); max-width: 360px; }
 .form-control--sm { padding: 6px 10px; font-size: 13px; width: auto; }
 
 /* ── Tour thumbnail ─────────────────────── */
