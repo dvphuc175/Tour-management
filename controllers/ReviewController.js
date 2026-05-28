@@ -24,6 +24,12 @@ const ReviewController = {
       }
 
       const { tour_id, rating, comment } = value;
+      const tour = await TourModel.findById(tour_id);
+
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return redirectBack(req, res);
+      }
  
       // 2. Chỉ cho review khi đã hoàn thành tour
       const canReview = await ReviewModel.hasCompletedBooking(userId, tour_id);
@@ -73,7 +79,7 @@ const ReviewController = {
         icon: 'star'
       });
 
-      return res.redirect(tour ? `/tours/${tour.slug}#reviews` : '/tours');
+      return res.redirect(`/tours/${tour.slug}#reviews`);
     } catch (err) {
       next(err);
     }
@@ -82,7 +88,12 @@ const ReviewController = {
   // DELETE /admin/reviews/:id
   async adminDelete(req, res, next) {
     try {
-      await ReviewModel.delete(req.params.id);
+      const result = await ReviewModel.delete(req.params.id);
+
+      if (!result.affectedRows) {
+        req.flash('error', 'Không tìm thấy đánh giá');
+        return redirectBack(req, res, '/admin/reviews');
+      }
 
       req.flash('success', {
         title: 'Đã xóa đánh giá',

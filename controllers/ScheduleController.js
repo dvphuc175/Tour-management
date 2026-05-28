@@ -59,6 +59,13 @@ const ScheduleController = {
   async create(req, res, next) {
     try {
       const { tourId } = req.params;
+      const tour = await TourModel.findById(tourId);
+
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour');
+        return res.redirect('/admin/tours');
+      }
+
       const { error, value } = scheduleSchema.validate(req.body);
       if (error) {
         req.flash('error', error.details[0].message);
@@ -106,6 +113,10 @@ const ScheduleController = {
       }
 
       const tour = await TourModel.findById(schedule.tour_id);
+      if (!tour) {
+        req.flash('error', 'Không tìm thấy tour của lịch trình');
+        return res.redirect('/admin/tours');
+      }
 
       res.render('admin/schedules/form', {
         title: 'Sửa lịch trình',
