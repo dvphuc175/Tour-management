@@ -146,7 +146,7 @@
   });
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) closeFilter();
+    if (window.innerWidth > 991) closeFilter();
   });
 })();
 

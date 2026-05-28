@@ -61,6 +61,14 @@ block content
 			.tour-list-main#tourListContainer
 				.tour-list-header
 					p.tour-count#tourCount Tìm thấy #{totalTours} tour
+					button.btn.btn--outline.btn--sm.filter-toggle(
+						type="button"
+						data-filter-toggle
+						aria-controls="tourFilterPanel"
+						aria-expanded="false"
+					)
+						+fa('filter')
+						span Bộ lọc
 
 				if tours.length === 0
 					.empty-state#tourEmptyState
