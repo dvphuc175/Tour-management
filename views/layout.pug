@@ -12,39 +12,15 @@ html(lang="vi")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
     link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css")
+    link(rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css")
+    link(rel="icon" type="image/jpeg" href="/assets/images/logo.jpg")
     link(rel="stylesheet" href="/assets/css/main.css")
     block head
 
   body
     include partials/navbar
 
-    if success && success.length
-      .flash.flash--success
-        each msg in success
-          .flash__item
-            .flash__icon
-              i.fas.fa-check-circle
-            .flash__content= msg
-            button.flash__close(type="button" aria-label="Đóng")
-              i.fas.fa-times
-    if error && error.length
-      .flash.flash--error
-        each msg in error
-          .flash__item
-            .flash__icon
-              i.fas.fa-exclamation-circle
-            .flash__content= msg
-            button.flash__close(type="button" aria-label="Đóng")
-              i.fas.fa-times
-    if info && info.length
-      .flash.flash--info
-        each msg in info
-          .flash__item
-            .flash__icon
-              i.fas.fa-info-circle
-            .flash__content= msg
-            button.flash__close(type="button" aria-label="Đóng")
-              i.fas.fa-times
+    include partials/flash
 
     main.main-content
       block content
@@ -52,23 +28,42 @@ html(lang="vi")
     //- ── Footer ─────────────────────────────────
     footer.footer#contact
       .container
-        .footer__content
-          .footer__col
-            h3.footer__title Vi Vu Việt Nam
-            p.footer__desc Công ty chuyên cung cấp các tour du lịch chất lượng cao khắp Việt Nam. Trải nghiệm du lịch tuyệt vời cùng chúng tôi!
+        .footer__top(data-aos="fade-up")
+          .footer__brand
+            a.footer__logo(href="/")
+              span.footer__logo-mark ViVu
+              span.footer__logo-text Việt Nam
+            p.footer__desc Công ty chuyên cung cấp các tour du lịch chất lượng cao khắp Việt Nam. Đặt tour nhanh chóng, an toàn và trải nghiệm tuyệt vời cùng chúng tôi.
             .footer__social
               a.footer__social-link(href="#" aria-label="Facebook")
-                +fa('facebook')
+                +fa('facebook', 'brands')
               a.footer__social-link(href="#" aria-label="Instagram")
-                +fa('instagram')
-              a.footer__social-link(href="#" aria-label="Zalo")
+                +fa('instagram', 'brands')
+              a.footer__social-link(href="https://zalo.me/0345043213" target="_blank" rel="noopener" aria-label="Zalo")
                 img(src="/assets/images/Zalo.jpg" alt="Zalo")
+
+          .footer__cta
+            h3.footer__title Nhận ưu đãi mỗi tuần
+            p.footer__muted Đăng ký email để nhận deal hot, gợi ý hành trình và voucher giảm giá.
+            form.footer__form(action="/contact" method="GET")
+              input.footer__input(type="email" name="email" placeholder="Email của bạn" autocomplete="email")
+              button.btn.btn--accent(type="submit") Đăng ký
+            p.footer__hint Bạn có thể hủy đăng ký bất cứ lúc nào.
+
+        .footer__grid(data-aos="fade-up" data-aos-delay="120")
           .footer__col
             h3.footer__title Liên kết nhanh
             a.footer__link(href="/") Trang chủ
             a.footer__link(href="/tours") Khám phá tour
             if !user || user.role === 'customer'
               a.footer__link(href="/my-bookings") Đơn của tôi
+            a.footer__link(href="/contact") Liên hệ
+          .footer__col
+            h3.footer__title Danh mục phổ biến
+            a.footer__link(href="/tours?category=1") Tour Miền Bắc
+            a.footer__link(href="/tours?category=2") Tour Miền Trung
+            a.footer__link(href="/tours?category=4") Tour Biển Đảo
+            a.footer__link(href="/tours?category=8") Tour Nghỉ Dưỡng
           .footer__col
             h3.footer__title Liên hệ
             .footer__contact
@@ -77,15 +72,20 @@ html(lang="vi")
                 span 123 Đường ABC, Quận 1, TP. Hồ Chí Minh
               .footer__contact-item
                 +fa('phone')
-                span 0345.043.213
+                a.footer__contact-link(href="tel:0345043213") 0345 043 213
               .footer__contact-item
                 +fa('envelope')
-                span info@vivuvietnam.com
+                a.footer__contact-link(href="mailto:info@vivuvietnam.com") info@vivuvietnam.com
               .footer__contact-item
                 +fa('clock')
                 span 8:00 - 22:00 mỗi ngày
+
         .footer__bottom
-          p &copy; 2024 Vi Vu Việt Nam. All rights reserved.
+          .footer__bottom-left
+            p &copy; 2026 Vi Vu Việt Nam. All rights reserved.
+          .footer__bottom-right
+            a.footer__tiny-link(href="/about") Giới thiệu
+            a.footer__tiny-link(href="/contact") Hỗ trợ
 
     #zalo-widget
       #zalo-button(onclick="toggleZaloChat()")
@@ -110,6 +110,7 @@ html(lang="vi")
             +fa('comment')
             |  Chat ngay trên Zalo
 
+    script(src="https://unpkg.com/aos@2.3.4/dist/aos.js")
     script(src="/assets/js/main.js")
     block scripts
 

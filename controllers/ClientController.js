@@ -2,9 +2,19 @@ const TourModel = require('../models/TourModel');
 const CategoryModel = require('../models/CategoryModel');
 const ScheduleModel = require('../models/ScheduleModel');
 const ReviewModel = require('../models/ReviewModel');
+const UserModel = require('../models/UserModel');
+const bcrypt = require('bcryptjs');
 const LIMIT = 9; 
 const HOME_LIMIT = 8; // 6 tours per page on homepage
 const REVIEW_LIMIT = 5;
+
+// Danh mục tiêu biểu cho section "Điểm đến nổi bật" (slug → ảnh minh họa)
+const HIGHLIGHT_CATEGORY_SLUGS = ['tour-bien-dao', 'tour-van-hoa', 'tour-nui-rung'];
+const HIGHLIGHT_CATEGORY_IMAGES = {
+  'tour-bien-dao': '/assets/images/slide2.jpg',
+  'tour-van-hoa': '/assets/images/slide1.jpg',
+  'tour-nui-rung': '/assets/images/slide3.jpg'
+};
 
 const ClientController = {
   // GET /
@@ -21,6 +31,19 @@ const ClientController = {
         CategoryModel.getActive()
       ]);
 
+      const highlightCategories = HIGHLIGHT_CATEGORY_SLUGS.map((slug) => {
+        const cat = categories.find((c) => c.slug === slug);
+        if (!cat) return null;
+        return {
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug,
+          description: cat.description,
+          image: HIGHLIGHT_CATEGORY_IMAGES[slug] || '/assets/images/slide1.jpg',
+          href: `/tours?category=${cat.id}`
+        };
+      }).filter(Boolean);
+
       if (req.headers.accept && req.headers.accept.includes('application/json')) {
         return res.json({
           tours,
@@ -33,6 +56,7 @@ const ClientController = {
       return res.render('client/home', {
         title: 'Trang chủ',
         tours: featuredTours,
+        highlightCategories,
         categories,
         currentPage: page,
         totalPages: Math.ceil(total / HOME_LIMIT),
@@ -373,5 +397,78 @@ function parseTourDescription(description) {
 
   return sections;
 }
+
+// Account Controller Functions
+ClientController.showAccount = async function(req, res, next) {
+  try {
+    const user = await UserModel.findById(req.session.user.id);
+    return res.render('client/account', {
+      title: 'Thông tin tài khoản',
+      user
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+ClientController.updateProfile = async function(req, res, next) {
+  try {
+    const { fullname, phone } = req.body;
+    if (!fullname) {
+      req.flash('error', 'Vui lòng nhập họ tên.');
+      return res.redirect('/profile');
+    }
+
+    await UserModel.updateProfile(req.session.user.id, { fullname, phone });
+    
+    // Update session user info
+    req.session.user.fullname = fullname;
+    
+    req.flash('success', 'Cập nhật thông tin thành công!');
+    return res.redirect('/profile');
+  } catch (err) {
+    next(err);
+  }
+};
+
+ClientController.updatePassword = async function(req, res, next) {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      req.flash('error', 'Vui lòng nhập đầy đủ thông tin.');
+      return res.redirect('/profile');
+    }
+
+    if (newPassword !== confirmPassword) {
+      req.flash('error', 'Mật khẩu xác nhận không khớp.');
+      return res.redirect('/profile');
+    }
+
+    if (newPassword.length < 6) {
+      req.flash('error', 'Mật khẩu phải có ít nhất 6 ký tự.');
+      return res.redirect('/profile');
+    }
+
+    // Get current user to check password
+    const user = await UserModel.findById(req.session.user.id);
+    const match = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!match) {
+      req.flash('error', 'Mật khẩu hiện tại không đúng.');
+      return res.redirect('/profile');
+    }
+
+    // Hash new password and update
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await UserModel.updatePassword(req.session.user.id, hashed);
+
+    req.flash('success', 'Đổi mật khẩu thành công!');
+    return res.redirect('/profile');
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = ClientController;

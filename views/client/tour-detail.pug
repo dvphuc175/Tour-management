@@ -365,6 +365,8 @@ block content
 block scripts
   script(src="/assets/js/tour-gallery.js")
   script.
+    const scheduleModal = document.getElementById('scheduleModal');
+
     function openScheduleModal() {
       document.getElementById('scheduleModal').classList.add('show');
       document.body.style.overflow = 'hidden'; 

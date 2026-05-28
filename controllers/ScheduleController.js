@@ -28,8 +28,7 @@ const ScheduleController = {
         schedules,
         today: new Date(),
         currentPage: page,
-        totalPages: Math.ceil(total / limit) || 1,
-        currentPath: req.path
+        totalPages: Math.ceil(total / limit) || 1
       });
     } catch (err) {
       next(err);
@@ -49,8 +48,7 @@ const ScheduleController = {
       res.render('admin/schedules/form', {
         title: 'Thêm lịch trình',
         tour,
-        schedule: null,
-        currentPath: req.path
+        schedule: null
       });
     } catch (err) {
       next(err);
@@ -123,8 +121,7 @@ const ScheduleController = {
       res.render('admin/schedules/form', {
         title: 'Sửa lịch trình',
         tour,
-        schedule,
-        currentPath: req.path
+        schedule
       });
     } catch (err) {
       next(err);

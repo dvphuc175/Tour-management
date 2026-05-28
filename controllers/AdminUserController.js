@@ -54,8 +54,7 @@ const AdminUserController = {
         paginationBaseUrl: buildListUrl('/admin/users', filters),
         returnTo: req.originalUrl,
         currentPage: page,
-        totalPages: Math.ceil(total / limit) || 1,
-        currentPath: req.path
+        totalPages: Math.ceil(total / limit) || 1
       });
     } catch (err) { next(err); }
   },
@@ -154,8 +153,7 @@ const AdminUserController = {
         hasFilters: Boolean(filters.q || filters.rating),
         paginationBaseUrl: buildListUrl('/admin/reviews', filters),
         currentPage: page,
-        totalPages: Math.ceil(total / limit) || 1,
-        currentPath: req.path
+        totalPages: Math.ceil(total / limit) || 1
       });
     } catch (err) { next(err); }
   }

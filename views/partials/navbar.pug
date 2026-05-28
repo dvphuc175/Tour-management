@@ -1,7 +1,9 @@
 nav.navbar
   .navbar__inner
     .navbar__brand
-      a(href="/").navbar__logo Vi Vu Việt Nam
+      a(href="/").navbar__logo
+        img(src="/assets/images/logo.jpg" alt="Vi Vu Việt Nam" class="navbar__logo-img")
+        span.navbar__logo-text Vi Vu Việt Nam
 
     button.navbar__toggle(
       type="button"
@@ -14,8 +16,7 @@ nav.navbar
       span.navbar__toggle-bar
 
     #navbar-panel.navbar__panel
-      button.navbar__close(type="button" aria-label="Đóng menu" data-navbar-close)
-        +fa('xmark')
+      
 
       .navbar__menu
         a(href="/" class=currentPath === '/' ? 'navbar__link--active' : '') Trang chủ
@@ -27,8 +28,9 @@ nav.navbar
         if user
           .navbar__dropdown
             button.navbar__dropdown-toggle(type="button" aria-haspopup="true" aria-expanded="false")
-              +fa('user')
-              |  Xin chào, #{user.fullname}
+              .navbar-avatar
+                span.navbar-avatar-initials= getUserInitials(user.fullname)
+              span.navbar-username Xin chào, #{user.fullname}
             .navbar__dropdown-menu
               a.navbar__dropdown-item(href="/profile")
                 +fa('user-circle')

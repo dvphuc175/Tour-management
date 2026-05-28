@@ -8,8 +8,6 @@ a.tour-card(href=`/tours/${tour.slug}`)
 			.tour-card__img-placeholder
 		if tour.category_name
 			span.tour-card__cat= tour.category_name
-		button.tour-card__favorite(type="button" aria-label="Thêm vào yêu thích")
-			+fa('heart')
 	.tour-card__body
 		h3.tour-card__name= tour.name
 		if tour.avg_rating && tour.review_count > 0

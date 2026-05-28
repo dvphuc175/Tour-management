@@ -10,6 +10,7 @@ html(lang="vi")
     link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
     link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Sora:wght@600;700&display=swap")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css")
+    link(rel="icon" type="image/jpeg" href="/assets/images/logo.jpg")
     link(rel="stylesheet" href="/assets/css/main.css")
     link(rel="stylesheet" href="/assets/css/admin.css")
     block head
@@ -22,26 +23,7 @@ html(lang="vi")
           button.admin-sidebar-toggle(type="button" aria-label="Mở menu" onclick="toggleAdminSidebar()")
             +fa('bars')
           h1.admin-page-title= title
-
-        //- Flash messages
-        if success && success.length
-          .flash.flash--success
-            each msg in success
-              .flash__item
-                .flash__icon
-                  i.fas.fa-check-circle
-                .flash__content= msg
-                button.flash__close(type="button" aria-label="Đóng")
-                  i.fas.fa-times
-        if error && error.length
-          .flash.flash--error
-            each msg in error
-              .flash__item
-                .flash__icon
-                  i.fas.fa-exclamation-circle
-                .flash__content= msg
-                button.flash__close(type="button" aria-label="Đóng")
-                  i.fas.fa-times
+        include ../partials/flash
 
         .admin-content
           block content
