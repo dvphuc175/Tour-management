@@ -33,9 +33,10 @@ nav.navbar
               a.navbar__dropdown-item(href="/profile")
                 +fa('user-circle')
                 |  Thông tin tài khoản
-              a.navbar__dropdown-item(href="/my-bookings")
-                +fa('ticket')
-                |  Đơn của tôi
+              if user.role === 'customer'
+                a.navbar__dropdown-item(href="/my-bookings")
+                  +fa('ticket')
+                  |  Đơn của tôi
               if user.role === 'admin'
                 a.navbar__dropdown-item(href="/admin")
                   +fa('gear')

@@ -44,5 +44,13 @@ function isStaff(req, res, next) {
   if (role === 'admin' || role === 'staff') return next();
   return renderForbidden(res);
 }
+
+function isCustomer(req, res, next) {
+  if (req.session.user?.role === 'customer') return next();
+  return renderForbidden(
+    res,
+    'Tài khoản quản trị hoặc nhân viên không thể đặt tour. Vui lòng sử dụng tài khoản khách hàng.'
+  );
+}
  
-module.exports = { isAuth, isAdmin, isStaff };
+module.exports = { isAuth, isAdmin, isStaff, isCustomer };
