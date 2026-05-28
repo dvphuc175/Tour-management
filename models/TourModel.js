@@ -292,6 +292,7 @@ async function getFeatured(limit = 6) {
       t.id,
       t.name,
       t.slug,
+      t.category_id,
       t.price_adult,
       t.images,
       c.name AS category_name,

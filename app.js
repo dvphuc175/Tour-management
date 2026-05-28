@@ -10,7 +10,56 @@ const sanitizeHtml = require('sanitize-html');
 const MySQLStore = require('express-mysql-session')(session);
 const { pool } = require('./config/db');
 const { csrf } = require('./middlewares/csrf');
+const bookingStatus = require('./utils/bookingStatus');
 const app = express()
+
+const FLASH_DEFAULTS = {
+  success: { title: 'Thành công', icon: 'check' },
+  error: { title: 'Không thể thực hiện', icon: 'warning' },
+  info: { title: 'Thông báo', icon: 'info' }
+};
+
+function normalizeFlashMessage(type, value) {
+  const defaults = FLASH_DEFAULTS[type] || FLASH_DEFAULTS.info;
+  const normalizeDetails = (details) =>
+    Array.isArray(details)
+      ? details.map((d) => String(d)).filter(Boolean)
+      : [];
+
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const fallbackMessage = value.message
+      || value.text
+      || value.description
+      || value.error
+      || '';
+    return {
+      type,
+      title: value.title || defaults.title,
+      message: String(fallbackMessage),
+      details: normalizeDetails(value.details),
+      icon: value.icon || defaults.icon,
+      action: value.action || null,
+      actions: Array.isArray(value.actions) ? value.actions : []
+    };
+  }
+
+  return {
+    type,
+    title: defaults.title,
+    message: String(value || ''),
+    details: [],
+    icon: defaults.icon,
+    action: null,
+    actions: []
+  };
+}
+
+function collectFlashMessages(req) {
+  return ['success', 'info', 'error'].flatMap((type) =>
+    req.flash(type).map((msg) => normalizeFlashMessage(type, msg))
+  );
+}
+
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
@@ -43,15 +92,38 @@ app.use(session({
 }));
 
 app.use(flash());
+app.use((req, res, next) => {
+  const redirect = res.redirect.bind(res);
+  const render = res.render.bind(res);
+
+  res.locals.success = [];
+  res.locals.error = [];
+  res.locals.info = [];
+  res.locals.flashMessages = [];
+  res.locals.user = req.session.user || null;
+  res.locals.currentPath = req.path;
+
+  res.redirect = (...args) => {
+    if (!req.session || typeof req.session.save !== 'function') {
+      return redirect(...args);
+    }
+
+    return req.session.save((err) => {
+      if (err) return next(err);
+      return redirect(...args);
+    });
+  };
+
+  res.render = (...args) => {
+    res.locals.flashMessages = collectFlashMessages(req);
+    return render(...args);
+  };
+
+  next();
+});
 app.use(csrf);
 app.use((req, res, next) => { 
-    res.locals.success = req.flash('success'); 
-    res.locals.error = req.flash('error'); 
-    res.locals.info = req.flash('info');
-    res.locals.user = req.session.user || null; 
-    res.locals.currentPath = req.path;
-
-    // Tạo helper cleanHtml để dùng trong Pug
+  // Tạo helper cleanHtml để dùng trong Pug
   res.locals.cleanHtml = (html) => {
     if (!html) return '';
     return sanitizeHtml(html, {
@@ -118,6 +190,7 @@ app.use((req, res, next) => {
     }
     return html;
   };
+  res.locals.bookingStatus = bookingStatus;
   res.locals.renderStarRating = (rating) => {
     const n = Math.min(5, Math.max(0, Math.round(Number(rating) || 0)));
     let html = '';
@@ -128,7 +201,18 @@ app.use((req, res, next) => {
     }
     return html;
   };
-    next(); });
+
+  // Helper để lấy 2 chữ cái đầu của họ tên
+  res.locals.getUserInitials = (fullname) => {
+    if (!fullname) return 'UN';
+    const parts = fullname.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+  next();
+});
 
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));

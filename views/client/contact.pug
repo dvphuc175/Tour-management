@@ -4,32 +4,56 @@ block content
   //- ── Hero Contact ───────────────────────────
   section.hero.hero--contact
     .hero__content.container
-      h1.hero__title Liên Hệ Với Chúng Tôi
-      p.hero__sub Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn
+      h1.hero__title(data-aos="fade-up") Kết Nối Với Vi Vu Việt Nam
+      p.hero__sub(data-aos="fade-up" data-aos-delay="100") Nhận tư vấn lịch trình, báo giá nhanh và hỗ trợ trực tiếp từ đội ngũ chuyên viên du lịch.
+
+  //- ── Contact quick metrics ──────────────────
+  section.section.section--gray
+    .container
+      .contact-metrics
+        .contact-metric(data-aos="zoom-in")
+          +fa('clock')
+          h4.contact-metric__value Phản hồi trong 15 phút
+          p.contact-metric__label Trong giờ làm việc
+        .contact-metric(data-aos="zoom-in" data-aos-delay="80")
+          +fa('shield-check')
+          h4.contact-metric__value Tư vấn minh bạch
+          p.contact-metric__label Không chi phí ẩn
+        .contact-metric(data-aos="zoom-in" data-aos-delay="140")
+          +fa('headset')
+          h4.contact-metric__value Hỗ trợ 24/7
+          p.contact-metric__label Theo sát booking
+        .contact-metric(data-aos="zoom-in" data-aos-delay="200")
+          +fa('users')
+          h4.contact-metric__value 10.000+ khách hàng
+          p.contact-metric__label Đã tin tưởng sử dụng
 
   //- ── Contact Content ────────────────────────
   section.section
     .container
       .contact-grid
         //- Contact Info
-        .contact-info
-          h2.section__title Thông Tin Liên Hệ
-          .contact-info__item
+        .contact-info(data-aos="fade-right")
+          h2.section__title Kênh hỗ trợ chính thức
+          p.contact-info__intro Chúng tôi luôn ưu tiên phản hồi nhanh để bạn không bỏ lỡ lịch trình phù hợp.
+          .contact-info__item(data-aos="fade-up")
             +fa('location-dot')
             .contact-info__content
               h4 Địa chỉ
               p 123 Đường ABC, Quận 1, TP. Hồ Chí Minh
-          .contact-info__item
+          .contact-info__item(data-aos="fade-up" data-aos-delay="60")
             +fa('phone')
             .contact-info__content
               h4 Điện thoại
-              p 0345.043.213
-          .contact-info__item
+              p 
+                a.contact-inline-link(href="tel:0345043213") 0345 043 213
+          .contact-info__item(data-aos="fade-up" data-aos-delay="100")
             +fa('envelope')
             .contact-info__content
               h4 Email
-              p info@vivuvietnam.com
-          .contact-info__item
+              p
+                a.contact-inline-link(href="mailto:info@vivuvietnam.com") info@vivuvietnam.com
+          .contact-info__item(data-aos="fade-up" data-aos-delay="140")
             +fa('clock')
             .contact-info__content
               h4 Giờ làm việc
@@ -53,22 +77,37 @@ block content
                 p 0901.234.567
 
         //- Contact Form
-        .contact-form
-          h2.section__title Gửi Tin Nhắn Cho Chúng Tôi
+        .contact-form(data-aos="fade-left")
+          .contact-form__heading
+            h2.section__title Gửi yêu cầu tư vấn
+            p.contact-form__sub Điền thông tin, chúng tôi sẽ liên hệ và đề xuất lịch trình phù hợp trong thời gian sớm nhất.
           form(action="/contact" method="POST")
             input(type="hidden" name="_csrf" value=csrfToken)
-            .form-group
-              label Họ và tên <span class="required">*</span>
-              input.form-control(type="text" name="fullname" placeholder="Nhập họ và tên của bạn" required)
-            .form-group
-              label Email <span class="required">*</span>
-              input.form-control(type="email" name="email" placeholder="Nhập email của bạn" required)
-            .form-group
-              label Số điện thoại
-              input.form-control(type="tel" name="phone" placeholder="Nhập số điện thoại của bạn")
+            .form-row
+              .form-group
+                label Họ và tên <span class="required">*</span>
+                input.form-control(type="text" name="fullname" placeholder="Nhập họ và tên của bạn" required)
+              .form-group
+                label Email <span class="required">*</span>
+                input.form-control(type="email" name="email" placeholder="Nhập email của bạn" required)
+            .form-row
+              .form-group
+                label Số điện thoại
+                input.form-control(type="tel" name="phone" placeholder="Nhập số điện thoại của bạn")
+              .form-group
+                label Chủ đề
+                select.form-control(name="topic")
+                  option(value="") Chọn chủ đề cần hỗ trợ
+                  option(value="tour-tu-van") Tư vấn chọn tour
+                  option(value="bao-gia") Báo giá theo nhu cầu
+                  option(value="booking") Hỗ trợ booking
+                  option(value="khac") Nội dung khác
             .form-group
               label Nội dung <span class="required">*</span>
-              textarea.form-control(name="message" rows="5" placeholder="Nhập nội dung tin nhắn..." required)
+              textarea.form-control(name="message" rows="5" placeholder="Mô tả nhu cầu của bạn: điểm đến, số người, thời gian dự kiến..." required)
+            .contact-form__note
+              +fa('circle-info')
+              span Thông tin của bạn được bảo mật và chỉ dùng cho mục đích tư vấn dịch vụ.
             button.btn.btn--primary.btn--block(type="submit")
               +fa('paper-plane')
-              |  Gửi tin nhắn
+              |  Gửi yêu cầu ngay

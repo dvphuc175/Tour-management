@@ -1,52 +1,117 @@
 extends layout
 
 block content
-  .report-filter
-    form.report-filter__form(method="GET" action="/admin/reports")
-      .form-group
-        label(for="from") Từ ngày
-        input#from(type="date" name="from" value=from)
-      .form-group
-        label(for="to") Đến ngày
-        input#to(type="date" name="to" value=to)
-      .form-group
-        button.btn.btn--primary(type="submit") Lọc
+  //- ── Report filter hero section ──
+  .report-hero
+    .report-hero__header
+      .report-hero__icon
+        i.fas.fa-chart-line
+      .report-hero__text
+        h2.report-hero__title Báo cáo doanh thu
+        p.report-hero__subtitle Phân tích chi tiết doanh thu, đơn đặt và hành khách theo khoảng thời gian
+    
+    form.report-hero__form(method="GET" action="/admin/reports")
+      .report-hero__filters
+        .report-filter-field
+          .report-filter-field__icon
+            i.fas.fa-calendar-alt
+          .report-filter-field__input
+            label(for="from") Từ ngày
+            input#from(type="date" name="from" value=from)
+        .report-filter-field
+          .report-filter-field__icon
+            i.fas.fa-calendar-alt
+          .report-filter-field__input
+            label(for="to") Đến ngày
+            input#to(type="date" name="to" value=to)
+        button.report-filter-submit(type="submit")
+          i.fas.fa-search
+          span Lọc báo cáo
 
-  .report-summary
-    .report-summary__card
-      .report-summary__label Tổng doanh thu
-      .report-summary__value= Number(totals.revenue || 0).toLocaleString('vi-VN') + ' ₫'
-    .report-summary__card
-      .report-summary__label Tổng đơn đặt
-      .report-summary__value= totals.bookings || 0
-    .report-summary__card
-      .report-summary__label Tổng hành khách
-      .report-summary__value= totals.passengers || 0
+  //- ── Summary cards with icons ──
+  .report-stats
+    .report-stat-card.report-stat-card--revenue
+      .report-stat-card__glow
+      .report-stat-card__icon
+        i.fas.fa-coins
+      .report-stat-card__content
+        .report-stat-card__label Tổng doanh thu
+        .report-stat-card__value= Number(totals.revenue || 0).toLocaleString('vi-VN') + ' ₫'
+      .report-stat-card__trend
+        i.fas.fa-chart-line
+
+    .report-stat-card.report-stat-card--bookings
+      .report-stat-card__glow
+      .report-stat-card__icon
+        i.fas.fa-ticket-alt
+      .report-stat-card__content
+        .report-stat-card__label Tổng đơn đặt
+        .report-stat-card__value= totals.bookings || 0
+      .report-stat-card__trend
+        i.fas.fa-shopping-cart
+
+    .report-stat-card.report-stat-card--passengers
+      .report-stat-card__glow
+      .report-stat-card__icon
+        i.fas.fa-user-friends
+      .report-stat-card__content
+        .report-stat-card__label Tổng hành khách
+        .report-stat-card__value= totals.passengers || 0
+      .report-stat-card__trend
+        i.fas.fa-users
 
   if rows.length > 0
-    .chart-card
-      .chart-card__header
-        h2.chart-card__title Doanh thu theo ngày
-      canvas#reportChart(width="400" height="280")
+    //- ── Chart section ──
+    .report-chart-section
+      .report-chart-card
+        .report-chart-card__header
+          .report-chart-card__title-group
+            i.fas.fa-chart-area
+            h2.report-chart-card__title Biểu đồ doanh thu theo ngày
+          .report-chart-card__badge
+            i.fas.fa-calendar-week
+            span= rows.length + ' ngày'
+        .report-chart-card__body
+          canvas#reportChart(width="400" height="320")
 
-    .table-wrap
-      table.data-table
-        thead
-          tr
-            th Ngày
-            th Doanh thu
-            th Đơn đặt
-            th Hành khách
-        tbody
-          each row in rows
-            tr
-              td= row.date
-              td= Number(row.revenue || 0).toLocaleString('vi-VN') + ' ₫'
-              td= row.bookings || 0
-              td= row.passengers || 0
+    //- ── Data table section ──
+    .report-table-section
+      .report-table-card
+        .report-table-card__header
+          .report-table-card__title-group
+            i.fas.fa-table
+            h2.report-table-card__title Chi tiết theo ngày
+          .report-table-card__count
+            span= rows.length + ' bản ghi'
+        .report-table-card__body
+          table.report-data-table
+            thead
+              tr
+                th
+                  i.fas.fa-calendar-day
+                  span Ngày
+                th
+                  i.fas.fa-dollar-sign
+                  span Doanh thu
+                th
+                  i.fas.fa-receipt
+                  span Đơn đặt
+                th
+                  i.fas.fa-users
+                  span Hành khách
+            tbody
+              each row, index in rows
+                tr(class=index % 2 === 0 ? 'row--even' : 'row--odd')
+                  td.report-data-table__date= row.date
+                  td.report-data-table__revenue= Number(row.revenue || 0).toLocaleString('vi-VN') + ' ₫'
+                  td.report-data-table__bookings= row.bookings || 0
+                  td.report-data-table__passengers= row.passengers || 0
   else
-    .flash.flash--info
-      p Không có dữ liệu trong khoảng thời gian đã chọn.
+    .report-empty
+      .report-empty__icon
+        i.fas.fa-inbox
+      h3.report-empty__title Không có dữ liệu
+      p.report-empty__text Chưa có dữ liệu trong khoảng thời gian đã chọn. Hãy thử chọn khoảng thời gian khác.
 
 block scripts
   script(src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js")
@@ -56,13 +121,15 @@ block scripts
       const reportCtx = document.getElementById('reportChart');
       if (reportCtx) {
         const ctx = reportCtx.getContext('2d');
-        const gradient1 = ctx.createLinearGradient(0, 0, 0, 280);
-        gradient1.addColorStop(0, 'rgba(59, 130, 246, 0.45)');
-        gradient1.addColorStop(1, 'rgba(59, 130, 246, 0.03)');
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient1.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradient1.addColorStop(0.5, 'rgba(99, 102, 241, 0.12)');
+        gradient1.addColorStop(1, 'rgba(99, 102, 241, 0.01)');
         
-        const gradient2 = ctx.createLinearGradient(0, 0, 0, 280);
-        gradient2.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
-        gradient2.addColorStop(1, 'rgba(245, 158, 11, 0.03)');
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient2.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+        gradient2.addColorStop(0.5, 'rgba(245, 158, 11, 0.1)');
+        gradient2.addColorStop(1, 'rgba(245, 158, 11, 0.01)');
         
         new Chart(reportCtx, {
           type: 'line',
@@ -72,16 +139,18 @@ block scripts
               {
                 label: 'Doanh thu',
                 data: reportData.revenue,
-                borderColor: '#3b82f6',
+                borderColor: '#6366f1',
                 backgroundColor: gradient1,
                 borderWidth: 3,
                 tension: 0.4,
                 fill: true,
                 pointRadius: 5,
-                pointHoverRadius: 7,
-                pointBackgroundColor: '#3b82f6',
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#6366f1',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 3
+                pointBorderWidth: 3,
+                pointHoverBorderWidth: 4,
+                pointHoverBackgroundColor: '#4f46e5'
               },
               {
                 label: 'Đơn đặt',
@@ -92,10 +161,12 @@ block scripts
                 tension: 0.4,
                 fill: true,
                 pointRadius: 5,
-                pointHoverRadius: 7,
+                pointHoverRadius: 8,
                 pointBackgroundColor: '#f59e0b',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 3
+                pointBorderWidth: 3,
+                pointHoverBorderWidth: 4,
+                pointHoverBackgroundColor: '#d97706'
               }
             ]
           },
@@ -103,7 +174,7 @@ block scripts
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-              duration: 1500,
+              duration: 1800,
               easing: 'easeOutQuart'
             },
             interaction: {
@@ -113,21 +184,29 @@ block scripts
             plugins: { 
               legend: { 
                 position: 'top',
+                align: 'end',
                 labels: {
                   usePointStyle: true,
-                  padding: 20,
+                  pointStyle: 'circle',
+                  padding: 24,
                   font: {
                     size: 13,
-                    weight: 600
+                    weight: 600,
+                    family: "'Be Vietnam Pro', sans-serif"
                   }
                 }
               },
               tooltip: {
-                backgroundColor: '#1f2937',
-                padding: 12,
-                titleFont: { size: 14, weight: 700 },
-                bodyFont: { size: 13 },
-                cornerRadius: 10,
+                backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                padding: 16,
+                titleFont: { size: 14, weight: 700, family: "'Be Vietnam Pro', sans-serif" },
+                bodyFont: { size: 13, family: "'Be Vietnam Pro', sans-serif" },
+                bodySpacing: 8,
+                cornerRadius: 12,
+                borderColor: 'rgba(99, 102, 241, 0.2)',
+                borderWidth: 1,
+                displayColors: true,
+                boxPadding: 6,
                 callbacks: {
                   label: function(context) {
                     let label = context.dataset.label || '';
@@ -144,14 +223,30 @@ block scripts
             },
             scales: {
               x: { 
-                grid: { display: false },
-                ticks: { font: { weight: 600 }, color: '#64748b' }
+                grid: { 
+                  display: false
+                },
+                border: {
+                  display: false
+                },
+                ticks: { 
+                  font: { weight: 500, size: 12, family: "'Be Vietnam Pro', sans-serif" }, 
+                  color: '#94a3b8',
+                  maxRotation: 45
+                }
               },
               y: {
-                grid: { color: 'rgba(226, 232, 240, 0.5)' },
+                border: {
+                  display: false
+                },
+                grid: { 
+                  color: 'rgba(226, 232, 240, 0.6)',
+                  drawBorder: false
+                },
                 ticks: {
-                  font: { weight: 600 },
-                  color: '#64748b',
+                  font: { weight: 500, size: 12, family: "'Be Vietnam Pro', sans-serif" },
+                  color: '#94a3b8',
+                  padding: 12,
                   callback: value => new Intl.NumberFormat('vi-VN').format(value)
                 }
               }

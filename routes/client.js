@@ -10,4 +10,10 @@ router.post('/contact', ClientController.submitContact);
 router.get('/tours', ClientController.tourList);
 router.get('/tours/:slug', ClientController.tourDetail);
 router.post('/reviews', isAuth, ReviewController.create);
+
+// Account routes
+router.get('/profile', isAuth, ClientController.showAccount);
+router.put('/profile', isAuth, ClientController.updateProfile);
+router.put('/profile/password', isAuth, ClientController.updatePassword);
+
 module.exports = router;

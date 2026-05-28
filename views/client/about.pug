@@ -4,63 +4,110 @@ block content
   //- ── Hero About ─────────────────────────────
   section.hero.hero--about
     .hero__content.container
-      h1.hero__title Về Chúng Tôi
-      p.hero__sub Khám phá hành trình và sứ mệnh của Vi Vu Việt Nam
+      h1.hero__title(data-aos="fade-up") Đồng Hành Cùng Bạn Trên Mọi Hành Trình Việt Nam
+      p.hero__sub(data-aos="fade-up" data-aos-delay="120") Vi Vu Việt Nam mang đến trải nghiệm đặt tour minh bạch, lịch trình chỉn chu và dịch vụ tận tâm từ tư vấn đến hậu mãi.
 
-  //- ── About Content ──────────────────────────
+  //- ── About Intro ─────────────────────────────
   section.section
     .container
       .about-grid
-        .about-content
-          h2.section__title Chúng Tôi Là Ai?
+        .about-content(data-aos="fade-right")
+          span.about-kicker CÂU CHUYỆN THƯƠNG HIỆU
+          h2.section__title Chúng tôi không chỉ bán tour, chúng tôi thiết kế trải nghiệm đáng nhớ
           p.
-            Vi Vu Việt Nam được thành lập với niềm đam mê khám phá và mong muốn mang đến những trải nghiệm du lịch độc đáo, đáng nhớ cho mọi người. 
-            Với nhiều năm kinh nghiệm trong ngành du lịch, chúng tôi tự hào là đối tác tin cậy của hàng ngàn khách hàng.
-          
-          h2.section__title Sứ Mệnh Của Chúng Tôi
+            Từ những chuyến đi đầu tiên, Vi Vu Việt Nam xây dựng nền tảng với mục tiêu giúp khách hàng đặt tour nhanh, hiểu rõ dịch vụ trước khi thanh toán và luôn có người đồng hành trong suốt hành trình.
           p.
-            Chúng tôi cam kết cung cấp các tour du lịch chất lượng cao, dịch vụ chuyên nghiệp và giá cả hợp lý. 
-            Mục tiêu của chúng tôi là giúp mỗi khách hàng có được một chuyến đi hoàn hảo, an toàn và tràn đầy niềm vui.
-          
-          h2.section__title Tại Sao Chọn Chúng Tôi?
+            Chúng tôi tập trung vào chất lượng thật: lịch trình thực tế, đối tác uy tín, hỗ trợ nhanh và chăm sóc sau chuyến đi để mỗi booking đều trở thành một kỷ niệm đẹp.
+
+          .about-highlights
+            .about-highlight
+              +fa('shield-heart')
+              span Cam kết thông tin rõ ràng, không chi phí ẩn
+            .about-highlight
+              +fa('route')
+              span Lịch trình tối ưu theo nhu cầu thực tế
+            .about-highlight
+              +fa('headset')
+              span Hỗ trợ 24/7 trước, trong và sau chuyến đi
+
+          h2.section__title Vì sao khách hàng chọn Vi Vu Việt Nam?
           .features-list
-            .feature-item
+            .feature-item(data-aos="zoom-in-up")
               +fa('map-location-dot')
               .feature-item__content
-                h4 Hành trình đa dạng
-                p Hơn 100 tour du lịch khắp các tỉnh thành Việt Nam
-            .feature-item
+                h4 Danh mục tour đa dạng, dễ chọn
+                p Từ nghỉ dưỡng, khám phá đến hành trình gia đình và doanh nghiệp.
+            .feature-item(data-aos="zoom-in-up" data-aos-delay="80")
               +fa('award')
               .feature-item__content
-                h4 Chất lượng đảm bảo
-                p Đội ngũ hướng dẫn viên chuyên nghiệp, kinh nghiệm
-            .feature-item
+                h4 Đối tác dịch vụ được chọn lọc
+                p Hướng dẫn viên, vận chuyển và lưu trú đều qua quy trình đánh giá chất lượng.
+            .feature-item(data-aos="zoom-in-up" data-aos-delay="140")
               +fa('headset')
               .feature-item__content
-                h4 Hỗ trợ 24/7
-                p Đội ngũ CSKH luôn sẵn sàng hỗ trợ bạn mọi lúc
-            .feature-item
+                h4 CSKH phản hồi nhanh
+                p Đội ngũ hỗ trợ theo sát từng booking để bạn an tâm trước ngày khởi hành.
+            .feature-item(data-aos="zoom-in-up" data-aos-delay="200")
               +fa('money-bill-wave')
               .feature-item__content
-                h4 Giá tốt nhất
-                p Cam kết giá cạnh tranh nhất thị trường
+                h4 Giá hợp lý, giá trị cao
+                p Tập trung chất lượng trải nghiệm thay vì chỉ cạnh tranh về giá.
 
-        .about-image
+        .about-image(data-aos="fade-left")
           img(src="/assets/images/slide3.jpg" alt="Về chúng tôi")
+
+  //- ── Process ────────────────────────────────
+  section.section.section--gray
+    .container
+      .section-header.section-header--centered(data-aos="fade-up")
+        h2.section__title Quy trình đồng hành cùng khách hàng
+        p.section__subtitle Rõ ràng, nhanh chóng và luôn có chuyên viên hỗ trợ
+      .journey-grid
+        .journey-step(data-aos="fade-up")
+          .journey-step__num 01
+          h3.journey-step__title Tư vấn theo nhu cầu
+          p.journey-step__desc Lắng nghe mục tiêu chuyến đi, ngân sách và thời gian của bạn.
+        .journey-step(data-aos="fade-up" data-aos-delay="80")
+          .journey-step__num 02
+          h3.journey-step__title Gợi ý lịch trình phù hợp
+          p.journey-step__desc Đề xuất tour tối ưu, minh bạch dịch vụ bao gồm và chi phí.
+        .journey-step(data-aos="fade-up" data-aos-delay="140")
+          .journey-step__num 03
+          h3.journey-step__title Hỗ trợ xuyên suốt hành trình
+          p.journey-step__desc Theo dõi booking, nhắc lịch và hỗ trợ nhanh khi phát sinh.
+        .journey-step(data-aos="fade-up" data-aos-delay="200")
+          .journey-step__num 04
+          h3.journey-step__title Chăm sóc sau chuyến đi
+          p.journey-step__desc Ghi nhận phản hồi để không ngừng cải thiện chất lượng tour.
 
   //- ── Stats ─────────────────────────────────
   section.section.section--gray
     .container
       .stats-grid
-        .stat-card
+        .stat-card(data-aos="zoom-in")
           .stat-card__number 100+
           .stat-card__label Tour đa dạng
-        .stat-card
+        .stat-card(data-aos="zoom-in" data-aos-delay="80")
           .stat-card__number 10,000+
           .stat-card__label Khách hàng hài lòng
-        .stat-card
+        .stat-card(data-aos="zoom-in" data-aos-delay="140")
           .stat-card__number 50+
           .stat-card__label Tỉnh thành
-        .stat-card
+        .stat-card(data-aos="zoom-in" data-aos-delay="200")
           .stat-card__number 5+
           .stat-card__label Năm kinh nghiệm
+
+  //- ── About CTA ─────────────────────────────
+  section.section
+    .container
+      .about-cta(data-aos="fade-up")
+        .about-cta__content
+          h2.about-cta__title Sẵn sàng lên kế hoạch cho chuyến đi tiếp theo?
+          p.about-cta__desc Nhận tư vấn miễn phí từ đội ngũ Vi Vu Việt Nam để chọn tour phù hợp nhất với nhu cầu của bạn.
+        .about-cta__actions
+          a.btn.btn--accent(href="/tours")
+            +fa('compass')
+            |  Khám phá tour
+          a.btn.btn--outline(href="/contact")
+            +fa('comments')
+            |  Liên hệ tư vấn

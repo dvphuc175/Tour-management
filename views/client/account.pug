@@ -1,0 +1,132 @@
+extends ../layout
+
+block content
+	.account-page
+		.container
+			.account-breadcrumb
+				a(href="/") Trang chủ
+				span /
+				span Tài khoản
+			
+			.account-header
+				h1.account-title Thông tin tài khoản
+				p.account-subtitle Quản lý thông tin cá nhân và thay đổi mật khẩu của bạn
+
+			.account-wrapper
+				.account-sidebar
+					.sidebar-menu
+						a.sidebar-menu-item.active(data-tab="profile" href="#profile")
+							i.fa-solid.fa-user-circle
+							|  Thông tin tài khoản
+						a.sidebar-menu-item(data-tab="password" href="#password")
+							i.fa-solid.fa-key
+							|  Đổi mật khẩu
+
+				.account-content-main
+					.tab-content.active#profile-tab
+						.profile-view-section
+							.profile-header-info
+								.profile-avatar-lg
+									.profile-avatar-initials-lg= getUserInitials(user.fullname)
+								.profile-info-main
+									h2.profile-name-view= user.fullname || 'Người dùng'
+									p.profile-email-view
+										i.fa-solid.fa-envelope
+										|  #{user.email}
+								
+							.profile-details
+								.profile-detail-row
+									.detail-label Họ và tên
+									.detail-value= user.fullname || 'Chưa cập nhật'
+								.profile-detail-row
+									.detail-label Email
+									.detail-value= user.email
+								.profile-detail-row
+									.detail-label Số điện thoại
+									.detail-value= user.phone || 'Chưa cập nhật'
+								.profile-detail-row
+									.detail-label Trạng thái tài khoản
+									.detail-value
+										span.badge-status.badge-status--active Đang hoạt động
+								.profile-detail-row
+									.detail-label Vai trò
+									.detail-value
+										span.badge-role.badge-role--user= user.role === 'admin' ? 'Quản trị viên' : 'Người dùng'
+							
+							.profile-actions
+								button.btn.btn-primary#edit-profile-btn
+									i.fa-solid.fa-pen-to-square
+									|  Sửa thông tin
+
+						.profile-edit-section.hidden
+							.profile-edit-header
+								h3.profile-edit-title Chỉnh sửa thông tin
+								p.profile-edit-subtitle Cập nhật thông tin cá nhân của bạn
+							
+							form#profile-edit-form(action="/profile" method="POST")
+								input(type="hidden" name="_csrf" value=csrfToken)
+								input(type="hidden" name="_method" value="PUT")
+								
+								.form-group-edit
+									label Họ và tên
+									input.form-control-edit(type="text" name="fullname" value=user.fullname required)
+								
+								.form-group-edit
+									label Email
+									input.form-control-edit(type="email" name="email" value=user.email readonly)
+								
+								.form-group-edit
+									label Số điện thoại
+									input.form-control-edit(type="tel" name="phone" value=user.phone)
+								
+								.profile-edit-actions
+									button.btn.btn-secondary(type="button" id="cancel-edit-btn")
+										|  Hủy
+									button.btn.btn-primary(type="submit")
+										i.fa-solid.fa-check
+										|  Lưu thay đổi
+
+					.tab-content#password-tab
+						.password-section
+							.password-header
+								h3.password-title Đổi mật khẩu
+								p.password-subtitle Đảm bảo tài khoản của bạn luôn an toàn
+							
+							form#password-form(action="/profile/password" method="POST")
+								input(type="hidden" name="_csrf" value=csrfToken)
+								input(type="hidden" name="_method" value="PUT")
+								
+								.form-group-password
+									label
+										i.fa-solid.fa-key
+										|  Mật khẩu hiện tại
+									.password-input-wrapper
+										input.form-control-password(type="password" name="currentPassword" placeholder="Nhập mật khẩu hiện tại" required)
+										button.password-toggle-btn(type="button" data-toggle="password")
+											i.fa-solid.fa-eye
+								
+								.form-group-password
+									label
+										i.fa-solid.fa-key
+										|  Mật khẩu mới
+									.password-input-wrapper
+										input.form-control-password(type="password" name="newPassword" placeholder="Nhập mật khẩu mới" required)
+										button.password-toggle-btn(type="button" data-toggle="password")
+											i.fa-solid.fa-eye
+								
+								.form-group-password
+									label
+										i.fa-solid.fa-key
+										|  Xác nhận mật khẩu mới
+									.password-input-wrapper
+										input.form-control-password(type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required)
+										button.password-toggle-btn(type="button" data-toggle="password")
+											i.fa-solid.fa-eye
+								
+								.password-tips
+									i.fa-solid.fa-circle-info
+									|  Mật khẩu nên có ít nhất 8 ký tự, kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt
+								
+								.password-actions
+									button.btn.btn-accent(type="submit")
+										|  Lưu mật khẩu
