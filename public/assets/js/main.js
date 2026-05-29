@@ -392,6 +392,22 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       year: 'numeric'
     });
   };
+
+  window.renderTourCardRating = function(tour) {
+    const hasRating = Number(tour.avg_rating) > 0 && Number(tour.review_count) > 0;
+
+    if (!hasRating) {
+      return `<div class="tour-card__rating tour-card__rating--empty">
+        <span class="tour-card__rating-count">Chưa có đánh giá</span>
+      </div>`;
+    }
+
+    return `<div class="tour-card__rating">
+      <span class="tour-card__rating-stars">${renderStars(tour.avg_rating)}</span>
+      <span class="tour-card__rating-score">${tour.avg_rating}</span>
+      <span class="tour-card__rating-count">(${tour.review_count} đánh giá)</span>
+    </div>`;
+  };
 })();
 
 // AJAX Pagination for tour list
@@ -402,7 +418,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       <div class="tour-card__img">`;
     
     if (tour.images && tour.images.length) {
-      html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy">`;
+      html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
     } else {
       html += `<div class="tour-card__img-placeholder"></div>`;
     }
@@ -414,15 +430,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     }
     
     html += `<h3 class="tour-card__name">${tour.name}</h3>`;
-    
-    if (tour.avg_rating && tour.review_count > 0) {
-      html += `<div class="tour-card__rating">
-        <span class="tour-card__rating-stars">${renderStars(tour.avg_rating)}</span>
-        <span class="tour-card__rating-score">${tour.avg_rating}</span>
-        <span class="tour-card__rating-count">(${tour.review_count} đánh giá)</span>
-      </div>`;
-    }
-    
+    html += renderTourCardRating(tour);
     html += `<div class="tour-card__meta">`;
     
     if (tour.next_departure) {
@@ -704,7 +712,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
             <div class="tour-card__img">`;
           
           if (tour.images && tour.images.length) {
-            html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy">`;
+            html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
           } else {
             html += `<div class="tour-card__img-placeholder"></div>`;
           }
@@ -716,15 +724,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
           }
           
           html += `<h3 class="tour-card__name">${tour.name}</h3>`;
-          
-          if (tour.avg_rating && tour.review_count > 0) {
-            html += `<div class="tour-card__rating">
-              <span class="tour-card__rating-stars">${renderStars(tour.avg_rating)}</span>
-              <span class="tour-card__rating-score">${tour.avg_rating}</span>
-              <span class="tour-card__rating-count">(${tour.review_count} đánh giá)</span>
-            </div>`;
-          }
-          
+          html += renderTourCardRating(tour);
           html += `<div class="tour-card__meta">`;
           
           if (tour.next_departure) {

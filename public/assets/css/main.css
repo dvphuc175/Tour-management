@@ -73,7 +73,7 @@
   --color-refunded-bg: hsl(238, 46%, 95%);
   --color-refunded-text: hsl(238, 38%, 38%);
   --color-danger-vivid-soft: hsl(355, 74%, 95%);
-  --container-max: 1440px;
+  --container-max: 1360px;
   --container-pad: clamp(20px, 6vw, 48px);
   --section-y: clamp(24px, 5vw, 48px);
   --header-h: 76px;
@@ -2878,12 +2878,14 @@
   line-height: 1.15;
 }
 
-.hero--about::before {
-  background-image: url("../images/slide3.jpg") !important;
-}
-
-.hero--contact::before {
-  background-image: url("../images/slide2.jpg") !important;
+.hero--about, .hero--contact {
+  min-height: clamp(320px, 32.8vw, 500px);
+  height: clamp(320px, 32.8vw, 500px);
+  max-height: min(500px, calc(100svh - var(--header-h)));
+  padding: clamp(24px, 4vw, 64px) clamp(16px, 3vw, 24px);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero__logo {
@@ -2914,21 +2916,22 @@
   max-width: 100%;
 }
 
-/* Chiều cao theo bề ngang → zoom thu nhỏ cả khối, ảnh không bị “phóng” thêm */
+/* Match the 2048:671 banner ratio while capping height on wide screens. */
 .hero--home {
-  --hero-home-h: clamp(280px, 36vw + 9rem, 620px);
+  --hero-home-h: clamp(320px, 32.8vw, 500px);
   min-height: var(--hero-home-h);
   height: var(--hero-home-h);
-  max-height: min(620px, calc(100svh - var(--header-h)));
-  padding: clamp(32px, 6vw, 100px) clamp(16px, 3vw, 24px);
+  max-height: min(500px, calc(100svh - var(--header-h)));
+  padding: clamp(24px, 4vw, 64px) clamp(16px, 3vw, 24px);
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
 }
 
 .hero--home::before {
-  background-size: cover;
-  background-position: center 38%;
+  background-image: url("../images/banner1.png");
+  background-size: contain;
+  background-position: center center;
   transform: none;
   will-change: background-image;
 }
@@ -2951,6 +2954,12 @@
   background-color: var(--color-white);
   z-index: -2;
   animation: hero-slideshow 25s infinite ease-in-out;
+}
+
+.hero--home::before, .hero--about::before, .hero--contact::before {
+  background-color: hsl(220, 28%, 96%);
+  background-size: contain;
+  background-position: center center;
 }
 
 .highlight-card {
@@ -5231,6 +5240,23 @@
   background: linear-gradient(135deg, var(--color-gray-lighter), var(--color-gray-light));
 }
 
+.tour-card__img--missing {
+  background: linear-gradient(135deg, var(--color-gray-lighter), var(--color-gray-light));
+}
+
+.tour-card__img--missing::after {
+  content: "\f03e";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-medium);
+  font-size: 32px;
+}
+
 .tour-card__meta {
   display: flex;
   align-items: center;
@@ -5272,6 +5298,11 @@
   gap: 6px 8px;
   margin-bottom: 12px;
   font-size: 12px;
+  min-height: 18px;
+}
+
+.tour-card__rating--empty {
+  color: var(--color-text-muted);
 }
 
 .tour-card__rating-score {
@@ -6200,6 +6231,23 @@
   align-items: start;
 }
 
+.tour-list-layout > .filter-backdrop {
+  position: fixed;
+  inset: 0;
+}
+
+.tour-list-layout > .filter-sidebar {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.tour-list-main {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+}
+
 .tour-nav-link {
   padding: 8px 16px !important;
   font-size: 13px;
@@ -6620,24 +6668,16 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
 }
 
 @keyframes hero-slideshow {
-  0%, 20% {
-    background-image: url("../images/slide1.jpg");
+  0%, 30% {
+    background-image: url("../images/banner1.png");
   }
 
-  21%, 40% {
-    background-image: url("../images/slide2.jpg");
+  33%, 63% {
+    background-image: url("../images/banner2.png");
   }
 
-  41%, 60% {
-    background-image: url("../images/slide3.jpg");
-  }
-
-  61%, 80% {
-    background-image: url("../images/slide4.jpg");
-  }
-
-  81%, 100% {
-    background-image: url("../images/slide5.jpg");
+  66%, 100% {
+    background-image: url("../images/banner3.png");
   }
 }
 
@@ -6726,11 +6766,16 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
 }
 
 @media (max-width: 1100px) {
-  .hero--home {
-    --hero-home-h: clamp(260px, 44vw + 6rem, 520px);
+  .hero--home, .hero--about, .hero--contact {
+    --hero-home-h: clamp(300px, 38vw, 420px);
     min-height: var(--hero-home-h);
     height: var(--hero-home-h);
-    max-height: min(520px, calc(100svh - var(--header-h)));
+    max-height: min(420px, calc(100svh - var(--header-h)));
+  }
+
+  .hero--home::before, .hero--about::before, .hero--contact::before {
+    background-size: cover;
+    background-position: center center;
   }
 }
 
@@ -6740,7 +6785,7 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
   }
 
   .hero--home {
-    --hero-home-h: clamp(240px, 92vw, 400px);
+    --hero-home-h: clamp(240px, 68vw, 320px);
     min-height: var(--hero-home-h);
     height: var(--hero-home-h);
   }
@@ -7388,21 +7433,24 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
   }
 
   .hero--about, .hero--contact {
-    min-height: 300px;
-    padding: 48px 0;
+    --hero-home-h: clamp(280px, 56vw, 380px);
+    min-height: var(--hero-home-h);
+    height: var(--hero-home-h);
+    max-height: min(380px, calc(100svh - var(--header-h)));
+    padding: clamp(22px, 6vw, 44px) 0 clamp(20px, 5vw, 32px);
   }
 
   .hero--home {
-    --hero-home-h: clamp(260px, 78vw, 480px);
+    --hero-home-h: clamp(280px, 56vw, 380px);
     min-height: var(--hero-home-h);
     height: var(--hero-home-h);
-    max-height: min(480px, calc(100svh - var(--header-h)));
-    padding: clamp(28px, 8vw, 56px) 0 clamp(24px, 5vw, 40px);
+    max-height: min(380px, calc(100svh - var(--header-h)));
+    padding: clamp(22px, 6vw, 44px) 0 clamp(20px, 5vw, 32px);
     align-items: flex-end;
   }
 
-  .hero--home::before {
-    background-position: center 42%;
+  .hero--home::before, .hero--about::before, .hero--contact::before {
+    background-position: center center;
     background-size: cover;
   }
 
@@ -8356,17 +8404,25 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
   }
 
   .hero:not(.hero--home) {
-    min-height: clamp(220px, 38vw + 4rem, 380px);
+    min-height: clamp(240px, 34vw + 2rem, 340px);
     height: auto;
-    padding: clamp(40px, 8vw, 80px) clamp(12px, 3vw, 20px);
+    padding: clamp(34px, 7vw, 64px) clamp(12px, 3vw, 20px);
+  }
+
+  .hero--about, .hero--contact {
+    --hero-home-h: clamp(260px, 48vw, 360px);
+    min-height: var(--hero-home-h);
+    height: var(--hero-home-h);
+    max-height: min(360px, calc(100svh - var(--header-h)));
+    padding: clamp(22px, 6vw, 44px) clamp(12px, 3vw, 20px);
   }
 
   .hero--home {
-    --hero-home-h: clamp(248px, 50vw + 3.5rem, 460px);
+    --hero-home-h: clamp(260px, 48vw, 360px);
     min-height: var(--hero-home-h);
     height: var(--hero-home-h);
-    max-height: min(460px, calc(100svh - var(--header-h)));
-    padding: clamp(28px, 7vw, 64px) clamp(12px, 3vw, 20px);
+    max-height: min(360px, calc(100svh - var(--header-h)));
+    padding: clamp(22px, 6vw, 44px) clamp(12px, 3vw, 20px);
   }
 
   .hero--home .hero__content {
@@ -8534,6 +8590,11 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
 }
 
 @media (max-width: 991px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   .filter-backdrop {
     display: block;
     position: fixed;
@@ -8584,6 +8645,8 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
   }
 
   .tour-list-main {
+    grid-column: 1;
+    grid-row: auto;
     min-width: 0;
   }
 

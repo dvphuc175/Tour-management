@@ -1,20 +1,28 @@
 include ../mixins/icons
+- const hasRating = Number(tour.avg_rating) > 0 && Number(tour.review_count) > 0
 
 a.tour-card(href=`/tours/${tour.slug}`)
 	.tour-card__img
 		if tour.images && tour.images.length
-			img(src=tour.images[0] alt=tour.name loading="lazy")
+			img(
+				src=tour.images[0]
+				alt=tour.name
+				loading="lazy"
+				onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();"
+			)
 		else
 			.tour-card__img-placeholder
 		if tour.category_name
 			span.tour-card__cat= tour.category_name
 	.tour-card__body
 		h3.tour-card__name= tour.name
-		if tour.avg_rating && tour.review_count > 0
-			.tour-card__rating
+		.tour-card__rating(class=!hasRating ? 'tour-card__rating--empty' : '')
+			if hasRating
 				span.tour-card__rating-stars!= renderStars(tour.avg_rating)
 				span.tour-card__rating-score= tour.avg_rating
 				span.tour-card__rating-count (#{tour.review_count} đánh giá)
+			else
+				span.tour-card__rating-count Chưa có đánh giá
 		.tour-card__meta
 			if tour.next_departure
 				span.icon-text
