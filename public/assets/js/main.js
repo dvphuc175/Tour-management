@@ -63,6 +63,28 @@
   });
 })();
 
+// Ensure footer content never stays hidden if AOS misses.
+(function guardFooterAOSVisibility() {
+  const revealHiddenFooterBlocks = () => {
+    document.querySelectorAll('.footer [data-aos]:not(.aos-animate)').forEach(node => {
+      node.classList.add('aos-fallback-visible');
+    });
+  };
+
+  // Let AOS run first, then reveal any footer block still not animated.
+  const runGuard = () => {
+    window.setTimeout(revealHiddenFooterBlocks, 1200);
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runGuard, { once: true });
+  } else {
+    runGuard();
+  }
+
+  window.addEventListener('load', runGuard, { once: true });
+})();
+
 // Auto apply scroll animations across pages
 (function initGlobalScrollAnimations() {
   const animationGroups = [
@@ -79,10 +101,28 @@
       step: 60
     },
     {
-      selector: '.table-responsive, .booking-detail-card, .tour-detail-main, .tour-detail-sidebar, .profile-card, .sidebar-menu, .tab-content',
+      selector: '.table-responsive, .booking-detail-card, .tour-detail-sidebar, .profile-card, .sidebar-menu, .tab-content',
       effect: 'fade-up',
       baseDelay: 20,
       step: 50
+    },
+    {
+      selector: '.tour-detail-main .tour-gallery, .tour-detail-main .tour-detail-header, .tour-detail-main .tour-nav-sticky, .tour-detail-main .tour-section, .tour-detail-main .reviews-section, .tour-detail-main .review-form-wrap, .tour-detail-main .review-notice, .tour-detail-main .no-reviews, .tour-detail-main .reviews-pagination',
+      effect: 'fade-up',
+      baseDelay: 0,
+      step: 80
+    },
+    {
+      selector: '.tour-list-layout .tour-list-main, .tour-list-header, .tour-grid-list, .tour-list-main .empty-state, .tour-list-main .pagination',
+      effect: 'fade-up',
+      baseDelay: 0,
+      step: 80
+    },
+    {
+      selector: '.tour-grid-list__item',
+      effect: 'zoom-in-up',
+      baseDelay: 120,
+      step: 60
     },
     {
       selector: 'form.card, .form-card, .payment-method-option, .review-item, .schedule-table-wrapper',
@@ -97,6 +137,7 @@
       const nodes = root.querySelectorAll(group.selector);
       nodes.forEach((node, index) => {
         if (node.hasAttribute('data-aos')) return;
+        if (group.selector.includes('.tour-card') && node.closest('#tourGrid, #homeTourGrid')) return;
         node.setAttribute('data-aos', group.effect);
         const delay = Math.min(360, group.baseDelay + (index % 6) * group.step);
         if (delay > 0) node.setAttribute('data-aos-delay', String(delay));
@@ -119,14 +160,22 @@
   const backdrop = document.querySelector('[data-filter-backdrop]');
   if (!panel || !toggle) return;
 
+  const resetPanelMotion = () => {
+    panel.style.removeProperty('transform');
+    panel.style.removeProperty('opacity');
+    panel.style.removeProperty('transition');
+  };
+
   const closeFilter = () => {
     document.body.classList.remove('filter-open');
     toggle.setAttribute('aria-expanded', 'false');
+    resetPanelMotion();
   };
 
   const openFilter = () => {
     document.body.classList.add('filter-open');
     toggle.setAttribute('aria-expanded', 'true');
+    resetPanelMotion();
   };
 
   toggle.addEventListener('click', () => {
@@ -134,7 +183,11 @@
     else openFilter();
   });
 
-  closeButton?.addEventListener('click', closeFilter);
+  closeButton?.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeFilter();
+  });
   backdrop?.addEventListener('click', closeFilter);
 
   panel.querySelectorAll('input[type="radio"]').forEach(input => {
@@ -343,8 +396,9 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
 // AJAX Pagination for tour list
 (function initTourListPagination() {
-  function generateTourCard(tour) {
-    let html = `<a class="tour-card" href="/tours/${tour.slug}">
+  function generateTourCard(tour, index = 0) {
+    const delay = 160 + (index % 6) * 60;
+    let html = `<div class="tour-grid-list__item" data-aos="zoom-in-up" data-aos-delay="${delay}"><a class="tour-card" href="/tours/${tour.slug}">
       <div class="tour-card__img">`;
     
     if (tour.images && tour.images.length) {
@@ -386,7 +440,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     html += `</div></div><div class="tour-card__footer">
       <span class="tour-card__price">${formatPrice(tour.price_adult)}</span>
       <span class="tour-card__cta">Xem chi tiết</span>
-    </div></a>`;
+    </div></a></div>`;
     
     return html;
   }
@@ -468,7 +522,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         if (tourEmptyStateEl) tourEmptyStateEl.style.display = 'none';
         if (tourGridEl) {
           tourGridEl.style.display = 'grid';
-          tourGridEl.innerHTML = data.tours.map(tour => generateTourCard(tour)).join('');
+          tourGridEl.innerHTML = data.tours.map((tour, idx) => generateTourCard(tour, idx)).join('');
         }
       }
       

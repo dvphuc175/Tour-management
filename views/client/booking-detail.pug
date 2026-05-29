@@ -5,7 +5,7 @@ block content
     .booking-detail-page
 
       .booking-detail-actions
-        a.btn.btn--outline(href="/my-bookings")
+        a.btn.btn--outline.btn--back(href="/my-bookings")
           +fa('arrow-left')
           |  Quay lại
 
@@ -29,21 +29,25 @@ block content
       //- if bookingStatus.isCashPendingBooking(booking)
       if booking.payment_method === 'cash' && booking.status === 'pending'
         .info-box.info-box--cash
-          p
+          .booking-notice__icon
             +fa('info')
-            |  Đơn đặt của bạn đang chờ xác nhận.
-          p
-            | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
-            strong 24 giờ.
-            |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
+          .booking-notice__content
+            p.booking-notice__title Đơn đặt của bạn đang chờ xác nhận.
+            p
+              | Vui lòng đến văn phòng thanh toán tiền mặt trong vòng 
+              strong 24 giờ.
+              |  Sau thời gian này, hệ thống sẽ tự động hủy giữ chỗ của bạn.
 
       if booking.payment_status === 'success'
         .tip-box
-          p
+          .booking-notice__icon
             +fa('check')
-            |  Đã thanh toán thành công
-          if booking.paid_at
-            p Thời gian: #{formatDate(booking.paid_at)}
+          .booking-notice__content
+            p.booking-notice__title Đã thanh toán thành công
+            if booking.paid_at
+              p.booking-notice__meta
+                span.booking-notice__meta-label Thời gian
+                span.booking-notice__meta-value= formatDate(booking.paid_at)
 
       
 

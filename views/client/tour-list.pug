@@ -58,8 +58,8 @@ block content
 					a.btn.btn--outline.btn--block(href="/tours") Xóa bộ lọc
 
 			//- Main content
-			.tour-list-main#tourListContainer
-				.tour-list-header
+			.tour-list-main#tourListContainer(data-aos="fade-up" data-aos-delay="80" data-aos-duration="700")
+				.tour-list-header(data-aos="fade-up" data-aos-delay="120")
 					p.tour-count#tourCount Tìm thấy #{totalTours} tour
 					button.btn.btn--outline.btn--sm.filter-toggle(
 						type="button"
@@ -71,18 +71,19 @@ block content
 						span Bộ lọc
 
 				if tours.length === 0
-					.empty-state#tourEmptyState
+					.empty-state#tourEmptyState(data-aos="zoom-in" data-aos-delay="160")
 						p Không tìm thấy tour phù hợp.
 						a.btn.btn--outline(href="/tours") Xem tất cả tour
 
 				else
-					.tour-grid-list#tourGrid
-						each tour in tours
-							include ../partials/tour-card
+					.tour-grid-list#tourGrid(data-aos="fade-up" data-aos-delay="140")
+						each tour, idx in tours
+							.tour-grid-list__item(data-aos="zoom-in-up" data-aos-delay=String(160 + (idx % 6) * 60))
+								include ../partials/tour-card
 
 					//- Phân trang
 					if totalPages > 1
-						.pagination#paginationContainer
+						.pagination#paginationContainer(data-aos="fade-up" data-aos-delay="200")
 							- const base = `/tours?search=${query.search||''}&category=${query.category||''}&min_price=${query.min_price||''}&max_price=${query.max_price||''}`
 							if currentPage > 1
 								a.pagination__item(href=`${base}&page=${currentPage-1}`)
