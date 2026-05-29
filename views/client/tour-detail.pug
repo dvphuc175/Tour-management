@@ -9,14 +9,17 @@ block content
     .tour-detail-layout
 
       .tour-detail-main
+        - let sectionAosDelay = 180
 
         if tour.images && tour.images.length
-          .tour-gallery
+          .tour-gallery(data-aos="fade-up" data-aos-duration="800")
             img.tour-gallery__main(
               id="mainImg"
               src=tour.images[0]
               alt=tour.name
             )
+            if tour.category_name
+              span.tour-card__cat.tour-detail__cat= tour.category_name
             if tour.images.length > 1
               .tour-gallery__thumbs-wrapper
                 button.tour-gallery__nav-btn.tour-gallery__nav-btn--prev(
@@ -40,14 +43,12 @@ block content
                 )
                   +fa('chevron-right')
 
-        .tour-detail-header
-          if tour.category_name
-            span.tour-card__cat= tour.category_name
+        .tour-detail-header(data-aos="fade-up" data-aos-delay="80")
           h1.tour-detail__title= tour.name
 
 
         // Anchor Navigation
-        nav.tour-nav-sticky
+        nav.tour-nav-sticky(data-aos="fade-up" data-aos-delay="120")
           .tour-nav-links
             if sections.overview
               a.tour-nav-link(href="#overview") GIỚI THIỆU
@@ -68,26 +69,30 @@ block content
 
           // Section: Overview
           if sections.overview
-            section.tour-section#overview
+            section.tour-section#overview(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title GIỚI THIỆU
               .tour-overview!= cleanHtml(sections.overview)
 
           // Section: Highlights
           if sections.highlights
-            section.tour-section#highlights
+            section.tour-section#highlights(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title ĐIỂM NỔI BẬT
               .tour-highlights!= cleanHtml(sections.highlights)
 
           // Section: Itinerary
           if sections.itinerary
-            section.tour-section#itinerary
+            section.tour-section#itinerary(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title LỊCH TRÌNH
               .tour-itinerary
                 != cleanHtml(sections.itinerary)
 
           // Section: Pricing
           if schedules.length
-            section.tour-section#pricing
+            section.tour-section#pricing(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title BẢNG GIÁ
               .tour-pricing-table
                 table.schedule-table.schedule-table--expandable
@@ -158,20 +163,22 @@ block content
 
           // Section: Services
           if sections.services
-            section.tour-section#services
+            section.tour-section#services(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title DỊCH VỤ 
               .tour-services!= cleanHtml(sections.services)
 
           // Section: Notes
           if sections.notes
-            section.tour-section#notes
+            section.tour-section#notes(data-aos="fade-up" data-aos-delay=sectionAosDelay)
+            - sectionAosDelay += 80
               h3.tour-section__title LƯU Ý
               .tour-notes!= cleanHtml(sections.notes)
 
         //- ── Section Reviews ──────────────────────
-        section#reviews.reviews-section
+        section#reviews.reviews-section(data-aos="fade-up" data-aos-delay=sectionAosDelay)
 
-          .reviews-header
+          .reviews-header(data-aos="fade-up" data-aos-delay="40")
             h2 Đánh giá từ khách hàng
             if ratingInfo && ratingInfo.total > 0
               .rating-summary
@@ -182,7 +189,7 @@ block content
           //- Form gửi đánh giá
           if user
             if canReview && !hasReviewed
-              .review-form-wrap
+              .review-form-wrap(data-aos="fade-up" data-aos-delay="80")
                 h3 Viết đánh giá của bạn
                 form.review-form(action="/reviews" method="POST")
                   input(type="hidden" name="tour_id" value=tour.id)
@@ -205,24 +212,24 @@ block content
                   button.btn.btn--primary(type="submit") Gửi đánh giá
 
             else if hasReviewed
-              .review-notice.review-notice--done
+              .review-notice.review-notice--done(data-aos="fade-up" data-aos-delay="80")
                 +fa('check')
                 |  Bạn đã đánh giá tour này rồi
 
             else
-              .review-notice Bạn cần hoàn thành tour để có thể đánh giá
+              .review-notice(data-aos="fade-up" data-aos-delay="80") Bạn cần hoàn thành tour để có thể đánh giá
           else
-            .review-notice
+            .review-notice(data-aos="fade-up" data-aos-delay="80")
               a(href="/login") Đăng nhập
               |  để gửi đánh giá
 
           //- Danh sách reviews
           if !reviews || reviews.length === 0
-            p.no-reviews#noReviews Chưa có đánh giá nào. Hãy là người đầu tiên!
+            p.no-reviews#noReviews(data-aos="fade-up" data-aos-delay="80") Chưa có đánh giá nào. Hãy là người đầu tiên!
           else
             .review-list#reviewsList
-              each rv in reviews
-                .review-item
+              each rv, idx in reviews
+                .review-item(data-aos="fade-up" data-aos-delay=String(80 + (idx % 6) * 60))
                   .review-item__avatar= (rv.user_name || 'K').trim().charAt(0).toUpperCase()
                   .review-item__content
                     .review-item__header
@@ -233,7 +240,7 @@ block content
                       p.review-item__comment= rv.comment
 
             if reviewTotalPages > 1
-              .pagination.reviews-pagination#reviewsPagination
+              .pagination.reviews-pagination#reviewsPagination(data-aos="fade-up" data-aos-delay="120")
                 - const reviewBase = `/tours/${tour.slug}?review_page=`
                 if reviewPage > 1
                   a.pagination__item(href=`${reviewBase}${reviewPage - 1}#reviews`)
@@ -384,6 +391,7 @@ block scripts
 
     // Tour navigation active state
     document.addEventListener('DOMContentLoaded', function() {
+      window.applyGlobalAOS?.();
       const navLinks = document.querySelectorAll('.tour-nav-link');
       
       // Set active on click

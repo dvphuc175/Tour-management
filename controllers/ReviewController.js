@@ -71,8 +71,6 @@ const ReviewController = {
         throw err;
       }
 
-      const tour = await TourModel.findById(tour_id);
-
       req.flash('success', {
         title: 'Cảm ơn bạn đã đánh giá',
         message: 'Nhận xét của bạn đã được ghi nhận và sẽ hiển thị trong danh sách đánh giá.',
