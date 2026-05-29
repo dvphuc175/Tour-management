@@ -1,4 +1,5 @@
 include ../mixins/icons
+- const hasRating = Number(tour.avg_rating) > 0 && Number(tour.review_count) > 0
 
 a.tour-card(href=`/tours/${tour.slug}`)
 	.tour-card__img
@@ -15,11 +16,13 @@ a.tour-card(href=`/tours/${tour.slug}`)
 			span.tour-card__cat= tour.category_name
 	.tour-card__body
 		h3.tour-card__name= tour.name
-		if tour.avg_rating && tour.review_count > 0
-			.tour-card__rating
+		.tour-card__rating(class=!hasRating ? 'tour-card__rating--empty' : '')
+			if hasRating
 				span.tour-card__rating-stars!= renderStars(tour.avg_rating)
 				span.tour-card__rating-score= tour.avg_rating
 				span.tour-card__rating-count (#{tour.review_count} đánh giá)
+			else
+				span.tour-card__rating-count Chưa có đánh giá
 		.tour-card__meta
 			if tour.next_departure
 				span.icon-text
