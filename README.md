@@ -2,7 +2,7 @@
  
 Chào mừng bạn đến với dự án **Hệ Thống Quản Lý Tour Du Lịch — Vi Vu Việt Nam**. Đây là đồ án chuyên đề thuộc chuyên ngành Công nghệ phần mềm, xây dựng một website đặt tour trực tuyến hoàn chỉnh: từ phía khách hàng (tìm kiếm — đặt tour — thanh toán — đánh giá) cho tới phía quản trị (quản lý tour, lịch trình, đơn đặt, người dùng, báo cáo doanh thu).
  
-> Demo: <https://adaptable-joy-production-bcfb.up.railway.app/>
+> Demo: <https://vivuvn.up.railway.app/>
  
 ---
  
