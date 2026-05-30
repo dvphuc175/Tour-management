@@ -326,35 +326,78 @@
   border-radius: var(--radius-sm);
 }
 .btn--edit {
-  background: var(--color-primary-soft);
-  color: var(--color-primary-dk);
-  border-color: var(--color-primary-soft);
-}
-.btn--edit:hover {
   background: var(--color-primary);
   color: var(--color-white);
-  border-color: var(--color-primary);
+}
+.btn--edit:hover {
+  background: var(--color-primary-dk);
+  color: var(--color-white);
 }
 .btn--view {
-  background: var(--color-info-soft);
+  background: var(--color-info);
   white-space: nowrap;
-  color: var(--color-info-dark);
-  border-color: var(--color-info-soft);
+  color: var(--color-white);
 }
 .btn--view:hover {
-  background: var(--color-info);
+  background: var(--color-info-dark);
   color: var(--color-white);
-  border-color: var(--color-info);
 }
 .btn--schedule {
-  background: var(--color-warning-softest);
-  color: var(--color-warning-dark);
-  border-color: var(--color-warning-softest);
-}
-.btn--schedule:hover {
   background: var(--color-warning);
   color: var(--color-white);
-  border-color: var(--color-warning);
+}
+.btn--schedule:hover {
+  background: var(--color-warning-dark);
+  color: var(--color-white);
+}
+.btn--delete {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+.btn--delete:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
+}
+.btn--eraser{
+  background: transparent;
+  color: var(--color-white);
+  background: var(--color-danger-soft);
+}
+.btn--eraser:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
+}
+.btn--active{
+  background: transparent;
+  padding: 8px 14px;
+  color: var(--color-white);
+  white-space: nowrap;
+  background: var(--color-success);
+}
+.btn--active:hover {
+  background: var(--color-success-dark);
+  color: var(--color-white);
+}
+.btn--change{
+  background: transparent;
+  padding: 8px 14px;
+  color: var(--color-white);
+  white-space: nowrap;
+  background: var(--color-primary);
+}
+.btn--change:hover {
+  background: var(--color-primary-dk);
+  color: var(--color-white);
+}
+
+.form-actions a {
+  background: transparent;
+  color: var(--color-white);
+  background: var(--color-danger);
+}
+.form-actions a:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
 }
 
 /* ── Form card ──────────────────────────── */
@@ -509,7 +552,7 @@ code {
 }
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 420px;
   gap: 24px;
   align-items: start;
 }
@@ -542,15 +585,15 @@ code {
 }
 .top-tours-card__meta {
   font-size: 13px;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   padding: 6px 14px;
-  background: var(--color-bg-soft);
+  background: var(--color-border);
   border-radius: 20px;
   font-weight: 500;
 }
 .chart-card canvas {
   width: 100% !important;
-  height: 340px !important;
+  height: 300px !important;
 }
 .top-list {
   display: flex;
@@ -598,9 +641,9 @@ code {
   font-size: 14px;
   font-weight: 700;
   color: #1f2937;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
   margin-bottom: 4px;
 }
 .top-item__meta {
@@ -1260,7 +1303,10 @@ button.btn[disabled] {
   display: flex;
   gap: 8px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+.user-actions > * {
+  min-width: 0;
 }
 .role-form {
   display: flex;
@@ -1277,6 +1323,28 @@ button.btn[disabled] {
   align-items: center;
 }
 
+/* Pagination hover styles specific to admin lists */
+.pagination--admin .btn {
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.pagination--admin .btn--sm {
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+.pagination--admin .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+.pagination--admin .btn--outline:hover {
+  background: var(--color-bg-soft);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.pagination--admin .btn--primary {
+  box-shadow: none;
+}
+
 /* ── Toolbar ────────────────────────────── */
 .toolbar {
 	display: flex;
@@ -1289,9 +1357,20 @@ button.btn[disabled] {
 .toolbar > a.btn {
 	margin-left: auto;
 }
-.filter-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.filter-search { flex: 1 1 260px; min-width: min(260px, 100%); max-width: 360px; }
-.form-control--sm { padding: 6px 10px; font-size: 13px; width: auto; }
+.filter-form { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; overflow: hidden; }
+.filter-form > * { min-width: 0; }
+.filter-search { flex: 1 1 220px; min-width: 0; max-width: 360px; }
+.form-control--sm { padding: 7.5px 13px; font-size: 13px; width: auto; border-radius: 8px; }
+.filter-form .form-control--sm, .filter-form select.form-control--sm { width: auto; max-width: 220px; }
+.filter-form select.form-control--sm { padding-right: 34px; }
+.filter-form .btn--sm { flex: 0 0 auto; white-space: nowrap; }
+
+/* On smaller screens allow wrapping so controls don't overflow */
+@media (max-width: 992px) {
+  .filter-form { flex-wrap: wrap; }
+  .filter-form .form-control--sm, .filter-form select.form-control--sm { max-width: 100%; }
+  .filter-search { flex: 1 1 100%; max-width: 100%; }
+}
 
 /* ── Tour thumbnail ─────────────────────── */
 .tour-thumb {
@@ -1376,22 +1455,6 @@ button.btn[disabled] {
 	font-weight: 600;
 }
 
-/* ── Pagination ─────────────────────────── */
-.pagination { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
-.pagination__item {
-	padding: 6px 12px;
-	border: 1px solid var(--color-border);
-	border-radius: var(--radius-sm);
-	font-size: 13px;
-	color: var(--color-text);
-	transition: all .15s;
-}
-.pagination__item:hover { border-color: var(--color-primary); color: var(--color-primary); }
-.pagination__item.active {
-	background: var(--color-primary);
-	border-color: var(--color-primary);
-	color: #fff;
-}
 .text-danger { color: var(--color-danger); font-weight: 500; }
 /* Làm mờ dòng đã kết thúc */
 .schedule-expired {
@@ -1742,14 +1805,14 @@ button.btn[disabled] {
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   flex-shrink: 0;
 }
 .info-group__label i {
   width: 16px;
   text-align: center;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--color-text);
 }
 .info-group__value {
   font-size: 14px;
@@ -1909,8 +1972,8 @@ button.btn[disabled] {
 
 .booking-action-btn--back {
   background: var(--color-bg-soft);
-  color: var(--color-text-muted);
-  border-color: var(--color-border);
+  color: var(--color-text);
+  border-color: var(--color-text);
 }
 .booking-action-btn--back:hover {
   background: var(--color-text);

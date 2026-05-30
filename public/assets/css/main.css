@@ -49,7 +49,7 @@
   --color-success-dark: hsl(152, 62%, 24%);
   --color-danger-bright: hsl(355, 82%, 60%);
   --color-danger-vivid: hsl(355, 78%, 52%);
-  --color-danger-softest: hsl(355, 74%, 95%);
+  --color-danger-softest: hsl(358, 69%, 90%);
   --color-danger-deep: hsl(355, 66%, 34%);
   --color-danger-dk: hsl(355, 70%, 38%);
   --color-danger-dark: hsl(355, 66%, 30%);
@@ -540,10 +540,28 @@
   margin: 0;
   line-height: 1.25;
 }
+.booking-detail-page .btn--cancel {
+  margin-top: 12px;
+  width: 100%;
+  background: var(--color-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+.booking-detail-page .btn--cancel:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
+}
 
 .booking-detail-page .btn--support-cancel {
   margin-top: 12px;
   width: 100%;
+  background: var(--color-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+.booking-detail-page .btn--support-cancel:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
 }
 
 .booking-detail-page .detail-card .summary-row--total strong.price {
@@ -1446,10 +1464,6 @@
   background: var(--color-primary-dk);
   border-color: var(--color-primary-dk);
   color: var(--color-white);
-}
-
-.btn--support-cancel {
-  margin-top: 10px;
 }
 
 .btn--zalo-contact {
