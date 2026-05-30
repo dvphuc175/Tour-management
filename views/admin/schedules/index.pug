@@ -45,7 +45,7 @@ block content
                             td.action-btns
                                 if isExpired
                                     button.btn.btn--edit.btn--sm(disabled) Sửa
-                                    button.btn.btn--danger.btn--sm(disabled) Xóa
+                                    button.btn.btn--delete.btn--sm(disabled) Xóa
                                 else
                                     a.btn.btn--edit.btn--sm(href=`/admin/schedules/${s.id}/edit`) Sửa
                                     form.form--inline(
@@ -54,6 +54,6 @@ block content
                                         data-confirm="Xóa lịch trình này? Không thể xóa nếu đã có đặt chỗ."
                                     )
                                         input(type="hidden" name="_csrf" value=csrfToken)
-                                        button.btn.btn--danger.btn--sm(type="submit") Xóa
+                                        button.btn.btn--delete.btn--sm(type="submit") Xóa
 
     +pagination(currentPage, totalPages, `/admin/tours/${tour.id}/schedules`)

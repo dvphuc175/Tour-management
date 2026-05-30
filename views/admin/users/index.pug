@@ -23,7 +23,7 @@ block content
         +fa('search')
         |  Lọc
       if hasFilters
-        a.btn.btn--outline.btn--sm(href="/admin/users")
+        a.btn.btn--eraser.btn--sm(href="/admin/users")
           +fa('rotate')
           |  Xóa lọc
 
@@ -78,7 +78,7 @@ block content
                       option(value="customer" selected=(u.role==='customer')) Khách hàng
                       option(value="staff" selected=(u.role==='staff')) Nhân viên
                       option(value="admin" selected=(u.role==='admin')) Admin
-                    button(type="submit" class="btn btn--sm btn--outline") Đổi
+                    button(type="submit" class="btn btn--sm btn--change") Đổi
                   if u.role !== 'admin'
                     form(
                       action=`/admin/users/${u.id}/toggle-status?_method=PUT`

@@ -104,7 +104,8 @@ block scripts
             { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
             { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
             { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' }
           ]
         },
         htmlSupport: {
@@ -120,14 +121,13 @@ block scripts
         console.error(error);
       });
 
-    // Section templates - properly formatted HTML
+    // Section templates — dùng data-section (CKEditor không xóa) thay vì HTML comment
     const sectionTemplates = {
-      overview: '<!-- SECTION:overview --><h3>Giới thiệu tour</h3><p>Mô tả tổng quan về tour...</p><!-- ENDSECTION -->',
-      highlights: '<!-- SECTION:highlights --><h3>Điểm nổi bật</h3><ul><li>Điểm nổi bật 1</li><li>Điểm nổi bật 2</li><li>Điểm nổi bật 3</li></ul><!-- ENDSECTION -->',
-      itinerary: '<!-- SECTION:itinerary --><h3>Ngày 1:</h3><ul><li>Hoạt động sáng</li><li>Hoạt động chiều</li><li>Hoạt động tối</li></ul><!-- ENDSECTION -->',
-      services: '<!-- SECTION:services --><h3>Dịch vụ</h3><h4>Bao gồm</h4><ul><li>Dịch vụ 1</li><li>Dịch vụ 2</li><li>Dịch vụ 3</li></ul><h4>Không bao gồm</h4><ul><li>Không bao gồm 1</li><li>Không bao gồm 2</li></ul><!-- ENDSECTION -->',
-      pricing: '<!-- SECTION:pricing --><h3>Bảng giá chi tiết</h3><ul><li>Người lớn: ...</li><li>Trẻ em (5-11 tuổi): ...</li><li>Trẻ em dưới 5 tuổi: ...</li></ul><!-- ENDSECTION -->',
-      notes: '<!-- SECTION:notes --><h3>Lưu ý quan trọng</h3><ul><li>Lưu ý 1</li><li>Lưu ý 2</li><li>Lưu ý 3</li></ul><!-- ENDSECTION -->'
+      overview: '<div data-section="overview"></div><h3>Giới thiệu tour</h3><p>Mô tả tổng quan về tour...</p>',
+      highlights: '<div data-section="highlights"></div><h3>Điểm nổi bật</h3><ul><li>Điểm nổi bật 1</li><li>Điểm nổi bật 2</li><li>Điểm nổi bật 3</li><li>Điểm nổi bật 4</li></ul>',
+      itinerary: '<div data-section="itinerary"></div><h3>Lịch trình</h3><h4>Ngày 1:</h4><ul><li>Hoạt động sáng</li><li>Hoạt động chiều</li><li>Hoạt động tối</li></ul><h4>Ngày 2:</h4><ul><li>Hoạt động sáng</li><li>Hoạt động chiều</li><li>Hoạt động tối</li></ul>',
+      services: '<div data-section="services"></div><h3>Dịch vụ</h3><h4>Bao gồm</h4><ul><li>Dịch vụ 1</li><li>Dịch vụ 2</li><li>Dịch vụ 3</li></ul><h4>Không bao gồm</h4><ul><li>Không bao gồm 1</li><li>Không bao gồm 2</li></ul>',
+      notes: '<div data-section="notes"></div><h3>Lưu ý</h3><ul><li>Lưu ý 1</li><li>Lưu ý 2</li><li>Lưu ý 3</li><li>Lưu ý 4</li></ul>'
     };
 
     async function insertSection(sectionName) {
