@@ -70,29 +70,44 @@ block content
           // Section: Overview
           if sections.overview
             section.tour-section#overview(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
-              h3.tour-section__title GIỚI THIỆU
-              .tour-overview!= cleanHtml(sections.overview)
+              - sectionAosDelay += 80
+              - const overviewHtml = cleanHtml(sections.overview)
+              - const overviewHasHeading = /^\s*<h[2-4]\b/i.test(overviewHtml)
+              .tour-overview!= overviewHasHeading ? overviewHtml : `<h3>GIỚI THIỆU</h3>${overviewHtml}`
 
           // Section: Highlights
           if sections.highlights
             section.tour-section#highlights(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
-              h3.tour-section__title ĐIỂM NỔI BẬT
-              .tour-highlights!= cleanHtml(sections.highlights)
+              - sectionAosDelay += 80
+              - const highlightsHtml = cleanHtml(sections.highlights)
+              - const highlightsHasHeading = /^\s*<h[2-4]\b/i.test(highlightsHtml)
+              .tour-highlights!= highlightsHasHeading ? highlightsHtml : `<h3>ĐIỂM NỔI BẬT</h3>${highlightsHtml}`
 
           // Section: Itinerary
           if sections.itinerary
             section.tour-section#itinerary(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
-              h3.tour-section__title LỊCH TRÌNH
-              .tour-itinerary
-                != cleanHtml(sections.itinerary)
+              - sectionAosDelay += 80
+              - const rawItineraryHtml = cleanHtml(sections.itinerary)
+              - let itineraryHtml = rawItineraryHtml
+              - const itineraryHasHeading = /^\s*<h[2-4]\b/i.test(rawItineraryHtml)
+              - if (!itineraryHasHeading) itineraryHtml = `<h3>LỊCH TRÌNH</h3>${rawItineraryHtml}`
+              - const trimmedItinerary = itineraryHtml.trim()
+              - const lowerItinerary = trimmedItinerary.toLowerCase()
+              - if (lowerItinerary.startsWith('<h3')) {
+              -   const firstCloseIndex = lowerItinerary.indexOf('</h3>')
+              -   if (firstCloseIndex !== -1) {
+              -     const head = trimmedItinerary.slice(0, firstCloseIndex + 5)
+              -     let tail = trimmedItinerary.slice(firstCloseIndex + 5)
+              -     tail = tail.replace(/<h3(\b[^>]*)>/gi, '<h4$1>').replace(/<\/h3>/gi, '</h4>')
+              -     itineraryHtml = head + tail
+              -   }
+              - }
+              .tour-itinerary!= itineraryHtml
 
           // Section: Pricing
           if schedules.length
             section.tour-section#pricing(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
+              - sectionAosDelay += 80
               h3.tour-section__title BẢNG GIÁ
               .tour-pricing-table
                 table.schedule-table.schedule-table--expandable
@@ -164,16 +179,18 @@ block content
           // Section: Services
           if sections.services
             section.tour-section#services(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
-              h3.tour-section__title DỊCH VỤ 
-              .tour-services!= cleanHtml(sections.services)
+              - sectionAosDelay += 80
+              - const servicesHtml = cleanHtml(sections.services)
+              - const servicesHasHeading = /^\s*<h[2-4]\b/i.test(servicesHtml)
+              .tour-services!= servicesHasHeading ? servicesHtml : `<h3>DỊCH VỤ</h3>${servicesHtml}`
 
           // Section: Notes
           if sections.notes
             section.tour-section#notes(data-aos="fade-up" data-aos-delay=sectionAosDelay)
-            - sectionAosDelay += 80
-              h3.tour-section__title LƯU Ý
-              .tour-notes!= cleanHtml(sections.notes)
+              - sectionAosDelay += 80
+              - const notesHtml = cleanHtml(sections.notes)
+              - const notesHasHeading = /^\s*<h[2-4]\b/i.test(notesHtml)
+              .tour-notes!= notesHasHeading ? notesHtml : `<h3>LƯU Ý</h3>${notesHtml}`
 
         //- ── Section Reviews ──────────────────────
         section#reviews.reviews-section(data-aos="fade-up" data-aos-delay=sectionAosDelay)
@@ -260,7 +277,7 @@ block content
         if schedules.length === 0
           h3.booking-box__title Lịch trình khởi hành
           p.booking-box__empty Hiện chưa có lịch trình khả dụng.
-          a.btn.btn--outline.btn--block(href="/tours") Xem tour khác
+          a.btn.btn--outline.btn--block.btn--check(href="/tours") Xem tour khác
         else
           - const nearestSchedule = schedules[0]
           - const upcomingDates = schedules.slice(0, 4)
@@ -309,7 +326,7 @@ block content
       .mobile-booking-bar__price
         span Lịch trình
         strong Chưa có ngày đi
-      a.btn.btn--outline.btn--sm(href="/tours") Xem tour khác
+      a.btn.btn--outline.btn--sm.btn--out(href="/tours") Xem tour khác
     else
       - const mobileSchedule = schedules[0]
       .mobile-booking-bar__price

@@ -692,60 +692,70 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     return html;
   }
 
+  function generateHomeTourCard(tour, index = 0) {
+    const delay = 80 + (index % 6) * 60;
+    let html = `<div data-aos="fade-up" data-aos-delay="${delay}"><a class="tour-card" href="/tours/${tour.slug}">
+      <div class="tour-card__img">`;
+
+    if (tour.images && tour.images.length) {
+      html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
+    } else {
+      html += `<div class="tour-card__img-placeholder"></div>`;
+    }
+
+    html += `</div><div class="tour-card__body">`;
+
+    if (tour.category_name) {
+      html += `<span class="tour-card__cat">${tour.category_name}</span>`;
+    }
+
+    html += `<h3 class="tour-card__name">${tour.name}</h3>`;
+    html += renderTourCardRating(tour);
+    html += `<div class="tour-card__meta">`;
+
+    if (tour.next_departure) {
+      html += `<span class="icon-text">
+        <i class="fa-solid fa-calendar"></i> ${formatDate(tour.next_departure)}
+      </span>`;
+    }
+
+    if (tour.total_available > 0) {
+      html += `<span class="tour-card__slots">${tour.total_available} chỗ còn</span>`;
+    } else {
+      html += `<span class="tour-card__slots tour-card__slots--full">Hết chỗ</span>`;
+    }
+
+    html += `</div></div><div class="tour-card__footer">
+      <span class="tour-card__price">${formatPrice(tour.price_adult)}</span>
+      <span class="tour-card__cta">Xem chi tiết</span>
+    </div></a></div>`;
+
+    return html;
+  }
+
   async function loadHomePage(url) {
     try {
-      const response = await fetch(url, {
+      const apiUrl = new URL(url, window.location.origin);
+      if (!apiUrl.searchParams.get('page')) {
+        apiUrl.searchParams.set('page', '1');
+      }
+
+      const response = await fetch(`${apiUrl.pathname}${apiUrl.search}`, {
         headers: {
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        cache: 'no-store'
       });
       
       if (!response.ok) throw new Error('Network response was not ok');
       
       const data = await response.json();
       
-      // Update tour grid
+      // Update tour grid — giữ nguyên thứ tự từ server (đánh giá cao → nhiều đơn → mới nhất)
       const homeTourGridEl = document.getElementById('homeTourGrid');
       if (homeTourGridEl) {
-        homeTourGridEl.innerHTML = data.tours.map(tour => {
-          let html = `<a class="tour-card" href="/tours/${tour.slug}">
-            <div class="tour-card__img">`;
-          
-          if (tour.images && tour.images.length) {
-            html += `<img src="${tour.images[0]}" alt="${tour.name}" loading="lazy" onerror="this.closest('.tour-card__img').classList.add('tour-card__img--missing'); this.remove();">`;
-          } else {
-            html += `<div class="tour-card__img-placeholder"></div>`;
-          }
-          
-          html += `</div><div class="tour-card__body">`;
-          
-          if (tour.category_name) {
-            html += `<span class="tour-card__cat">${tour.category_name}</span>`;
-          }
-          
-          html += `<h3 class="tour-card__name">${tour.name}</h3>`;
-          html += renderTourCardRating(tour);
-          html += `<div class="tour-card__meta">`;
-          
-          if (tour.next_departure) {
-            html += `<span class="icon-text">
-              <i class="fa-solid fa-calendar"></i> ${formatDate(tour.next_departure)}
-            </span>`;
-          }
-          
-          if (tour.total_available > 0) {
-            html += `<span class="tour-card__slots">${tour.total_available} chỗ còn</span>`;
-          } else {
-            html += `<span class="tour-card__slots tour-card__slots--full">Hết chỗ</span>`;
-          }
-          
-          html += `</div></div><div class="tour-card__footer">
-            <span class="tour-card__price">${formatPrice(tour.price_adult)}</span>
-            <span class="tour-card__cta">Xem chi tiết</span>
-          </div></a>`;
-          
-          return html;
-        }).join('');
+        homeTourGridEl.innerHTML = data.tours.map((tour, index) => generateHomeTourCard(tour, index)).join('');
       }
       
       // Update pagination

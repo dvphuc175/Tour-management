@@ -16,6 +16,13 @@ const HIGHLIGHT_CATEGORY_IMAGES = {
   'tour-nui-rung': '/assets/images/slide3.jpg'
 };
 
+function wantsJson(req) {
+  return (
+    req.get('X-Requested-With') === 'XMLHttpRequest' ||
+    (req.headers.accept && req.headers.accept.includes('application/json'))
+  );
+}
+
 const ClientController = {
   // GET /
   async home(req, res, next) {
@@ -24,9 +31,8 @@ const ClientController = {
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const offset = (page - 1) * HOME_LIMIT;
 
-      const [featuredTours, tours, total, categories] = await Promise.all([
-        TourModel.getFeatured(HOME_LIMIT),
-        TourModel.getPublic({ limit: HOME_LIMIT, offset }),
+      const [tours, total, categories] = await Promise.all([
+        TourModel.getFeatured(HOME_LIMIT, offset),
         TourModel.countPublic({}),
         CategoryModel.getActive()
       ]);
@@ -44,7 +50,7 @@ const ClientController = {
         };
       }).filter(Boolean);
 
-      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      if (wantsJson(req)) {
         return res.json({
           tours,
           totalTours: total,
@@ -55,7 +61,7 @@ const ClientController = {
 
       return res.render('client/home', {
         title: 'Trang chủ',
-        tours: featuredTours,
+        tours,
         highlightCategories,
         categories,
         currentPage: page,
@@ -274,15 +280,12 @@ const ClientController = {
 };
 
 // Helper function to parse tour description into sections
-// Supports both: <!-- SECTION:name -->...<!-- ENDSECTION --> format
-// and plain HTML with h3/h4 headings as section names
+// Supports: <!-- SECTION:name --> comments, <div data-section="name"> markers (CKEditor-safe),
+// and plain HTML with h2/h3 headings as section names
 function parseTourDescription(description) {
   if (!description) return {};
 
-  console.log('[parseTourDescription] Starting with description length:', description.length);
-
   // Decode HTML entities if content is HTML-encoded (e.g., &lt; → <)
-  // This handles cases where HTML comments got encoded in the database
   description = description
     .replace(/&lt;!--/g, '<!--')
     .replace(/--&gt;/g, '-->')
@@ -293,28 +296,30 @@ function parseTourDescription(description) {
     .replace(/&#39;/g, "'");
 
   const sections = {};
+  const markerPatterns = [
+    /<!--\s*SECTION:\s*(\w+)\s*-->([\s\S]*?)(?=<!--\s*(?:SECTION:\s*\w+|ENDSECTION)\s*-->|$)/gi,
+    /<div[^>]*\bdata-section=["'](\w+)["'][^>]*>\s*<\/div>([\s\S]*?)(?=<div[^>]*\bdata-section=["']|<div[^>]*\bdata-section-end=["']|$)/gi
+  ];
 
-  // Try format with section markers first
-  // FIX 1: Improved regex to handle both ENDSECTION and next SECTION as delimiters
-  const sectionRegex = /<!--\s*SECTION:\s*(\w+)\s*-->([\s\S]*?)(?=<!--\s*(?:SECTION:\s*\w+|ENDSECTION)\s*-->|$)/gi;
   let hasMarkers = false;
-  let match;
-
-  console.log('[parseTourDescription] Checking for SECTION markers...');
-  while ((match = sectionRegex.exec(description)) !== null) {
-    hasMarkers = true;
-    const sectionName = match[1].toLowerCase().trim();
-    let sectionContent = match[2].trim();
-    // Remove any trailing ENDSECTION comment if present in the captured content
-    sectionContent = sectionContent.replace(/<!--\s*ENDSECTION\s*-->\s*$/i, '').trim();
-    sections[sectionName] = sectionContent;
-    console.log(`[parseTourDescription] Found marker section: ${sectionName} (length: ${sectionContent.length})`);
+  for (const sectionRegex of markerPatterns) {
+    sectionRegex.lastIndex = 0;
+    let match;
+    while ((match = sectionRegex.exec(description)) !== null) {
+      hasMarkers = true;
+      const sectionName = match[1].toLowerCase().trim();
+      let sectionContent = match[2].trim();
+      sectionContent = sectionContent
+        .replace(/<!--\s*ENDSECTION\s*-->\s*$/i, '')
+        .replace(/<div[^>]*\bdata-section-end=["'][^"']*["'][^>]*>\s*<\/div>\s*$/i, '')
+        .trim();
+      sections[sectionName] = sectionContent;
+    }
+    if (hasMarkers) break;
   }
 
-  // If no markers found, parse from HTML headings (h2, h3, h4)
+  // Fallback: parse from h2/h3 section headings (h4 = sub-heading, e.g. Ngày 1 / Bao gồm)
   if (!hasMarkers) {
-    console.log('[parseTourDescription] No markers found, parsing from headings...');
-    // Map Vietnamese headings to section keys
     const headingMap = {
       'giới thiệu': 'overview',
       'giới thiệu tour': 'overview',
@@ -337,51 +342,51 @@ function parseTourDescription(description) {
       'chính sách': 'notes'
     };
 
-    // Split by h2, h3, h4 tags
-    const headingRegex = /<h([2-4])[^>]*>(.*?)<\/h\1>([\s\S]*?)(?=<h[2-4]|$)/gi;
-
-    while ((match = headingRegex.exec(description)) !== null) {
-      const headingText = match[2].replace(/<[^>]*>/g, '').trim().toLowerCase();
-      const content = match[3].trim();
-      console.log(`[parseTourDescription] Found heading: "${headingText}", content length: ${content.length}`);
-      let matched = false;
-
-      // Find matching section key - EXACT match first, then includes
+    const resolveSectionKey = (headingText) => {
+      const normalized = headingText.replace(/<[^>]*>/g, '').trim().toLowerCase();
       for (const [key, sectionKey] of Object.entries(headingMap)) {
-        if (headingText === key.toLowerCase() || headingText.includes(key.toLowerCase())) {
-          matched = true;
-          console.log(`[parseTourDescription] Matched heading to section: ${sectionKey}`);
+        if (normalized === key || normalized.includes(key)) {
+          return sectionKey;
+        }
+      }
+      return null;
+    };
 
-          // For services and itinerary, append multiple sub-sections with their headings
-          if ((sectionKey === 'services' || sectionKey === 'itinerary') && sections[sectionKey]) {
-            sections[sectionKey] += `<h${match[1]}>${match[2]}</h${match[1]}>${content}`;
-          } else {
-            sections[sectionKey] = `<h${match[1]}>${match[2]}</h${match[1]}>${content}`;
-          }
+    const headingRegex = /<h([2-4])[^>]*>([\s\S]*?)<\/h\1>/gi;
+    const headers = [];
+    let match;
+    while ((match = headingRegex.exec(description)) !== null) {
+      const level = parseInt(match[1], 10);
+      headers.push({
+        level,
+        rawTitle: match[2],
+        index: match.index,
+        sectionKey: level <= 3 ? resolveSectionKey(match[2]) : null
+      });
+    }
+
+    for (let i = 0; i < headers.length; i++) {
+      const header = headers[i];
+      if (!header.sectionKey) continue;
+
+      let contentEnd = description.length;
+      for (let j = i + 1; j < headers.length; j++) {
+        if (headers[j].level <= 3 && headers[j].sectionKey) {
+          contentEnd = headers[j].index;
           break;
         }
       }
 
-      // If no match but content exists and has substantial length, put in 'overview' as default ONLY IF OVERVIEW IS EMPTY
-      if (!matched && content && content.length > 20 && !sections.overview) {
-        console.log('[parseTourDescription] Putting unmatched content in overview');
-        sections.overview = `<h${match[1]}>${match[2]}</h${match[1]}>${content}`;
-      }
+      sections[header.sectionKey] = description.slice(header.index, contentEnd).trim();
     }
 
-    // If still no sections parsed but we have content, put it all in overview
     if (Object.keys(sections).length === 0 && description.trim().length > 0) {
-      console.log('[parseTourDescription] No sections found, putting all content in overview');
       sections.overview = description.trim();
     }
 
-    // FIX 3: Improve the itinerary detection logic - don't overwrite content unnecessarily
-    // Also check if there's any itinerary content that might be in wrong section
     const ngayPattern = /<h[2-4][^>]*>\s*(?:ngày|ngay|day)\s*\d+|<(?:h4|strong|b)[^>]*>\s*(?:ngày|ngay|day)\s*\d+/i;
-    
-    // Check overview for itinerary content
+
     if (sections.overview && !sections.itinerary && ngayPattern.test(sections.overview)) {
-      console.log('[parseTourDescription] Found itinerary content in overview, moving it...');
       const splitIndex = sections.overview.search(ngayPattern);
       if (splitIndex > 0) {
         sections.itinerary = sections.overview.substring(splitIndex).trim();
@@ -391,10 +396,8 @@ function parseTourDescription(description) {
         sections.overview = '';
       }
     }
-    
-    // Check highlights for itinerary content
+
     if (sections.highlights && !sections.itinerary && ngayPattern.test(sections.highlights)) {
-      console.log('[parseTourDescription] Found itinerary content in highlights, moving it...');
       const splitIndex = sections.highlights.search(ngayPattern);
       if (splitIndex > 0) {
         sections.itinerary = sections.highlights.substring(splitIndex).trim();
@@ -405,9 +408,7 @@ function parseTourDescription(description) {
       }
     }
 
-    // Additional parsing: if no itinerary yet, check full description for standalone "Ngày X:" sections
     if (!sections.itinerary) {
-      console.log('[parseTourDescription] Checking for standalone itinerary sections...');
       const standaloneItineraryPattern = /(<h[2-4][^>]*>\s*(?:ngày|ngay|day)\s*\d+[\s\S]*?)(?=<h[2-4]|$)/gi;
       let itineraryMatch;
       let itineraryContent = '';
@@ -416,12 +417,10 @@ function parseTourDescription(description) {
       }
       if (itineraryContent) {
         sections.itinerary = itineraryContent.trim();
-        console.log('[parseTourDescription] Found standalone itinerary content');
       }
     }
   }
 
-  console.log('[parseTourDescription] Final sections:', Object.keys(sections));
   return sections;
 }
 
