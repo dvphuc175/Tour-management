@@ -22,13 +22,21 @@ const TourController = {
         CategoryModel.getAll()
       ]);
 
+      function buildListUrl(path, filters) {
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([k, v]) => { if (v) params.set(k, v); });
+        const qs = params.toString();
+        return qs ? `${path}?${qs}` : path;
+      }
+
       res.render('admin/tours/index', {
         title: 'Quản lý tour',
         tours,
         categories,
         currentPage: page,
         totalPages: Math.ceil(total / LIMIT),
-        query: req.query
+        query: req.query,
+        paginationBaseUrl: buildListUrl('/admin/tours', { category: req.query.category || '', status: req.query.status || '' })
       });
     } catch (err) {
       next(err);

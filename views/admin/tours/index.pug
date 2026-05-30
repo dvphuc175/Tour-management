@@ -52,12 +52,7 @@ block content
 								data-confirm=`Xóa tour "${tour.name}"? Hành động này không thể hoàn tác.`
 							)
 								input(type="hidden" name="_csrf" value=csrfToken)
-								button.btn.btn--danger.btn--sm(type="submit") Xóa
-	//- Phân trang
-	if totalPages > 1
-		.pagination
-			each p in Array.from({length: totalPages}, (_, i) => i + 1)
-				a(
-					href=`/admin/tours?page=${p}&category=${query.category||''}&status=${query.status||''}`
-					class=`pagination__item${p === currentPage ? ' active' : ''}`
-				)= p
+								button.btn.btn--delete.btn--sm(type="submit") Xóa
+	//- Phân trang (dùng mixin chuẩn)
+	include ../_pagination
+	+pagination(currentPage, totalPages, paginationBaseUrl)
