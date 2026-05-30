@@ -104,12 +104,7 @@ const AuthController = {
     
     const existing = await UserModel.findByEmail(email);
     if (existing) {
-      req.flash('error', {
-        title: 'Email đã tồn tại',
-        message: 'Email này đã được đăng ký. Bạn có thể đăng nhập hoặc dùng email khác.',
-        icon: 'warning',
-        action: { label: 'Đăng nhập', href: '/login' }
-      });
+      req.flash('error', 'Email này đã được đăng ký. Bạn có thể đăng nhập hoặc dùng email khác.');
       return res.redirect('/register');
     }
 
