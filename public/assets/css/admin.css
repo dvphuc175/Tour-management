@@ -243,9 +243,23 @@
 .data-table--reviews {
     table-layout: fixed;
 }
-.data-table--users { min-width: 1300px; }
-.data-table--bookings { min-width: 1280px; }
+.data-table--users,
+.data-table--bookings {
+    min-width: 100%;
+    font-size: 13px;
+}
 .data-table--reviews { min-width: 1120px; }
+.data-table--users th,
+.data-table--users td,
+.data-table--bookings th,
+.data-table--bookings td {
+    padding: 10px 8px;
+}
+.data-table--users th,
+.data-table--bookings th {
+    font-size: 11px;
+    letter-spacing: .04em;
+}
 .data-table th { 
     background: var(--color-bg-soft); 
     padding: 10px 14px; 
@@ -301,40 +315,40 @@
 .cell-lg { --cell-max: 280px; }
 .cell-xl { --cell-max: 360px; }
 .data-table--users th:nth-child(1),
-.data-table--users td:nth-child(1) { width: 64px; }
+.data-table--users td:nth-child(1) { width: 4%; }
 .data-table--users th:nth-child(2),
-.data-table--users td:nth-child(2) { width: 180px; }
+.data-table--users td:nth-child(2) { width: 14%; }
 .data-table--users th:nth-child(3),
-.data-table--users td:nth-child(3) { width: 260px; }
+.data-table--users td:nth-child(3) { width: 22%; }
 .data-table--users th:nth-child(4),
-.data-table--users td:nth-child(4) { width: 130px; }
+.data-table--users td:nth-child(4) { width: 9%; }
 .data-table--users th:nth-child(5),
-.data-table--users td:nth-child(5) { width: 130px; }
+.data-table--users td:nth-child(5) { width: 9%; }
 .data-table--users th:nth-child(6),
-.data-table--users td:nth-child(6) { width: 130px; }
+.data-table--users td:nth-child(6) { width: 9%; }
 .data-table--users th:nth-child(7),
-.data-table--users td:nth-child(7) { width: 140px; }
+.data-table--users td:nth-child(7) { width: 10%; }
 .data-table--users th:nth-child(8),
-.data-table--users td:nth-child(8) { width: 260px; }
+.data-table--users td:nth-child(8) { width: 23%; }
 
 .data-table--bookings th:nth-child(1),
-.data-table--bookings td:nth-child(1) { width: 64px; }
+.data-table--bookings td:nth-child(1) { width: 4%; }
 .data-table--bookings th:nth-child(2),
-.data-table--bookings td:nth-child(2) { width: 220px; }
+.data-table--bookings td:nth-child(2) { width: 17%; }
 .data-table--bookings th:nth-child(3),
-.data-table--bookings td:nth-child(3) { width: 260px; }
+.data-table--bookings td:nth-child(3) { width: 20%; }
 .data-table--bookings th:nth-child(4),
-.data-table--bookings td:nth-child(4) { width: 120px; }
+.data-table--bookings td:nth-child(4) { width: 9%; }
 .data-table--bookings th:nth-child(5),
-.data-table--bookings td:nth-child(5) { width: 130px; }
+.data-table--bookings td:nth-child(5) { width: 10%; }
 .data-table--bookings th:nth-child(6),
-.data-table--bookings td:nth-child(6) { width: 150px; }
+.data-table--bookings td:nth-child(6) { width: 12%; }
 .data-table--bookings th:nth-child(7),
-.data-table--bookings td:nth-child(7) { width: 90px; }
+.data-table--bookings td:nth-child(7) { width: 7%; }
 .data-table--bookings th:nth-child(8),
-.data-table--bookings td:nth-child(8) { width: 130px; }
+.data-table--bookings td:nth-child(8) { width: 10%; }
 .data-table--bookings th:nth-child(9),
-.data-table--bookings td:nth-child(9) { width: 110px; }
+.data-table--bookings td:nth-child(9) { width: 11%; }
 
 .data-table--reviews th:nth-child(1),
 .data-table--reviews td:nth-child(1) { width: 270px; }
@@ -398,6 +412,12 @@
 .badge--refunded {
     background: var(--color-refunded-bg);
     color: var(--color-refunded-text);
+}
+.data-table--users .badge,
+.data-table--bookings .badge {
+    padding: 4px 8px;
+    font-size: 11px;
+    white-space: nowrap;
 }
 /* ── Page actions bar ───────────────────── */
 .page-actions {
@@ -1363,7 +1383,7 @@ button.btn[disabled] {
 }
 .user-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   flex-wrap: nowrap;
   white-space: nowrap;
@@ -1373,11 +1393,19 @@ button.btn[disabled] {
 }
 .role-form {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   align-items: center;
   flex: 0 0 auto;
 }
 .form-control--compact { padding: 4px 6px; }
+.data-table--users .form-control--compact {
+  max-width: 100px;
+  padding: 5px 6px;
+}
+.data-table--users .btn--sm,
+.data-table--bookings .btn--sm {
+  padding: 7px 10px;
+}
 .badge--lg-pad { padding: 8px 14px; }
 .pagination--admin {
   margin-top: 24px;
