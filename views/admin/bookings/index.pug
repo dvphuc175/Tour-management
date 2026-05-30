@@ -3,7 +3,7 @@ include ../_pagination
 
 block content
   .toolbar
-    form.filter-form(method="GET" action="/admin/bookings")
+    form.filter-form.filter-form--inline(method="GET" action="/admin/bookings")
       input.form-control.form-control--sm.filter-search(
         type="search"
         name="q"
@@ -35,7 +35,7 @@ block content
           |  Xóa lọc
 
   .table-wrap
-    table.data-table
+    table.data-table.data-table--bookings
       thead
         tr
           th #
@@ -55,9 +55,11 @@ block content
           tr
             td= b.id
             td
-              div= b.user_name
-              small= b.user_email
-            td= b.tour_name
+              .cell-stack.cell-md
+                span.cell-truncate(title=b.user_name)= b.user_name
+                small.cell-truncate.cell-muted(title=b.user_email)= b.user_email
+            td
+              span.cell-truncate.cell-xl(title=b.tour_name)= b.tour_name
             td= formatDate(b.start_date)
             td= formatPrice(b.total_price)
             //- td

@@ -3,7 +3,7 @@ include ../_pagination
 
 block content
   .toolbar
-    form.filter-form(method="GET" action="/admin/reviews")
+    form.filter-form.filter-form--inline(method="GET" action="/admin/reviews")
       input.form-control.form-control--sm.filter-search(
         type="search"
         name="q"
@@ -26,7 +26,7 @@ block content
           |  Xóa lọc
 
   .table-wrap
-    table.data-table
+    table.data-table.data-table--reviews
       thead
         tr
           th Tour
@@ -41,10 +41,13 @@ block content
             td.table-empty(colspan="6")= hasFilters ? 'Không tìm thấy đánh giá phù hợp' : 'Chưa có đánh giá nào'
         each rv in reviews
           tr
-            td= rv.tour_name
-            td= rv.user_name
+            td
+              span.cell-truncate.cell-xl(title=rv.tour_name)= rv.tour_name
+            td
+              span.cell-truncate.cell-md(title=rv.user_name)= rv.user_name
             td.stars-display!= renderStarRating(rv.rating)
-            td.review-comment= rv.comment || '—'
+            td.review-comment(title=rv.comment || '')
+              span.cell-clamp-2.cell-xl= rv.comment || '—'
             td= formatDate(rv.created_at)
             td
               form.form--inline(

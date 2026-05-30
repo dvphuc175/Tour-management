@@ -3,7 +3,7 @@ include ../_pagination
 
 block content
   .toolbar
-    form.filter-form(method="GET" action="/admin/users")
+    form.filter-form.filter-form--inline(method="GET" action="/admin/users")
       input.form-control.form-control--sm.filter-search(
         type="search"
         name="q"
@@ -28,7 +28,7 @@ block content
           |  Xóa lọc
 
   .table-wrap
-    table.data-table
+    table.data-table.data-table--users
       thead
         tr
           th ID
@@ -47,9 +47,12 @@ block content
           - var isSelf = user && user.id === u.id
           tr(class=u.status === 'locked' ? 'row--locked' : '')
             td= u.id
-            td: strong= u.fullname
-            td= u.email
-            td= u.phone || '—'
+            td
+              strong.cell-truncate.cell-md(title=u.fullname)= u.fullname
+            td
+              span.cell-truncate.cell-lg(title=u.email)= u.email
+            td
+              span.cell-truncate.cell-sm(title=u.phone || '')= u.phone || '—'
             td
               - var roleBadge = u.role === 'admin' ? 'badge--confirmed' : (u.role === 'staff' ? 'badge--pending' : 'badge--active')
               - var roleLabel = u.role === 'admin' ? 'Admin' : (u.role === 'staff' ? 'Nhân viên' : 'Khách hàng')
@@ -86,7 +89,7 @@ block content
                       input(type="hidden" name="returnTo" value=returnTo)
                       button(
                         type="submit"
-                        class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--active'}`
+                        class=`btn btn--sm ${u.status === 'active' ? 'btn--danger' : 'btn--success'}`
                       )= u.status === 'active' ? 'Khóa' : 'Mở khóa'
 
   +pagination(currentPage, totalPages, paginationBaseUrl)
