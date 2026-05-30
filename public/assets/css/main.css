@@ -1427,6 +1427,20 @@
   background: var(--color-primary-dk);
   border-color: var(--color-primary-dk);
 }
+
+.btn--secondary-cta {
+  background: var(--gradient-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.22);
+}
+
+.btn--secondary-cta:hover {
+  background: var(--color-accent-dk);
+  border-color: var(--color-accent-dk);
+  color: var(--color-white);
+}
+
 .btn--sm {
   padding: 8px 24px;
   font-size: 13px;
@@ -3476,6 +3490,10 @@
   display: none;
 }
 
+.filter-toggle, .filter-sidebar__close, .filter-backdrop {
+  display: none;
+}
+
 .navbar__dropdown {
   position: relative;
   display: inline-block;
@@ -4418,6 +4436,9 @@
   gap: 16px;
   background: var(--color-bg-soft);
   transition: all var(--transition);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .review-item__avatar {
@@ -4441,10 +4462,16 @@
   color: var(--color-text);
   line-height: 1.6;
   margin-top: 6px;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .review-item__content {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .review-item__date {
@@ -4459,6 +4486,7 @@
   flex-wrap: wrap;
   gap: 8px 12px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
 .review-item__stars {
@@ -8155,6 +8183,7 @@ p:last-child, .flash p:last-child, .flash__item:last-child, .section-header .sec
   }
 
   #homeTourGrid {
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
   }
 
