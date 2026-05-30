@@ -272,31 +272,42 @@ function initItineraryAccordion() {
 }
 
 // Wrap itinerary content into accordion structure
+// Expected HTML: <h3> section title, then <h4> per day + content (ul, p, ...)
 function wrapItineraryDays(container) {
 	const children = Array.from(container.children);
+	const hasDayHeaders = children.some(child => child.tagName === 'H4');
+
+	// No day headers — keep original markup (e.g. plain list under h3)
+	if (!hasDayHeaders) return;
+
+	let sectionTitle = null;
 	let currentDay = null;
 	let dayContent = [];
 
-	// Clear container
 	container.innerHTML = '';
 
 	children.forEach(child => {
-		if (child.tagName === 'H3') {
-			// Save previous day if exists
-			if (currentDay && dayContent.length) {
+		const tag = child.tagName;
+
+		if (tag === 'H3' && !sectionTitle && currentDay === null) {
+			sectionTitle = child;
+		} else if (tag === 'H4' || (tag === 'H3' && sectionTitle)) {
+			if (currentDay !== null) {
 				appendDayToContainer(container, currentDay, dayContent);
 			}
-			// Start new day
-			currentDay = child.textContent;
+			currentDay = child.textContent.trim();
 			dayContent = [];
-		} else if (currentDay) {
+		} else if (currentDay !== null) {
 			dayContent.push(child);
 		}
 	});
 
-	// Don't forget the last day
-	if (currentDay && dayContent.length) {
+	if (currentDay !== null) {
 		appendDayToContainer(container, currentDay, dayContent);
+	}
+
+	if (sectionTitle) {
+		container.insertBefore(sectionTitle, container.firstChild);
 	}
 }
 

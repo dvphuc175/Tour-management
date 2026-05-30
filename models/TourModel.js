@@ -286,7 +286,7 @@ async function countPublic({
 
 
 // Public: lấy tour nổi bật cho trang chủ (sắp xếp theo đánh giá và số đơn đặt)
-async function getFeatured(limit = 6) {
+async function getFeatured(limit = 6, offset = 0) {
   const sql = `
     SELECT
       t.id,
@@ -327,7 +327,7 @@ async function getFeatured(limit = 6) {
       COALESCE(rv_stats.avg_rating, 0) DESC,
       COALESCE(bk_stats.booking_count, 0) DESC,
       t.created_at DESC
-    LIMIT ${Number(limit)}
+    LIMIT ${Number(limit)} OFFSET ${Number(offset)}
   `;
 
   const rows = await query(sql);
