@@ -30,7 +30,7 @@ const BookingController = {
         return res.redirect('/tours');
       }
       
-      if (schedule.status !== 'active' || schedule.available_slots === 0) {
+      if (schedule.status !== 'active' || schedule.available_slots <= 0) {
         req.flash('error', {
           title: 'Lịch trình không khả dụng',
           message: 'Lịch trình này không còn chỗ hoặc đã bị hủy. Vui lòng chọn ngày khởi hành khác.',

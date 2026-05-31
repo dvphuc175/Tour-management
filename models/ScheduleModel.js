@@ -95,7 +95,10 @@ const ScheduleModel = {
     return query(
       `SELECT *
       FROM TOUR_SCHEDULES
-      WHERE tour_id = ? AND status = 'active' AND start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+      WHERE tour_id = ?
+        AND status = 'active'
+        AND available_slots > 0
+        AND start_date >= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
       ORDER BY start_date ASC`,
       [tourId] ); },
   async checkDuplicate(tour_id, departure_location, start_date, end_date, excludeId = null) {
