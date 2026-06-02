@@ -1,4 +1,8 @@
 const { query, getConnection } = require('../config/db');
+const {
+  BOOKING_LEAD_TIME_MESSAGE,
+  isBookableStartDate
+} = require('../utils/bookingPolicy');
 
 const BookingModel = {
   /**
@@ -27,9 +31,9 @@ const BookingModel = {
 
       // 1. Lock schedule
       const [rows] = await conn.execute(
-        `SELECT id, available_slots, status
+        `SELECT id, available_slots, status, start_date
          FROM TOUR_SCHEDULES
-         WHERE id = ? AND status = 'active'
+         WHERE id = ?
          FOR UPDATE`,
         [schedule_id]
       );
@@ -37,7 +41,15 @@ const BookingModel = {
       const schedule = rows[0];
 
       if (!schedule) {
+        throw new Error('Lịch trình không tồn tại');
+      }
+
+      if (schedule.status !== 'active') {
         throw new Error('Lịch trình không tồn tại hoặc đã bị hủy');
+      }
+
+      if (!isBookableStartDate(schedule.start_date)) {
+        throw new Error(BOOKING_LEAD_TIME_MESSAGE);
       }
 
       if (schedule.available_slots < neededSlots) {

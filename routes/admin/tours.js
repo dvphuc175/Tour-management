@@ -27,7 +27,7 @@ const uploadMiddleware = (req, res, next) => {
             } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
                 req.flash('error', 'Chỉ được upload tối đa 10 ảnh cùng một lúc!');
             } else {
-                req.flash('error', 'Đã xảy ra lỗi khi upload ảnh: ' + err.message);
+                req.flash('error', 'Đã xảy ra lỗi khi upload ảnh. Vui lòng thử lại.');
             }
             return req.session.save(() => {
                 res.redirect('/admin/tours/create');

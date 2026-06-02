@@ -17,7 +17,7 @@ const AuthController = {
       if (!user) {
         req.flash('error', {
           title: 'Đăng nhập thất bại',
-          message: 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.',
+          message: 'Email hoặc mật khẩu không đúng.',
           icon: 'warning'
         });
         return res.redirect('/login');
@@ -26,9 +26,8 @@ const AuthController = {
       if (user.status === 'locked') {
         req.flash('error', {
           title: 'Tài khoản đã bị khóa',
-          message: 'Vui lòng liên hệ bộ phận hỗ trợ để được kiểm tra và mở lại tài khoản.',
-          icon: 'warning',
-          action: { label: 'Liên hệ hỗ trợ', href: '/#contact' }
+          message: 'Vui lòng liên hệ bộ phận hỗ trợ để được kiểm tra.',
+          icon: 'warning'
         });
         return res.redirect('/login');
       }
@@ -37,7 +36,7 @@ const AuthController = {
       if (!match) {
         req.flash('error', {
           title: 'Đăng nhập thất bại',
-          message: 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.',
+          message: 'Email hoặc mật khẩu không đúng.',
           icon: 'warning'
         });
         return res.redirect('/login');
@@ -72,7 +71,7 @@ const AuthController = {
 
     } catch (err) {
       console.error(err);
-      res.status(500).render('error', { message: err.message });
+      res.status(500).render('error', { message: 'Lỗi máy chủ, vui lòng thử lại sau.' });
     }
   },
 
@@ -91,7 +90,7 @@ const AuthController = {
   const messages = error.details.map(e => e.message);
   req.flash('error', {
     title: 'Đăng ký chưa hoàn tất',
-    message: 'Vui lòng kiểm tra lại các thông tin bên dưới.',
+    message: 'Vui lòng kiểm tra lại thông tin đăng ký.',
     icon: 'warning',
     details: messages
   });
@@ -129,7 +128,7 @@ const AuthController = {
 
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', { message: err.message });
+    res.status(500).render('error', { message: 'Lỗi máy chủ, vui lòng thử lại sau.' });
   }
 },
 

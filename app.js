@@ -37,9 +37,7 @@ function normalizeFlashMessage(type, value) {
       title: value.title || defaults.title,
       message: String(fallbackMessage),
       details: normalizeDetails(value.details),
-      icon: value.icon || defaults.icon,
-      action: value.action || null,
-      actions: Array.isArray(value.actions) ? value.actions : []
+      icon: value.icon || defaults.icon
     };
   }
 
@@ -48,9 +46,7 @@ function normalizeFlashMessage(type, value) {
     title: '',
     message: String(value || ''),
     details: [],
-    icon: defaults.icon,
-    action: null,
-    actions: []
+    icon: defaults.icon
   };
 }
 
@@ -222,7 +218,8 @@ app.use((req, res) => {
 });
 //Error handler
 app.use((err, req, res, next) => { 
-  console.error(err.stack); res.status(500).render('error', { message: err.message }); 
+  console.error(err.stack);
+  res.status(500).render('error', { message: 'Lỗi máy chủ, vui lòng thử lại sau.' });
 });
 
 const PORT = process.env.PORT || 3000; 

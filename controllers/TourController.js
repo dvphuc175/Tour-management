@@ -188,7 +188,7 @@ const TourController = {
               const publicId = url.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
               await cloudinary.uploader.destroy(publicId).catch(() => {});
           }
-          req.flash('error', `Tổng số ảnh không được vượt quá 10 ảnh! (Hiện đang là ${keepImages.length + newImages.length})`);
+          req.flash('error', `Tổng số ảnh không được vượt quá 10 ảnh. Hiện đang có ${keepImages.length + newImages.length} ảnh.`);
           return res.redirect(`/admin/tours/${id}/edit`);
       }
 

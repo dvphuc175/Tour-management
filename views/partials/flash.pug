@@ -4,11 +4,6 @@ if flashMessages && flashMessages.length
       -
         const type = item.type || 'info';
         const icon = item.icon || 'info';
-        const actions = [];
-        if (item.action && item.action.href && item.action.label) actions.push(item.action);
-        if (item.actions && item.actions.length) {
-          actions.push(...item.actions.filter((action) => action && action.href && action.label));
-        }
       .flash__item(class=`flash--${type}`)
         .flash__icon
           +fa(icon)
@@ -20,9 +15,5 @@ if flashMessages && flashMessages.length
           if item.details && item.details.length
             each detail in item.details
               div= `- ${detail}`
-          if actions.length
-            each action in actions
-              div
-                a(href=action.href)= action.label
         button.flash__close(type="button" aria-label="Đóng")
           +fa('xmark')

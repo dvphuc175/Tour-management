@@ -164,7 +164,7 @@ const ScheduleController = {
       const newAvailableSlots = newTotalSlots - bookedSlots;
       
       if (newAvailableSlots < 0) {
-        req.flash('error', `Lỗi: Đã có ${bookedSlots} khách đặt vé. Không thể giảm tổng số chỗ xuống ${newTotalSlots}.`);
+        req.flash('error', `Đã có ${bookedSlots} khách đặt vé. Không thể giảm tổng số chỗ xuống ${newTotalSlots}.`);
         return res.redirect(`/admin/schedules/${id}/edit`);
       }
 
