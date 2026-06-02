@@ -45,7 +45,7 @@ function normalizeFlashMessage(type, value) {
 
   return {
     type,
-    title: defaults.title,
+    title: '',
     message: String(value || ''),
     details: [],
     icon: defaults.icon,

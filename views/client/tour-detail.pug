@@ -277,7 +277,7 @@ block content
         if schedules.length === 0
           h3.booking-box__title Lịch trình khởi hành
           p.booking-box__empty Hiện chưa có lịch trình khả dụng.
-          a.btn.btn--outline.btn--block.btn--check(href="/tours") Xem tour khác
+          a.btn.btn--secondary-cta.btn--block(href="/tours") Xem tour khác
         else
           - const nearestSchedule = schedules[0]
           - const upcomingDates = schedules.slice(0, 4)
@@ -326,7 +326,7 @@ block content
       .mobile-booking-bar__price
         span Lịch trình
         strong Chưa có ngày đi
-      a.btn.btn--outline.btn--sm.btn--out(href="/tours") Xem tour khác
+      a.btn.btn--secondary-cta.btn--sm(href="/tours") Xem tour khác
     else
       - const mobileSchedule = schedules[0]
       .mobile-booking-bar__price
