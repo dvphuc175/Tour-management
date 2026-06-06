@@ -1245,7 +1245,15 @@
   background: var(--color-success-dark);
   color: var(--color-white);
 }
-
+.btn--contact{
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+}
+.btn--contact:hover {
+  background: var(--color-primary-dk);
+  color: var(--color-white);
+}
 .booking-success-modern .success-card, .booking-success-modern .success-note-card {
   min-width: 0;
   height: 100%;
@@ -1383,6 +1391,15 @@
   padding: 12px;
   font-size: 15px;
 }
+.btn--eraser{
+  background: transparent;
+  color: var(--color-white);
+  background: var(--color-danger-soft);
+}
+.btn--eraser:hover {
+  background: var(--color-danger-dk);
+  color: var(--color-white);
+}
 
 .btn--danger {
   background: var(--color-danger-soft);
@@ -1447,15 +1464,13 @@
 }
 
 .btn--secondary-cta {
-  background: var(--gradient-accent);
+  background: var(--color-accent);
   color: var(--color-white);
-  border-color: var(--color-accent);
-  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.22);
+  
 }
 
 .btn--secondary-cta:hover {
   background: var(--color-accent-dk);
-  border-color: var(--color-accent-dk);
   color: var(--color-white);
 }
 
@@ -1639,10 +1654,11 @@
 
 .contact-admin-info {
   display: none;
-  margin-top: 16px;
   animation: fadeIn 0.3s ease;
 }
-
+.contact-admin-info .contact-info__item{
+  margin-bottom: 16px;
+}
 .contact-admin-info.show, .modal--policy.is-open, #zalo-chat-window.is-open, .tab-content.active {
   display: block;
 }
@@ -1719,7 +1735,6 @@
   gap: 16px;
   align-items: center;
   padding: 24px;
-  margin-bottom: 20px;
   background: var(--color-white);
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
@@ -2064,7 +2079,7 @@
   color: var(--color-text);
 }
 
-.experience-card:hover, .stat-card:hover {
+.experience-card:hover, .stat-card:hover, .journey-step:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-card);
   border-color: var(--color-primary);
