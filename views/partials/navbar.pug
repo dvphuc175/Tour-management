@@ -39,10 +39,10 @@ nav.navbar
                 a.navbar__dropdown-item(href="/my-bookings")
                   +fa('ticket')
                   |  Đơn của tôi
-              if user.role === 'admin'
+              if user.role === 'admin' || user.role === 'staff'
                 a.navbar__dropdown-item(href="/admin")
                   +fa('gear')
-                  |  Quản trị
+                  |  Quản lý
               .navbar__dropdown-divider
               form.form--inline(action="/logout?_method=DELETE" method="POST")
                 input(type="hidden" name="_csrf" value=csrfToken)
