@@ -38,8 +38,7 @@ const ReviewController = {
         req.flash('error', {
           title: 'Chưa thể đánh giá tour',
           message: 'Bạn cần hoàn thành tour trước khi gửi đánh giá.',
-          icon: 'warning',
-          action: { label: 'Xem đơn của tôi', href: '/my-bookings' }
+          icon: 'warning'
         });
         return redirectBack(req, res);
       }

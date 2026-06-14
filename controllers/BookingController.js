@@ -4,6 +4,10 @@ const TourModel = require('../models/TourModel');
 const { bookingSchema } = require('../validators/bookingSchema');
 const EmailService = require('../services/emailService');
 const bookingStatus = require('../utils/bookingStatus');
+const {
+  BOOKING_LEAD_TIME_MESSAGE,
+  isBookableStartDate
+} = require('../utils/bookingPolicy');
 const BookingController = {
 
   //GET/booking/:scheduleId
@@ -17,9 +21,8 @@ const BookingController = {
       if (!schedule) {
         req.flash('error', {
           title: 'Không tìm thấy lịch trình',
-          message: 'Lịch trình bạn chọn không còn tồn tại. Vui lòng chọn một lịch trình khác.',
-          icon: 'warning',
-          action: { label: 'Xem tour', href: '/tours' }
+          message: 'Lịch trình bạn chọn không còn tồn tại.',
+          icon: 'warning'
         });
         return res.redirect('/tours');
       }
@@ -33,10 +36,19 @@ const BookingController = {
       if (schedule.status !== 'active' || schedule.available_slots <= 0) {
         req.flash('error', {
           title: 'Lịch trình không khả dụng',
-          message: 'Lịch trình này không còn chỗ hoặc đã bị hủy. Vui lòng chọn ngày khởi hành khác.',
+          message: 'Lịch trình này không còn chỗ hoặc đã bị hủy.',
           icon: 'warning'
         });
         return res.redirect(tour ? `/tours/${tour.slug}` : '/tours');
+      }
+
+      if (!isBookableStartDate(schedule.start_date)) {
+        req.flash('error', {
+          title: 'Ngày khởi hành quá gần',
+          message: BOOKING_LEAD_TIME_MESSAGE,
+          icon: 'warning'
+        });
+        return res.redirect(`/tours/${tour.slug}`);
       }
 
       return res.render('client/booking-form', {
@@ -78,31 +90,34 @@ const BookingController = {
       if (!schedule) {
         req.flash('error', {
           title: 'Không tìm thấy lịch trình',
-          message: 'Lịch trình bạn chọn không còn tồn tại. Vui lòng chọn một lịch trình khác.',
-          icon: 'warning',
-          action: { label: 'Xem tour', href: '/tours' }
-        });
-        return res.redirect('/tours');
-      }
-
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const startDate = new Date(schedule.start_date);
-      const diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
-
-      if (diffDays < 3) {
-        req.flash('error', {
-          title: 'Ngày khởi hành quá gần',
-          message: 'Vui lòng chọn lịch trình khác cách ngày khởi hành ít nhất 3 ngày.',
+          message: 'Lịch trình bạn chọn không còn tồn tại.',
           icon: 'warning'
         });
-        return res.redirect(`/tours/${schedule.tour_slug || 'tours'}`);
+        return res.redirect('/tours');
       }
 
       const tour = await TourModel.findById(schedule.tour_id);
       if (!tour) {
         req.flash('error', 'Không tìm thấy tour');
         return res.redirect('/tours');
+      }
+
+      if (schedule.status !== 'active' || schedule.available_slots <= 0) {
+        req.flash('error', {
+          title: 'Lịch trình không khả dụng',
+          message: 'Lịch trình này không còn chỗ hoặc đã bị hủy.',
+          icon: 'warning'
+        });
+        return res.redirect(`/tours/${tour.slug}`);
+      }
+
+      if (!isBookableStartDate(schedule.start_date)) {
+        req.flash('error', {
+          title: 'Ngày khởi hành quá gần',
+          message: BOOKING_LEAD_TIME_MESSAGE,
+          icon: 'warning'
+        });
+        return res.redirect(`/tours/${tour.slug}`);
       }
 
       const total_price = adults * tour.price_adult + children * tour.price_child;
@@ -127,19 +142,22 @@ const BookingController = {
         req.flash('success', {
           title: 'Đặt tour thành công',
           message: `Đơn #${bookingId} đã được ghi nhận. Vui lòng chờ nhân viên xác nhận thanh toán tiền mặt.`,
-          icon: 'receipt',
-          actions: [
-            { label: 'Xem đơn đặt', href: `/my-bookings/${bookingId}` },
-            { label: 'Đơn của tôi', href: '/my-bookings' }
-          ]
+          icon: 'receipt'
         });
         return res.redirect(`/booking/success/${bookingId}`);
       }
 
     } catch (err) {
+      const publicMessage =
+        err.message === 'Lịch trình không tồn tại' ||
+        err.message === 'Lịch trình không tồn tại hoặc đã bị hủy' ||
+        err.message === BOOKING_LEAD_TIME_MESSAGE ||
+        (err.message && err.message.startsWith('Không đủ chỗ'))
+          ? err.message
+          : 'Không thể tạo đơn đặt tour lúc này. Vui lòng thử lại sau.';
       req.flash('error', {
         title: 'Không thể tạo đơn đặt tour',
-        message: err.message,
+        message: publicMessage,
         icon: 'warning'
       });
       const backUrl = req.body.schedule_id ? `/booking/${req.body.schedule_id}` : '/tours';
@@ -266,15 +284,17 @@ const BookingController = {
         req.flash('success', {
           title: 'Đã hủy đơn đặt',
           message: `Đơn #${bookingId} đã được hủy và số chỗ đã được hoàn lại cho lịch trình.`,
-          icon: 'check',
-          action: { label: 'Xem đơn của tôi', href: '/my-bookings' }
+          icon: 'check'
         });
       }
 
     } catch (err) {
+      const publicMessage = ['Không tìm thấy đơn đặt', 'Chỉ được hủy đơn đang chờ'].includes(err.message)
+        ? err.message
+        : 'Không thể hủy đơn lúc này. Vui lòng thử lại sau.';
       req.flash('error', {
         title: 'Không thể hủy đơn',
-        message: err.message || 'Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu lỗi vẫn tiếp diễn.',
+        message: publicMessage,
         icon: 'warning'
       });
     }

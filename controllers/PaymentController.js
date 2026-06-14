@@ -183,8 +183,7 @@ const PaymentController = {
         req.flash('info', {
           title: 'Đơn đã được thanh toán',
           message: `Đơn #${booking.id} đã ghi nhận thanh toán thành công trước đó.`,
-          icon: 'info',
-          action: { label: 'Xem chi tiết đơn', href: `/my-bookings/${booking.id}` }
+          icon: 'info'
         });
         return res.redirect(`/my-bookings/${booking.id}`);
       }
@@ -193,8 +192,7 @@ const PaymentController = {
         req.flash('error', {
           title: 'Không thể thanh toán đơn này',
           message: 'Đơn hiện không ở trạng thái phù hợp để thanh toán VNPay.',
-          icon: 'warning',
-          action: { label: 'Xem chi tiết đơn', href: `/my-bookings/${booking.id}` }
+          icon: 'warning'
         });
         return res.redirect(`/my-bookings/${booking.id}`);
       }
