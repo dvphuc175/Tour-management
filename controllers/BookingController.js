@@ -4,6 +4,15 @@ const TourModel = require('../models/TourModel');
 const { bookingSchema } = require('../validators/bookingSchema');
 const EmailService = require('../services/emailService');
 const bookingStatus = require('../utils/bookingStatus');
+
+function wantsJson(req) {
+  return (
+    req.get('X-Requested-With') === 'XMLHttpRequest' ||
+    (req.headers.accept && req.headers.accept.includes('application/json')) ||
+    req.query._format === 'json'
+  );
+}
+
 const BookingController = {
 
   //GET/booking/:scheduleId
@@ -187,7 +196,12 @@ const BookingController = {
         return bookingStatus.decorateBooking(b);
       });
 
-      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      if (wantsJson(req)) {
+        // Set headers to prevent caching and vary on Accept
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Vary', 'Accept');
         return res.json({
           bookings: parsedBookings,
           currentPage: page,

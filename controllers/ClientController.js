@@ -19,7 +19,8 @@ const HIGHLIGHT_CATEGORY_IMAGES = {
 function wantsJson(req) {
   return (
     req.get('X-Requested-With') === 'XMLHttpRequest' ||
-    (req.headers.accept && req.headers.accept.includes('application/json'))
+    (req.headers.accept && req.headers.accept.includes('application/json')) ||
+    req.query._format === 'json'
   );
 }
 
@@ -51,6 +52,11 @@ const ClientController = {
       }).filter(Boolean);
 
       if (wantsJson(req)) {
+        // Set headers to prevent caching and vary on Accept
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Vary', 'Accept');
         return res.json({
           tours,
           totalTours: total,
@@ -179,7 +185,12 @@ const ClientController = {
       };
 
       // Check if request is AJAX
-      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      if (wantsJson(req)) {
+        // Set headers to prevent caching and vary on Accept
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Vary', 'Accept');
         return res.json({
           tours,
           totalTours: total,
@@ -247,7 +258,12 @@ const ClientController = {
       }
 
       // Check if request is for reviews JSON only
-      if (req.headers.accept && req.headers.accept.includes('application/json') && req.query.review_page) {
+      if (wantsJson(req) && req.query.review_page) {
+        // Set headers to prevent caching and vary on Accept
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Vary', 'Accept');
         return res.json({
           reviews,
           reviewPage,
