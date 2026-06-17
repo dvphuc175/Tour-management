@@ -503,7 +503,11 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
   async function loadPage(url) {
     try {
-      const response = await fetch(url, {
+      // Add _format=json parameter to distinguish AJAX requests
+      const apiUrl = new URL(url, window.location.origin);
+      apiUrl.searchParams.set('_format', 'json');
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Accept': 'application/json'
         }
@@ -545,7 +549,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
         }
       }
       
-      // Update URL without reload
+      // Update URL without reload (without the _format parameter)
       history.pushState(null, '', url);
       window.applyGlobalAOS?.();
       
@@ -739,6 +743,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
       if (!apiUrl.searchParams.get('page')) {
         apiUrl.searchParams.set('page', '1');
       }
+      apiUrl.searchParams.set('_format', 'json');
 
       const response = await fetch(`${apiUrl.pathname}${apiUrl.search}`, {
         headers: {
@@ -906,7 +911,11 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
   async function loadMyBookingsPage(url) {
     try {
-      const response = await fetch(url, {
+      // Add _format=json parameter to distinguish AJAX requests
+      const apiUrl = new URL(url, window.location.origin);
+      apiUrl.searchParams.set('_format', 'json');
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Accept': 'application/json'
         }
@@ -1033,7 +1042,11 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
 
   async function loadReviewsPage(url) {
     try {
-      const response = await fetch(url, {
+      // Add _format=json parameter to distinguish AJAX requests
+      const apiUrl = new URL(url, window.location.origin);
+      apiUrl.searchParams.set('_format', 'json');
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Accept': 'application/json'
         }
